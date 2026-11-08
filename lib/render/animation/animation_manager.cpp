@@ -3,6 +3,7 @@
 #include "render/animation/motion_service.h"
 
 #include <chrono>
+#include <cmath>
 
 namespace {
   constexpr float kReducedMotionDurationMs = 1.0F;
@@ -159,3 +160,133 @@ void AnimationManager::tick(float /*deltaMs*/) {
 }
 
 bool AnimationManager::hasActive() const { return !m_animations.empty(); }
+
+AnimationManager::Id AnimationManager::animateSpring(
+    float initial, float target, SpringSpec spec, std::function<void(float)> setter, const void* owner,
+    float eps_x, float eps_v
+) {
+  const Id id = m_nextId++;
+  m_springs.emplace(
+      id, SpringState{
+              initial, 0.0F, initial, 0.0F, target, spec.dampingRatio, spec.stiffness, 0.0F,
+              eps_x, eps_v, std::move(setter), owner, false,
+          }
+  );
+  return id;
+}
+
+bool AnimationManager::retargetSpring(Id id, float target) {
+  if (id == 0) {
+    return false;
+  }
+  const auto it = m_springs.find(id);
+  if (it == m_springs.end()) {
+    return false;
+  }
+
+  auto& state = it->second;
+  state.x0 = state.x;
+  state.v0 = state.v;
+  state.elapsed = 0.0F;
+  state.target = target;
+  state.finished = false;
+  return true;
+}
+
+void AnimationManager::tickSprings(float dt) {
+  constexpr float kZetaEps = 1e-4F;
+
+  if (dt > 0.032F) {
+    dt = 0.032F;
+  }
+
+  // Snapshot IDs: setter callbacks may call animateSpring() and rehash
+  // m_springs, invalidating any iterator held across the callback.
+  std::vector<Id> ids;
+  ids.reserve(m_springs.size());
+  for (const auto& entry : m_springs) {
+    ids.push_back(entry.first);
+  }
+
+  for (Id id : ids) {
+    const auto it = m_springs.find(id);
+    if (it == m_springs.end()) {
+      continue;
+    }
+    auto& state = it->second;
+    if (state.finished) {
+      continue;
+    }
+
+    state.elapsed += dt;
+
+    const float w0 = std::sqrt(state.stiffness);
+    const float d0 = state.x0 - state.target;
+    const float zeta = state.dampingRatio;
+    const float t = state.elapsed;
+
+    float d = 0.0F;
+    float v = 0.0F;
+
+    if (zeta < 1.0F - kZetaEps) {
+      const float wd = w0 * std::sqrt(1.0F - zeta * zeta);
+      const float a = zeta * w0;
+      const float b = (state.v0 + a * d0) / wd;
+      const float decay = std::exp(-a * t);
+      const float cosWd = std::cos(wd * t);
+      const float sinWd = std::sin(wd * t);
+      d = decay * (d0 * cosWd + b * sinWd);
+      v = decay * ((-a * d0 + b * wd) * cosWd + (-a * b - d0 * wd) * sinWd);
+    } else if (zeta > 1.0F + kZetaEps) {
+      const float root = std::sqrt(zeta * zeta - 1.0F);
+      const float r1 = w0 * (-zeta + root);
+      const float r2 = w0 * (-zeta - root);
+      const float c1 = (state.v0 - r2 * d0) / (r1 - r2);
+      const float c2 = (r1 * d0 - state.v0) / (r1 - r2);
+      const float e1 = std::exp(r1 * t);
+      const float e2 = std::exp(r2 * t);
+      d = c1 * e1 + c2 * e2;
+      v = c1 * r1 * e1 + c2 * r2 * e2;
+    } else {
+      const float decay = std::exp(-w0 * t);
+      const float k = state.v0 + w0 * d0;
+      d = decay * (d0 + k * t);
+      v = decay * (state.v0 - w0 * k * t);
+    }
+
+    state.x = state.target + d;
+    state.v = v;
+
+    if (std::abs(state.x - state.target) < state.eps_x && std::abs(state.v) < state.eps_v) {
+      state.x = state.target;
+      state.v = 0.0F;
+      if (state.setter) {
+        state.setter(state.target);
+      }
+      state.finished = true;
+    } else if (state.setter) {
+      state.setter(state.x);
+    }
+  }
+}
+
+bool AnimationManager::hasActiveSprings() const {
+  for (const auto& [id, state] : m_springs) {
+    (void)id;
+    if (!state.finished) {
+      return true;
+    }
+  }
+  return false;
+}
+
+std::optional<float> AnimationManager::springValue(Id id) const {
+  if (id == 0) {
+    return std::nullopt;
+  }
+  const auto it = m_springs.find(id);
+  if (it == m_springs.end()) {
+    return std::nullopt;
+  }
+  return it->second.x;
+}

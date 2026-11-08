@@ -1,0 +1,169 @@
+#include "render/animation/animation_manager.h"
+#include "tests/test_check.h"
+
+#include <cmath>
+
+namespace {
+
+  constexpr float kDt = 0.016F;
+  constexpr float kTol = 1e-4F;
+
+} // namespace
+
+int main() {
+  {
+    AnimationManager manager;
+    const auto id =
+        manager.animateSpring(0.0F, 1.0F, SpringSpec{1.0F, 1600.0F}, [](float) {}, nullptr, kTol, kTol);
+
+    float previous = 0.0F;
+    for (float t = 0.0F; t < 5.0F && manager.hasActiveSprings(); t += kDt) {
+      manager.tickSprings(kDt);
+      const float x = *manager.springValue(id);
+      TEST_CHECK(x >= previous - kTol);
+      TEST_CHECK(x <= 1.0F + kTol);
+      previous = x;
+    }
+
+    TEST_CHECK(!manager.hasActiveSprings());
+    TEST_CHECK(*manager.springValue(id) == 1.0F);
+  }
+
+  {
+    AnimationManager manager;
+    const auto id =
+        manager.animateSpring(0.0F, 1.0F, SpringSpec{0.8F, 380.0F}, [](float) {}, nullptr, kTol, kTol);
+
+    float maxX = -1.0F;
+    int frames = 0;
+    for (float t = 0.0F; t < 5.0F && manager.hasActiveSprings(); t += kDt) {
+      manager.tickSprings(kDt);
+      const float x = *manager.springValue(id);
+      if (x > maxX) {
+        maxX = x;
+      }
+      ++frames;
+    }
+
+    TEST_CHECK(maxX > 1.001F);
+    TEST_CHECK(*manager.springValue(id) == 1.0F);
+    const float settleTime = static_cast<float>(frames) * kDt;
+    TEST_CHECK(settleTime >= 0.3F);
+    TEST_CHECK(settleTime <= 2.0F);
+  }
+
+  {
+    AnimationManager manager;
+    const auto id =
+        manager.animateSpring(0.0F, 1.0F, SpringSpec{1.5F, 1000.0F}, [](float) {}, nullptr, kTol, kTol);
+
+    float previous = 0.0F;
+    for (float t = 0.0F; t < 5.0F && manager.hasActiveSprings(); t += kDt) {
+      manager.tickSprings(kDt);
+      const float x = *manager.springValue(id);
+      TEST_CHECK(x >= previous - kTol);
+      TEST_CHECK(x <= 1.0F + kTol);
+      previous = x;
+    }
+
+    TEST_CHECK(!manager.hasActiveSprings());
+    TEST_CHECK(*manager.springValue(id) == 1.0F);
+  }
+
+  {
+    AnimationManager clamped;
+    AnimationManager reference;
+    const auto clampedId =
+        clamped.animateSpring(0.0F, 1.0F, SpringSpec{0.8F, 380.0F}, [](float) {}, nullptr, kTol, kTol);
+    const auto referenceId =
+        reference.animateSpring(0.0F, 1.0F, SpringSpec{0.8F, 380.0F}, [](float) {}, nullptr, kTol, kTol);
+
+    clamped.tickSprings(0.2F);
+    reference.tickSprings(0.032F);
+    TEST_NEAR(*clamped.springValue(clampedId), *reference.springValue(referenceId), 1e-6F);
+
+    for (int i = 0; i < 200; ++i) {
+      clamped.tickSprings(0.032F);
+    }
+    const float x = *clamped.springValue(clampedId);
+    TEST_CHECK(std::isfinite(x));
+    TEST_CHECK(x >= 0.0F);
+    TEST_CHECK(x <= 2.0F);
+  }
+
+  {
+    AnimationManager manager;
+    const auto a =
+        manager.animateSpring(0.0F, 0.0F, SpringSpec{1.0F, 1600.0F}, [](float) {}, nullptr, kTol, kTol);
+    const auto b =
+        manager.animateSpring(0.0F, 1.0F, SpringSpec{1.0F, 1600.0F}, [](float) {}, nullptr, kTol, kTol);
+
+    manager.tickSprings(kDt);
+    TEST_CHECK(manager.hasActiveSprings());
+    TEST_CHECK(*manager.springValue(a) == 0.0F);
+    TEST_CHECK(*manager.springValue(b) >= 0.0F);
+
+    for (float t = 0.0F; t < 5.0F && manager.hasActiveSprings(); t += kDt) {
+      manager.tickSprings(kDt);
+    }
+    TEST_CHECK(!manager.hasActiveSprings());
+    TEST_CHECK(*manager.springValue(b) == 1.0F);
+
+    TEST_CHECK(!manager.springValue(0).has_value());
+    TEST_CHECK(!manager.springValue(999).has_value());
+  }
+
+  {
+    AnimationManager manager;
+    const auto id =
+        manager.animateSpring(0.0F, 1.0F, SpringSpec{0.8F, 380.0F}, [](float) {}, nullptr, kTol, kTol);
+
+    for (int i = 0; i < 5; ++i) {
+      manager.tickSprings(kDt);
+    }
+    TEST_CHECK(manager.hasActiveSprings());
+    const float before = *manager.springValue(id);
+
+    TEST_CHECK(manager.retargetSpring(id, 2.0F));
+    TEST_CHECK(*manager.springValue(id) == before);
+
+    for (float t = 0.0F; t < 5.0F && manager.hasActiveSprings(); t += kDt) {
+      manager.tickSprings(kDt);
+    }
+    TEST_CHECK(*manager.springValue(id) == 2.0F);
+
+    TEST_CHECK(!manager.retargetSpring(0, 2.0F));
+    TEST_CHECK(!manager.retargetSpring(999, 2.0F));
+  }
+
+  {
+    AnimationManager manager;
+    AnimationManager::Id bId = 0;
+    bool created = false;
+
+    const auto a = manager.animateSpring(
+        0.0F, 1.0F, SpringSpec{1.0F, 1600.0F},
+        [&](float) {
+          if (!created) {
+            created = true;
+            bId = manager.animateSpring(
+                0.0F, 1.0F, SpringSpec{1.0F, 1600.0F}, [](float) {}, nullptr, kTol, kTol
+            );
+          }
+        },
+        nullptr, kTol, kTol
+    );
+    (void)a;
+
+    for (float t = 0.0F; t < 5.0F && manager.hasActiveSprings(); t += kDt) {
+      manager.tickSprings(kDt);
+    }
+
+    TEST_CHECK(created);
+    TEST_CHECK(bId != 0);
+    TEST_CHECK(!manager.hasActiveSprings());
+    TEST_CHECK(*manager.springValue(bId) == 1.0F);
+  }
+
+  return 0;
+}

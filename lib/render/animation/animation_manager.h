@@ -1,10 +1,29 @@
 #pragma once
 
 #include "render/animation/animation.h"
+#include "render/animation/motion_scheme.h"
 
 #include <cstdint>
 #include <functional>
+#include <optional>
+#include <unordered_map>
 #include <vector>
+
+struct SpringState {
+  float x0 = 0.0F;
+  float v0 = 0.0F;
+  float x = 0.0F;
+  float v = 0.0F;
+  float target = 0.0F;
+  float dampingRatio = 1.0F;
+  float stiffness = 0.0F;
+  float elapsed = 0.0F;
+  float eps_x = 0.5F;
+  float eps_v = 1.0F;
+  std::function<void(float)> setter;
+  const void* owner = nullptr;
+  bool finished = false;
+};
 
 class AnimationManager {
 public:
@@ -38,6 +57,15 @@ public:
   void tick(float deltaMs);
   bool hasActive() const;
 
+  Id animateSpring(
+      float initial, float target, SpringSpec spec, std::function<void(float)> setter,
+      const void* owner = nullptr, float eps_x = 0.5F, float eps_v = 1.0F
+  );
+  bool retargetSpring(Id id, float target);
+  void tickSprings(float dt);
+  bool hasActiveSprings() const;
+  std::optional<float> springValue(Id id) const;
+
 private:
   struct Entry {
     Id id = 0;
@@ -47,6 +75,7 @@ private:
   };
 
   std::vector<Entry> m_animations;
+  std::unordered_map<Id, SpringState> m_springs;
   Id m_nextId = 1;
 
   Id animateInternal(

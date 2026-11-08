@@ -1286,6 +1286,7 @@ if build_tests
     'secret_store',
     'security_primitives',
     'settings_search',
+    'spring',
     'state_store',
     'surface_blur_region',
     'sway_workspace_backend',
