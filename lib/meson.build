@@ -123,6 +123,7 @@ _noctalia_ui_sources = files(
   'i18n/language_tag.cpp',
   'render/animation/animation.cpp',
   'render/animation/animation_manager.cpp',
+  'render/animation/motion_scheme.cpp',
   'render/animation/motion_service.cpp',
   'render/backend/gles_framebuffer.cpp',
   'render/backend/gles_render_backend.cpp',

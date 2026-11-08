@@ -1245,6 +1245,7 @@ if build_tests
     'lockscreen_session_actions',
     'math_provider',
     'monitor_selector',
+    'motion_scheme',
     'network_display',
     'network_manager_security',
     'network_secret_keyring',
