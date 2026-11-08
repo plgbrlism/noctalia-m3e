@@ -62,6 +62,7 @@ public:
       const void* owner = nullptr, float eps_x = 0.5F, float eps_v = 1.0F
   );
   bool retargetSpring(Id id, float target);
+  bool retargetSpringSpec(Id id, SpringSpec spec);
   void tickSprings(float dt);
   bool hasActiveSprings() const;
   std::optional<float> springValue(Id id) const;

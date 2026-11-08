@@ -193,6 +193,24 @@ bool AnimationManager::retargetSpring(Id id, float target) {
   return true;
 }
 
+bool AnimationManager::retargetSpringSpec(Id id, SpringSpec spec) {
+  if (id == 0) {
+    return false;
+  }
+  const auto it = m_springs.find(id);
+  if (it == m_springs.end()) {
+    return false;
+  }
+  auto& state = it->second;
+  state.x0 = state.x;
+  state.v0 = state.v;
+  state.elapsed = 0.0F;
+  state.dampingRatio = spec.dampingRatio;
+  state.stiffness = spec.stiffness;
+  state.finished = false;
+  return true;
+}
+
 void AnimationManager::tickSprings(float dt) {
   constexpr float kZetaEps = 1e-4F;
 

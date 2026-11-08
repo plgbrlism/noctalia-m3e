@@ -17,3 +17,6 @@ Status: `pending-test` | `pass` | `fail` | `reverted`
 [MOT-002] lib/render/animation/animation_manager.cpp reentrancy-safe snapshot iteration pass
 [MOT-002] tests/spring_test.cpp add MOT-002 acceptance coverage pass
 [MOT-002] meson.build register spring test pass
+[MOT-003] lib/render/animation/animation_manager.h add retargetSpringSpec API pass
+[MOT-003] lib/render/animation/animation_manager.cpp add retargetSpringSpec impl pass
+[MOT-003] tests/spring_test.cpp add target + spec retarget continuity tests pass

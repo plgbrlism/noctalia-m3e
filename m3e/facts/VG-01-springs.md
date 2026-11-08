@@ -1,6 +1,6 @@
 # VG-01 — springs
 
-Verdict: partial (velocity absent; additive animateSpring() path approved via MOT-002/004 amendment on 2026-11-08)
+Verdict: pass (additive animateSpring() path shipped; spring state carries (x, v, target, zeta, k, elapsed). Existing animate() tween left untouched per MOT-002 amendment.)
 Baseline commit: d4ca76442
 Date: 2026-11-08
 
@@ -19,3 +19,8 @@ Date: 2026-11-08
   tween"); MOT-004 → "migrate MVP-tier callers only, defer rest"
 - MOT-SPRING-001 conversion moot until springs exist; keep rule for
   user-tunable config
+
+## Resolution
+- MOT-002 shipped SpringState with (x0, v0, x, v) + closed-form branches (underdamped/critical/overdamped)
+- MOT-003 shipped retargetSpringSpec preserving (x, v) per MOT-SCHEME-001
+- Gated gap (velocity state) closed via parallel spring path; tween path unmodified by design

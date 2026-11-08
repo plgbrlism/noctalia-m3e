@@ -165,5 +165,114 @@ int main() {
     TEST_CHECK(*manager.springValue(bId) == 1.0F);
   }
 
+  {
+    AnimationManager manager;
+    const auto id =
+        manager.animateSpring(0.0F, 1.0F, SpringSpec{0.8F, 380.0F}, [](float) {}, nullptr, kTol, kTol);
+
+    for (int i = 0; i < 5; ++i) {
+      manager.tickSprings(kDt);
+    }
+    float xBefore = *manager.springValue(id);
+    manager.tickSprings(kDt);
+    const float xTwoBefore = xBefore;
+    xBefore = *manager.springValue(id);
+    const float lastDelta = xBefore - xTwoBefore;
+
+    TEST_CHECK(manager.retargetSpring(id, 2.0F));
+    TEST_CHECK(std::abs(*manager.springValue(id) - xBefore) < 1e-4F);
+
+    manager.tickSprings(kDt);
+    const float firstDelta = *manager.springValue(id) - xBefore;
+    const float scale = std::abs(lastDelta) > kDt ? std::abs(lastDelta) : kDt;
+    TEST_CHECK(std::abs(firstDelta - lastDelta) < 0.5F * scale);
+
+    for (float t = 0.0F; t < 5.0F && manager.hasActiveSprings(); t += kDt) {
+      manager.tickSprings(kDt);
+    }
+    TEST_CHECK(*manager.springValue(id) == 2.0F);
+  }
+
+  {
+    AnimationManager manager;
+    const auto id =
+        manager.animateSpring(0.0F, 1.0F, SpringSpec{0.8F, 380.0F}, [](float) {}, nullptr, kTol, kTol);
+
+    for (float t = 0.0F; t < 5.0F && manager.hasActiveSprings(); t += kDt) {
+      manager.tickSprings(kDt);
+    }
+    TEST_CHECK(*manager.springValue(id) == 1.0F);
+
+    TEST_CHECK(manager.retargetSpring(id, 0.0F));
+    TEST_CHECK(manager.hasActiveSprings());
+
+    for (float t = 0.0F; t < 5.0F && manager.hasActiveSprings(); t += kDt) {
+      manager.tickSprings(kDt);
+    }
+    TEST_CHECK(*manager.springValue(id) == 0.0F);
+  }
+
+  {
+    AnimationManager retarget;
+    AnimationManager control;
+    const auto retargetId =
+        retarget.animateSpring(0.0F, 1.0F, SpringSpec{0.8F, 380.0F}, [](float) {}, nullptr, kTol, kTol);
+    const auto controlId =
+        control.animateSpring(0.0F, 1.0F, SpringSpec{0.8F, 380.0F}, [](float) {}, nullptr, kTol, kTol);
+
+    for (int i = 0; i < 4; ++i) {
+      retarget.tickSprings(kDt);
+      control.tickSprings(kDt);
+    }
+    const float previous = *retarget.springValue(retargetId);
+    retarget.tickSprings(kDt);
+    control.tickSprings(kDt);
+    const float xBefore = *retarget.springValue(retargetId);
+    const float lastDelta = xBefore - previous;
+
+    TEST_CHECK(retarget.retargetSpringSpec(retargetId, SpringSpec{0.6F, 800.0F}));
+    TEST_CHECK(std::abs(*retarget.springValue(retargetId) - xBefore) < 1e-4F);
+
+    retarget.tickSprings(kDt);
+    const float firstDelta = *retarget.springValue(retargetId) - xBefore;
+    const float scale = std::abs(lastDelta) > kDt ? std::abs(lastDelta) : kDt;
+    TEST_CHECK(std::abs(firstDelta - lastDelta) < 0.5F * scale);
+
+    for (int i = 0; i < 10; ++i) {
+      retarget.tickSprings(kDt);
+      control.tickSprings(kDt);
+    }
+    TEST_CHECK(std::abs(*retarget.springValue(retargetId) - *control.springValue(controlId)) > 1e-3F);
+
+    for (float t = 0.0F; t < 5.0F && retarget.hasActiveSprings(); t += kDt) {
+      retarget.tickSprings(kDt);
+    }
+    TEST_CHECK(*retarget.springValue(retargetId) == 1.0F);
+  }
+
+  {
+    AnimationManager manager;
+    const auto id =
+        manager.animateSpring(0.0F, 1.0F, SpringSpec{0.8F, 380.0F}, [](float) {}, nullptr, kTol, kTol);
+
+    for (float t = 0.0F; t < 5.0F && manager.hasActiveSprings(); t += kDt) {
+      manager.tickSprings(kDt);
+    }
+    TEST_CHECK(*manager.springValue(id) == 1.0F);
+
+    TEST_CHECK(manager.retargetSpringSpec(id, SpringSpec{1.5F, 1000.0F}));
+    TEST_CHECK(manager.hasActiveSprings());
+
+    manager.tickSprings(kDt);
+    TEST_CHECK(!manager.hasActiveSprings());
+    TEST_CHECK(*manager.springValue(id) == 1.0F);
+  }
+
+  {
+    AnimationManager manager;
+    TEST_CHECK(!manager.retargetSpringSpec(0, SpringSpec{1.0F, 1600.0F}));
+    TEST_CHECK(!manager.retargetSpringSpec(999, SpringSpec{1.0F, 1600.0F}));
+  }
+
   return 0;
 }
