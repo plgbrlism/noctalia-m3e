@@ -14,8 +14,8 @@ Keep these even solo. Everything else is Opt.
 | AT-SHP-02 | Render at 1.25x and 1.5x | Radii correct |
 | AT-SHP-03 | Morph with overshoot, incremental render | No clipping |
 | AT-SHP-04 | Bar/panel frame time vs baseline | No regression over 5% |
-| AT-CFG-01 | Invalid token | Clear error, no partial apply |
-| AT-CFG-02 | No `[motion]` section | Expressive applied |
+| AT-CFG-01 | Invalid token | Clear error, no partial apply. Verified in CFG-001, not MOT-001. |
+| AT-CFG-02 | No `[motion]` section | Expressive applied. Verified in CFG-001, not MOT-001. |
 | AT-CFG-03 | Effects damping 1.2 | Accepted |
 | AT-PHASE-01 | Debug assertions | No Render-phase mutation; correct request types |
 | AT-INV-01 | Include-path audit | No `src/` includes in `lib/` |
