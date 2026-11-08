@@ -15,13 +15,13 @@
 
 # 9. Milestones
 
-| Milestone | Scope | Exit | Time |
-|---|---|---|---|
-| M0 | VG-00 to VG-08 | Baseline, spring convention, uniform path, and numbers confirmed | 2-3 days |
-| M1 | MOT-001 to 006, CFG-001 | Tokens live, idle verified, controls migrated | ~1 week |
-| M2 | SHP-001, SHP-002 | Press radii morph, clamp, damage, fractional scale | ~1 week |
-| M3 | COL-001, COL-002 | Expressive palette, role audit | ~1 week |
-| MVP | M0 to M3 | Shippable expressive feel | 4-6 weeks total |
-| M4 | COL-003, SHP-003 to 007 | r(theta) shapes (about 10 first, then 35), controller, tier-1 wiring | +4-5 weeks |
-| M5 | CMP-001 to 003 | Expressive components | +3 weeks |
-| M6 | TYP, CHO | Type scale, variable fonts, choreography | +2-3 weeks |
+| Milestone | Scope | Blocks (gates) | Exit | Time |
+|---|---|---|---|---|
+| M0 | VG-00 to VG-08 | — | Baseline, spring convention, uniform path, numbers confirmed | 2-3 days |
+| M1 | MOT-001 to 006, CFG-001 | VG-00, VG-01, VG-07, VG-08 | Tokens live, idle verified, controls migrated | ~1 week |
+| M2 | SHP-001, SHP-002 | VG-02 | Press radii morph, clamp, damage, fractional scale | ~1 week |
+| M3 | COL-001, COL-002 | VG-04 | Expressive palette, role audit | ~1 week |
+| MVP | M0 to M3 | — | Shippable expressive feel | 4-6 weeks total |
+| M4 | COL-003, SHP-003 to 007 | VG-05 | r(theta) shapes, controller, tier-1 wiring | +4-5 weeks |
+| M5 | CMP-001 to 003 | — | Expressive components | +3 weeks |
+| M6 | TYP, CHO | VG-03 | Type scale, variable fonts, choreography | +2-3 weeks |

@@ -1,6 +1,6 @@
 # VG-01 — springs
 
-Verdict: fail (velocity state absent; additive path viable)
+Verdict: partial (velocity absent; additive animateSpring() path approved via MOT-002/004 amendment on 2026-11-08)
 Baseline commit: d4ca76442
 Date: 2026-11-08
 
