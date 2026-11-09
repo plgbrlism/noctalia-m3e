@@ -37,3 +37,5 @@ Status: `pending-test` | `pass` | `fail` | `reverted`
 [MOT-004] lib/render/animation/animation_manager.cpp update animateSpring signature + fire onComplete on snap pass
 [MOT-004] tests/spring_test.cpp update animateSpring call sites + add onComplete cases A-D pass
 [MOT-004] tests/idle_test.cpp update animateSpring call sites (insert {}) pass
+[MOT-004] lib/render/animation/motion_service.h add resolve(SpringToken) pass
+[MOT-004] lib/render/animation/motion_service.cpp implement resolve(SpringToken) pass

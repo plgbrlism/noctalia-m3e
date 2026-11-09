@@ -22,6 +22,7 @@ public:
 
   void setMotionConfig(const MotionConfig& config);
   const MotionConfig& motionConfig() const;
+  SpringSpec resolve(SpringToken token) const;
 
   bool enabled() const noexcept { return m_enabled; }
   float speed() const noexcept { return m_speed; }

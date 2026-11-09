@@ -44,3 +44,7 @@ void MotionService::setSpeed(float speed) { m_speed = std::clamp(speed, 0.05F, 4
 void MotionService::setMotionConfig(const MotionConfig& config) { m_motionConfig = config; }
 
 const MotionConfig& MotionService::motionConfig() const { return m_motionConfig; }
+
+SpringSpec MotionService::resolve(SpringToken token) const {
+  return SpringTokenResolver(m_motionConfig).resolve(token);
+}
