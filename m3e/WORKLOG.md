@@ -39,3 +39,4 @@ Status: `pending-test` | `pass` | `fail` | `reverted`
 [MOT-004] tests/idle_test.cpp update animateSpring call sites (insert {}) pass
 [MOT-004] lib/render/animation/motion_service.h add resolve(SpringToken) pass
 [MOT-004] lib/render/animation/motion_service.cpp implement resolve(SpringToken) pass
+[MOT-004] src/shell/bar/bar.cpp add motion_service.h include + migrate 7 animate() sites to animateSpring() pass

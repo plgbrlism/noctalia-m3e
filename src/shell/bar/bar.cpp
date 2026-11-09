@@ -10,6 +10,7 @@
 #include "idle/idle_inhibitor.h"
 #include "ipc/ipc_arg_parse.h"
 #include "ipc/ipc_service.h"
+#include "render/animation/motion_service.h"
 #include "render/render_context.h"
 #include "render/scene/input_area.h"
 #include "shell/bar/bar_corner_shape.h"
@@ -2023,8 +2024,8 @@ void Bar::setInstanceIpcVisible(BarInstance& instance, bool visible) {
   }
   const float current = instance.hideOpacity;
   const float target = visible ? 1.0F : 0.0F;
-  instance.animations.animate(
-      current, target, Style::animNormal, visible ? Easing::EaseOutCubic : Easing::EaseInQuad,
+  instance.animations.animateSpring(
+      current, target, MotionService::instance().resolve(SpringToken::EffectsFast),
       [inst = &instance, this](float v) {
         inst->hideOpacity = v;
         syncBarSlideLayerTransform(*inst);
@@ -3039,8 +3040,8 @@ void Bar::animateWidgetHoverHighlight(BarInstance& instance, Widget& widget, boo
   }
   const ColorSpec fill = widget.widgetForegroundOr(colorSpecFromRole(ColorRole::OnSurface));
   instance.animations.cancelForOwner(box);
-  instance.animations.animate(
-      widget.barHoverProgress(), hovered ? 1.0F : 0.0F, Style::animFast, Easing::EaseOutCubic,
+  instance.animations.animateSpring(
+      widget.barHoverProgress(), hovered ? 1.0F : 0.0F, MotionService::instance().resolve(SpringToken::SpatialFast),
       [&widget, box, fill](float progress) {
         widget.setBarHoverProgress(progress);
         box->setVisible(progress > 0.001F);
@@ -3056,8 +3057,8 @@ void Bar::animateWidgetHoverHighlight(BarInstance& instance, Widget& widget, boo
 void Bar::beginAccordionAnimation(BarInstance& instance, BarCapsuleRun& run, bool expanded) {
   run.accordionExpanded = expanded;
   instance.animations.cancelForOwner(run.shell);
-  instance.animations.animate(
-      run.accordionProgress, expanded ? 1.0F : 0.0F, run.accordionDurationMs, Easing::EaseOutCubic,
+  instance.animations.animateSpring(
+      run.accordionProgress, expanded ? 1.0F : 0.0F, MotionService::instance().resolve(SpringToken::SpatialFast),
       [&run, surface = instance.surface.get()](float progress) {
         run.accordionProgress = progress;
         if (surface != nullptr) {
@@ -3126,8 +3127,8 @@ void Bar::updateAccordionExpansion(BarInstance& instance, InputArea* hoveredArea
 void Bar::beginWidgetPeekAnimation(BarInstance& instance, Widget& widget, bool expanded) {
   widget.setPeekExpanded(expanded);
   instance.animations.cancelForOwner(widget.peekAnimationOwner());
-  instance.animations.animate(
-      widget.peekProgress(), expanded ? 1.0F : 0.0F, static_cast<float>(kBarRevealDurationMs), Easing::EaseOutCubic,
+  instance.animations.animateSpring(
+      widget.peekProgress(), expanded ? 1.0F : 0.0F, MotionService::instance().resolve(SpringToken::SpatialFast),
       [&widget, surface = instance.surface.get()](float progress) {
         widget.setPeekProgress(progress);
         if (surface != nullptr) {
@@ -3350,8 +3351,8 @@ void Bar::revealAutoHideBar(BarInstance& instance) {
     return;
   }
 
-  instance.animations.animate(
-      current, 1.0F, Style::animNormal, Easing::EaseOutCubic,
+  instance.animations.animateSpring(
+      current, 1.0F, MotionService::instance().resolve(SpringToken::EffectsFast),
       [inst = &instance, this](float v) {
         inst->hideOpacity = v;
         syncBarSlideLayerTransform(*inst);
@@ -3442,8 +3443,8 @@ void Bar::startHideFadeOut(BarInstance& instance, bool immediate) {
   }
   instance.autoHideDelayTimer.stop();
   const float current = instance.hideOpacity;
-  instance.animations.animate(
-      current, 0.0F, Style::animNormal, Easing::EaseInQuad,
+  instance.animations.animateSpring(
+      current, 0.0F, MotionService::instance().resolve(SpringToken::EffectsFast),
       [this, inst = &instance](float v) {
         inst->hideOpacity = v;
         syncBarSlideLayerTransform(*inst);
@@ -4263,8 +4264,8 @@ std::string Bar::setBarAutoHideIpc(std::string_view args) {
     if (instance.barConfig.autoHide && instance.hideOpacity < 0.999F) {
       const float current = instance.hideOpacity;
       instance.autoHideDisablePending = true;
-      instance.animations.animate(
-          current, 1.0F, Style::animNormal, Easing::EaseOutCubic,
+      instance.animations.animateSpring(
+          current, 1.0F, MotionService::instance().resolve(SpringToken::EffectsFast),
           [this, inst = &instance](float v) {
             inst->hideOpacity = v;
             syncBarSlideLayerTransform(*inst);
