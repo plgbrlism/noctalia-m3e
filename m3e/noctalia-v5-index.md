@@ -7,9 +7,13 @@ Regenerate only via the spec-verify or spec-amend skills.
 
 - `lib/render/animation/animation_manager.*` — AnimationManager spring/tween core
 - `lib/render/animation/motion_service.h` — motion service (spring tokens likely live here or adjacent)
+- `lib/wayland/surface.cpp` — Surface::requestFrameTick() (line 1146); per-surface frame request
+- `src/theme/theme_service.cpp` — AnimationManager::tick() call site (line 631)
+- `src/shell/lockscreen/lockscreen_widgets_host.cpp` — per-widget AnimationManager, tick() at line 334
+- `src/shell/desktop/desktop_widget.h` — widget-level requestFrameTick() wrapper (line 113)
 - `lib/ui/controls/` — controls animate through `AnimationManager`
 - Invariants: PHASE-001, MOT-SPRING-001, MOT-INT-001, MOT-DT-001, MOT-IDLE-001, MOT-REDUCE-001, LIB-001
-- Work items: MOT-001, MOT-002, MOT-003, MOT-005, MOT-006, CHO-001, CHO-002
+- Work items: MOT-001, MOT-002, MOT-003, MOT-004, MOT-005, MOT-006, CHO-001, CHO-002
 ---
 ## Rect primitive
 
@@ -37,8 +41,9 @@ Regenerate only via the spec-verify or spec-amend skills.
 
 - `src/shell/surface/shadow.*` — shared shadow logic for panels, bars, dock
 - `src/shell/render/` — shell-only custom draw nodes and render extensions
+- `src/shell/desktop/widgets/` — desktop widget tick/request call sites
 - Invariants: INV-02, INV-03, INV-04
-- Work items: COL-003, SHP-007
+- Work items: MOT-004, COL-003, SHP-007
 ---
 ## Config schema
 
