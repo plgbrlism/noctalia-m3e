@@ -84,9 +84,13 @@ AnimationManager::Id AnimationManager::animateInternal(
 
 void AnimationManager::cancel(Id id) {
   std::erase_if(m_animations, [id](const Entry& e) { return e.id == id; });
+  m_springs.erase(id);
 }
 
-void AnimationManager::cancelAll() { m_animations.clear(); }
+void AnimationManager::cancelAll() {
+  m_animations.clear();
+  m_springs.clear();
+}
 
 void AnimationManager::reduceMotion() {
   const auto now = std::chrono::steady_clock::now();
