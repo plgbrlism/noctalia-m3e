@@ -146,6 +146,7 @@ private:
   }};
 
   void selectTab(TabId tab, bool animated = false);
+  void cycleVisibleTabs(int direction);
   void scrollFocusedInputIntoView(InputArea* area) override;
   void scrollSidebarNodeIntoView(const Node* node);
   void scheduleMprisRefreshFor(TabId tab);
