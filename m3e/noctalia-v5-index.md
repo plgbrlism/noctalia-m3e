@@ -6,7 +6,8 @@ Regenerate only via the spec-verify or spec-amend skills.
 ## Animation core
 
 - `lib/render/animation/animation_manager.*` — AnimationManager spring/tween core
-- `lib/render/animation/motion_service.h` — motion service (spring tokens likely live here or adjacent)
+- `lib/render/animation/motion_service.h` — motion service
+- `lib/render/animation/motion_scheme.*` — MotionScheme/SpringToken/SpringSpec/MotionConfig/SpringTokenResolver; added MOT-001/CFG-001
 - `lib/wayland/surface.cpp` — Surface::requestFrameTick() (line 1146); per-surface frame request
 - `src/theme/theme_service.cpp` — AnimationManager::tick() call site (line 631)
 - `src/shell/lockscreen/lockscreen_widgets_host.cpp` — per-widget AnimationManager, tick() at line 334
