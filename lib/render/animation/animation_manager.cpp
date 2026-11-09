@@ -123,7 +123,7 @@ void AnimationManager::cancelForOwner(const void* owner) {
   });
 }
 
-void AnimationManager::tick(float /*deltaMs*/) {
+void AnimationManager::tick(float deltaMs) {
   // Collect completed callbacks separately — onComplete may call animate()
   // which would push_back and invalidate iterators during iteration.
   std::vector<std::function<void()>> completedCallbacks;
@@ -164,9 +164,13 @@ void AnimationManager::tick(float /*deltaMs*/) {
   for (auto& cb : completedCallbacks) {
     cb();
   }
+
+  tickSprings(deltaMs * 0.001F);
 }
 
-bool AnimationManager::hasActive() const { return !m_animations.empty(); }
+bool AnimationManager::hasActive() const {
+  return !m_animations.empty() || hasActiveSprings();
+}
 
 AnimationManager::Id AnimationManager::animateSpring(
     float initial, float target, SpringSpec spec, std::function<void(float)> setter,
