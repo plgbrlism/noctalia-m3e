@@ -37,6 +37,7 @@ namespace noctalia::config {
     constexpr int kAppIconColorizationMigrationVersion = 19;
     constexpr int kCornerShapePresetMigrationVersion = 20;
     constexpr int kDensityMigrationVersion = 22;
+    constexpr int kCircularAvatarMigrationVersion = 23;
     constexpr std::int64_t kMaxBarRadius = 500;
     constexpr std::array<std::string_view, 5> kBarRadiusKeys = {
         "radius", "radius_top_left", "radius_top_right", "radius_bottom_left", "radius_bottom_right",
@@ -627,6 +628,41 @@ namespace noctalia::config {
     void migrateWorkspacesMonitorsSidecar(toml::table& root, const toml::table& /*base*/, schema::Diagnostics& diag) {
       migrateWorkspacesMonitors(root, [&diag](const std::string& path) {
         diag.warn(path, "migrated workspaces show_all_outputs to monitors");
+      });
+    }
+
+    template <typename OnChanged> void migrateCircularAvatar(toml::table& root, OnChanged&& onChanged) {
+      auto* controlCenter = root["control_center"].as_table();
+      if (controlCenter == nullptr) {
+        return;
+      }
+      const auto* circular = controlCenter->get("circular_avatar");
+      if (circular == nullptr) {
+        return;
+      }
+
+      if (!root.contains("shell")) {
+        root.insert("shell", toml::table{});
+      }
+      auto* shell = root["shell"].as_table();
+      if (shell == nullptr) {
+        return;
+      }
+      const bool keptCanonical = shell->contains("circular_avatar");
+      if (!keptCanonical) {
+        shell->insert("circular_avatar", *circular);
+      }
+      controlCenter->erase("circular_avatar");
+      onChanged("control_center.circular_avatar", keptCanonical);
+    }
+
+    void migrateCircularAvatarSidecar(toml::table& root, const toml::table& /*base*/, schema::Diagnostics& diag) {
+      migrateCircularAvatar(root, [&diag](const std::string& path, bool keptCanonical) {
+        diag.warn(
+            path,
+            keptCanonical ? "removed control_center.circular_avatar; kept existing shell.circular_avatar"
+                          : "migrated control_center.circular_avatar to shell.circular_avatar"
+        );
       });
     }
 
@@ -1253,6 +1289,11 @@ namespace noctalia::config {
             .summary = "theme: replace accessibility ui_scale with theme density",
             .apply = migrateDensitySidecar,
         },
+        {
+            .toVersion = kCircularAvatarMigrationVersion,
+            .summary = "shell: move circular_avatar from Control Center to shared avatar settings",
+            .apply = migrateCircularAvatarSidecar,
+        },
     };
     return migrations;
   }
@@ -1463,6 +1504,14 @@ namespace noctalia::config {
           .migrationVersion = kDensityMigrationVersion,
           .path = path,
           .message = "spring, ripple and reduce motion settings were removed",
+      });
+    });
+    migrateCircularAvatar(root, [&issues](const std::string& path, bool keptCanonical) {
+      issues.push_back({
+          .migrationVersion = kCircularAvatarMigrationVersion,
+          .path = path,
+          .message = keptCanonical ? "removed control_center.circular_avatar; kept existing shell.circular_avatar"
+                                   : "control_center.circular_avatar moved to shell.circular_avatar",
       });
     });
   }

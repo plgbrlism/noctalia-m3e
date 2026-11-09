@@ -1695,11 +1695,6 @@ namespace settings {
         ToggleSetting{cfg.controlCenter.showSessionButton}, "session button show hide"
     ));
     entries.push_back(makeEntry(
-        SettingsSection::ControlCenter, "home", tr("settings.schema.panels.home-circular-avatar.label"),
-        tr("settings.schema.panels.home-circular-avatar.description"), {"control_center", "circular_avatar"},
-        ToggleSetting{cfg.controlCenter.circularAvatar}, "avatar profile picture circle radius roundness"
-    ));
-    entries.push_back(makeEntry(
         SettingsSection::ControlCenter, "home", tr("settings.schema.panels.home-avatar-border.label"),
         tr("settings.schema.panels.home-avatar-border.description"), {"control_center", "show_avatar_border"},
         ToggleSetting{cfg.controlCenter.showAvatarBorder}, "avatar border ring accent hide show"
@@ -2055,6 +2050,12 @@ namespace settings {
             .browseFileExtensions = DirectoryScanner::imageExtensionFilter(true)
         },
         "image picture"
+    ));
+    entries.push_back(makeEntry(
+        SettingsSection::Shell, "general", tr("settings.schema.shell.circular-avatar.label"),
+        tr("settings.schema.shell.circular-avatar.description"), {"shell", "circular_avatar"},
+        ToggleSetting{cfg.shell.circularAvatar},
+        "avatar profile picture launcher control center circle radius roundness"
     ));
     entries.push_back(makeEntry(
         SettingsSection::Shell, "general", tr("settings.schema.shell.settings-window-translucent.label"),
