@@ -62,6 +62,21 @@ constexpr std::array<std::array<std::string_view, 6>, 2> kInternalIds = {{
     }},
 }};
 
+bool isSpatialToken(SpringToken token) noexcept
+{
+    switch (token) {
+      case SpringToken::SpatialFast:
+      case SpringToken::SpatialDefault:
+      case SpringToken::SpatialSlow:
+        return true;
+      case SpringToken::EffectsFast:
+      case SpringToken::EffectsDefault:
+      case SpringToken::EffectsSlow:
+        return false;
+    }
+    return false;
+}
+
 } // namespace
 
 SpringTokenResolver::SpringTokenResolver(MotionScheme scheme) noexcept
@@ -87,10 +102,13 @@ void SpringTokenResolver::setScheme(MotionScheme scheme) noexcept
 SpringSpec SpringTokenResolver::resolve(SpringToken token) const noexcept
 {
     const auto idx = tokenIndex(token);
-    if (config_.overrides[idx]) {
-        return *config_.overrides[idx];
+    SpringSpec spec = config_.overrides[idx]
+        ? *config_.overrides[idx]
+        : kSprings[schemeIndex(config_.scheme)][idx];
+    if (config_.reduce && isSpatialToken(token)) {
+        spec.dampingRatio = 1.0F;
     }
-    return kSprings[schemeIndex(config_.scheme)][idx];
+    return spec;
 }
 
 std::optional<SpringSpec> SpringTokenResolver::tryResolve(std::string_view configKey) const noexcept

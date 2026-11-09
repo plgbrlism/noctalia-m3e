@@ -29,3 +29,7 @@ Status: `pending-test` | `pass` | `fail` | `reverted`
 [CFG-001] tests/config_motion_test.cpp add schema coverage pass
 [CFG-001] meson.build register config_motion test pass
 [CFG-001] src/app/application_services.cpp wire setMotionConfig into applyMotionConfig pass
+[MOT-006] lib/render/animation/motion_scheme.cpp add isSpatialToken + reduce branch in resolve() pending-test
+[MOT-006] tests/motion_scheme_test.cpp add AT-MOT-06 reduce cases + regression pass pending-test
+[MOT-006] lib/render/animation/motion_scheme.cpp add isSpatialToken + reduce branch in resolve() pass
+[MOT-006] tests/motion_scheme_test.cpp add AT-MOT-06 reduce cases + regression pass

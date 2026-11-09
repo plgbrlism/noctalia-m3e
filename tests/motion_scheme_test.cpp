@@ -136,5 +136,64 @@ int main() {
     }
   }
 
+  {
+    const SpringTokenResolver baseline;
+    const auto spec = baseline.resolve(SpringToken::SpatialFast);
+    TEST_NEAR(spec.dampingRatio, 0.6F, kEps);
+    TEST_NEAR(spec.stiffness, 800.0F, kEps);
+  }
+
+  // TODO(MOT-006/CHO-001): choreography disable assertion deferred —
+  // CHO-001/002 ship in P3. MotionConfig::reduce is queryable now;
+  // verify choreography suppression when CHO lands.
+
+  {
+    auto makeReduceConfig = [](MotionScheme scheme, bool reduce) {
+      MotionConfig c;
+      c.scheme = scheme;
+      c.reduce = reduce;
+      return c;
+    };
+
+    {
+      const SpringTokenResolver r(makeReduceConfig(MotionScheme::Expressive, true));
+      const auto spec = r.resolve(SpringToken::SpatialFast);
+      TEST_NEAR(spec.dampingRatio, 1.0F, kEps);
+      TEST_NEAR(spec.stiffness, 800.0F, kEps);
+    }
+
+    {
+      const SpringTokenResolver r(makeReduceConfig(MotionScheme::Standard, true));
+      const auto spec = r.resolve(SpringToken::SpatialFast);
+      TEST_NEAR(spec.dampingRatio, 1.0F, kEps);
+      TEST_NEAR(spec.stiffness, 1400.0F, kEps);
+    }
+
+    {
+      MotionConfig c;
+      c.scheme = MotionScheme::Expressive;
+      c.reduce = true;
+      c.overrides[static_cast<std::size_t>(SpringToken::SpatialFast)] = SpringSpec{0.3F, 999.0F};
+      const SpringTokenResolver r(c);
+      const auto spec = r.resolve(SpringToken::SpatialFast);
+      TEST_NEAR(spec.dampingRatio, 1.0F, kEps);
+      TEST_NEAR(spec.stiffness, 999.0F, kEps);
+    }
+
+    {
+      const SpringTokenResolver r(makeReduceConfig(MotionScheme::Expressive, true));
+      const auto spec = r.resolve(SpringToken::EffectsDefault);
+      TEST_NEAR(spec.dampingRatio, 1.0F, kEps);
+      TEST_NEAR(spec.stiffness, 1600.0F, kEps);
+    }
+
+    {
+      const SpringTokenResolver r(makeReduceConfig(MotionScheme::Expressive, false));
+      const auto spec = r.resolve(SpringToken::SpatialFast);
+      TEST_NEAR(spec.dampingRatio, 0.6F, kEps);
+      TEST_NEAR(spec.stiffness, 800.0F, kEps);
+    }
+  }
+
   return 0;
 }
