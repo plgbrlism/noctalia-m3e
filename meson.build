@@ -1269,6 +1269,7 @@ if build_tests
     'panel_reveal',
     'path_browse',
     'pipewire_error',
+    'pipewire_route_cache',
     'umbriel_audio_provider',
     'privacy_capture_classification',
     'plugin_app_icon_path',
