@@ -114,6 +114,9 @@ void AnimationManager::cancelForOwner(const void* owner) {
     return;
   }
   std::erase_if(m_animations, [owner](const Entry& e) { return e.owner == owner; });
+  std::erase_if(m_springs, [owner](const auto& pair) {
+    return pair.second.owner == owner;
+  });
 }
 
 void AnimationManager::tick(float /*deltaMs*/) {

@@ -338,5 +338,34 @@ int main() {
     TEST_CHECK(completes == 3);
   }
 
+  {
+    AnimationManager manager;
+    int someOwner = 0;
+    const auto a = manager.animateSpring(
+        0.0F, 1.0F, SpringSpec{0.8F, 380.0F}, [](float) {}, {}, &someOwner, kTol, kTol
+    );
+    const auto b = manager.animateSpring(
+        0.0F, 1.0F, SpringSpec{0.8F, 380.0F}, [](float) {}, {}, &someOwner, kTol, kTol
+    );
+    manager.animateSpring(
+        0.0F, 1.0F, SpringSpec{0.8F, 380.0F}, [](float) {}, {}, nullptr, kTol, kTol
+    );
+    TEST_CHECK(manager.hasActiveSprings());
+    manager.cancelForOwner(&someOwner);
+    TEST_CHECK(manager.hasActiveSprings());
+    TEST_CHECK(!manager.springValue(a).has_value());
+    TEST_CHECK(!manager.springValue(b).has_value());
+  }
+
+  {
+    AnimationManager manager;
+    const auto id = manager.animateSpring(
+        0.0F, 1.0F, SpringSpec{0.8F, 380.0F}, [](float) {}, {}, nullptr, kTol, kTol
+    );
+    manager.cancelForOwner(nullptr);
+    TEST_CHECK(manager.hasActiveSprings());
+    TEST_CHECK(manager.springValue(id).has_value());
+  }
+
   return 0;
 }

@@ -40,3 +40,5 @@ Status: `pending-test` | `pass` | `fail` | `reverted`
 [MOT-004] lib/render/animation/motion_service.h add resolve(SpringToken) pass
 [MOT-004] lib/render/animation/motion_service.cpp implement resolve(SpringToken) pass
 [MOT-004] src/shell/bar/bar.cpp add motion_service.h include + migrate 7 animate() sites to animateSpring() pass
+[MOT-004] lib/render/animation/animation_manager.cpp extend cancelForOwner to erase springs by owner pass
+[MOT-004] tests/spring_test.cpp add cancelForOwner spring cases E-F pass
