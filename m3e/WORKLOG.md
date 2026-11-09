@@ -33,3 +33,7 @@ Status: `pending-test` | `pass` | `fail` | `reverted`
 [MOT-006] tests/motion_scheme_test.cpp add AT-MOT-06 reduce cases + regression pass pending-test
 [MOT-006] lib/render/animation/motion_scheme.cpp add isSpatialToken + reduce branch in resolve() pass
 [MOT-006] tests/motion_scheme_test.cpp add AT-MOT-06 reduce cases + regression pass
+[MOT-004] lib/render/animation/animation_manager.h add onComplete to SpringState + animateSpring signature pass
+[MOT-004] lib/render/animation/animation_manager.cpp update animateSpring signature + fire onComplete on snap pass
+[MOT-004] tests/spring_test.cpp update animateSpring call sites + add onComplete cases A-D pass
+[MOT-004] tests/idle_test.cpp update animateSpring call sites (insert {}) pass

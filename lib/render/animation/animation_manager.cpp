@@ -162,14 +162,14 @@ void AnimationManager::tick(float /*deltaMs*/) {
 bool AnimationManager::hasActive() const { return !m_animations.empty(); }
 
 AnimationManager::Id AnimationManager::animateSpring(
-    float initial, float target, SpringSpec spec, std::function<void(float)> setter, const void* owner,
-    float eps_x, float eps_v
+    float initial, float target, SpringSpec spec, std::function<void(float)> setter,
+    std::function<void()> onComplete, const void* owner, float eps_x, float eps_v
 ) {
   const Id id = m_nextId++;
   m_springs.emplace(
       id, SpringState{
               initial, 0.0F, initial, 0.0F, target, spec.dampingRatio, spec.stiffness, 0.0F,
-              eps_x, eps_v, std::move(setter), owner, false,
+              eps_x, eps_v, std::move(setter), std::move(onComplete), owner, false,
           }
   );
   requestFrame();
@@ -291,6 +291,11 @@ void AnimationManager::tickSprings(float dt) {
       state.v = 0.0F;
       if (state.setter) {
         state.setter(state.target);
+      }
+      // onComplete fires on every snap (initial settle and every reviving
+      // retarget that re-settles). Not cleared — caller may rely on repeat.
+      if (state.onComplete) {
+        state.onComplete();
       }
       state.finished = true;
     } else if (state.setter) {

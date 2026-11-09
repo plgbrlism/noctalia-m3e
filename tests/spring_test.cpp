@@ -14,7 +14,7 @@ int main() {
   {
     AnimationManager manager;
     const auto id =
-        manager.animateSpring(0.0F, 1.0F, SpringSpec{1.0F, 1600.0F}, [](float) {}, nullptr, kTol, kTol);
+        manager.animateSpring(0.0F, 1.0F, SpringSpec{1.0F, 1600.0F}, [](float) {}, {}, nullptr, kTol, kTol);
 
     float previous = 0.0F;
     for (float t = 0.0F; t < 5.0F && manager.hasActiveSprings(); t += kDt) {
@@ -32,7 +32,7 @@ int main() {
   {
     AnimationManager manager;
     const auto id =
-        manager.animateSpring(0.0F, 1.0F, SpringSpec{0.8F, 380.0F}, [](float) {}, nullptr, kTol, kTol);
+        manager.animateSpring(0.0F, 1.0F, SpringSpec{0.8F, 380.0F}, [](float) {}, {}, nullptr, kTol, kTol);
 
     float maxX = -1.0F;
     int frames = 0;
@@ -55,7 +55,7 @@ int main() {
   {
     AnimationManager manager;
     const auto id =
-        manager.animateSpring(0.0F, 1.0F, SpringSpec{1.5F, 1000.0F}, [](float) {}, nullptr, kTol, kTol);
+        manager.animateSpring(0.0F, 1.0F, SpringSpec{1.5F, 1000.0F}, [](float) {}, {}, nullptr, kTol, kTol);
 
     float previous = 0.0F;
     for (float t = 0.0F; t < 5.0F && manager.hasActiveSprings(); t += kDt) {
@@ -74,9 +74,9 @@ int main() {
     AnimationManager clamped;
     AnimationManager reference;
     const auto clampedId =
-        clamped.animateSpring(0.0F, 1.0F, SpringSpec{0.8F, 380.0F}, [](float) {}, nullptr, kTol, kTol);
+        clamped.animateSpring(0.0F, 1.0F, SpringSpec{0.8F, 380.0F}, [](float) {}, {}, nullptr, kTol, kTol);
     const auto referenceId =
-        reference.animateSpring(0.0F, 1.0F, SpringSpec{0.8F, 380.0F}, [](float) {}, nullptr, kTol, kTol);
+        reference.animateSpring(0.0F, 1.0F, SpringSpec{0.8F, 380.0F}, [](float) {}, {}, nullptr, kTol, kTol);
 
     clamped.tickSprings(0.2F);
     reference.tickSprings(0.032F);
@@ -94,9 +94,9 @@ int main() {
   {
     AnimationManager manager;
     const auto a =
-        manager.animateSpring(0.0F, 0.0F, SpringSpec{1.0F, 1600.0F}, [](float) {}, nullptr, kTol, kTol);
+        manager.animateSpring(0.0F, 0.0F, SpringSpec{1.0F, 1600.0F}, [](float) {}, {}, nullptr, kTol, kTol);
     const auto b =
-        manager.animateSpring(0.0F, 1.0F, SpringSpec{1.0F, 1600.0F}, [](float) {}, nullptr, kTol, kTol);
+        manager.animateSpring(0.0F, 1.0F, SpringSpec{1.0F, 1600.0F}, [](float) {}, {}, nullptr, kTol, kTol);
 
     manager.tickSprings(kDt);
     TEST_CHECK(manager.hasActiveSprings());
@@ -116,7 +116,7 @@ int main() {
   {
     AnimationManager manager;
     const auto id =
-        manager.animateSpring(0.0F, 1.0F, SpringSpec{0.8F, 380.0F}, [](float) {}, nullptr, kTol, kTol);
+        manager.animateSpring(0.0F, 1.0F, SpringSpec{0.8F, 380.0F}, [](float) {}, {}, nullptr, kTol, kTol);
 
     for (int i = 0; i < 5; ++i) {
       manager.tickSprings(kDt);
@@ -147,11 +147,11 @@ int main() {
           if (!created) {
             created = true;
             bId = manager.animateSpring(
-                0.0F, 1.0F, SpringSpec{1.0F, 1600.0F}, [](float) {}, nullptr, kTol, kTol
+                0.0F, 1.0F, SpringSpec{1.0F, 1600.0F}, [](float) {}, {}, nullptr, kTol, kTol
             );
           }
         },
-        nullptr, kTol, kTol
+        {}, nullptr, kTol, kTol
     );
     (void)a;
 
@@ -168,7 +168,7 @@ int main() {
   {
     AnimationManager manager;
     const auto id =
-        manager.animateSpring(0.0F, 1.0F, SpringSpec{0.8F, 380.0F}, [](float) {}, nullptr, kTol, kTol);
+        manager.animateSpring(0.0F, 1.0F, SpringSpec{0.8F, 380.0F}, [](float) {}, {}, nullptr, kTol, kTol);
 
     for (int i = 0; i < 5; ++i) {
       manager.tickSprings(kDt);
@@ -196,7 +196,7 @@ int main() {
   {
     AnimationManager manager;
     const auto id =
-        manager.animateSpring(0.0F, 1.0F, SpringSpec{0.8F, 380.0F}, [](float) {}, nullptr, kTol, kTol);
+        manager.animateSpring(0.0F, 1.0F, SpringSpec{0.8F, 380.0F}, [](float) {}, {}, nullptr, kTol, kTol);
 
     for (float t = 0.0F; t < 5.0F && manager.hasActiveSprings(); t += kDt) {
       manager.tickSprings(kDt);
@@ -216,9 +216,9 @@ int main() {
     AnimationManager retarget;
     AnimationManager control;
     const auto retargetId =
-        retarget.animateSpring(0.0F, 1.0F, SpringSpec{0.8F, 380.0F}, [](float) {}, nullptr, kTol, kTol);
+        retarget.animateSpring(0.0F, 1.0F, SpringSpec{0.8F, 380.0F}, [](float) {}, {}, nullptr, kTol, kTol);
     const auto controlId =
-        control.animateSpring(0.0F, 1.0F, SpringSpec{0.8F, 380.0F}, [](float) {}, nullptr, kTol, kTol);
+        control.animateSpring(0.0F, 1.0F, SpringSpec{0.8F, 380.0F}, [](float) {}, {}, nullptr, kTol, kTol);
 
     for (int i = 0; i < 4; ++i) {
       retarget.tickSprings(kDt);
@@ -253,7 +253,7 @@ int main() {
   {
     AnimationManager manager;
     const auto id =
-        manager.animateSpring(0.0F, 1.0F, SpringSpec{0.8F, 380.0F}, [](float) {}, nullptr, kTol, kTol);
+        manager.animateSpring(0.0F, 1.0F, SpringSpec{0.8F, 380.0F}, [](float) {}, {}, nullptr, kTol, kTol);
 
     for (float t = 0.0F; t < 5.0F && manager.hasActiveSprings(); t += kDt) {
       manager.tickSprings(kDt);
@@ -272,6 +272,70 @@ int main() {
     AnimationManager manager;
     TEST_CHECK(!manager.retargetSpringSpec(0, SpringSpec{1.0F, 1600.0F}));
     TEST_CHECK(!manager.retargetSpringSpec(999, SpringSpec{1.0F, 1600.0F}));
+  }
+
+  {
+    AnimationManager manager;
+    int completes = 0;
+    const auto id = manager.animateSpring(
+        0.0F, 1.0F, SpringSpec{1.0F, 1600.0F}, [](float) {}, [&] { ++completes; }, nullptr, kTol, kTol
+    );
+    (void)id;
+    for (float t = 0.0F; t < 5.0F && manager.hasActiveSprings(); t += kDt) {
+      manager.tickSprings(kDt);
+    }
+    TEST_CHECK(completes == 1);
+  }
+
+  {
+    AnimationManager manager;
+    int completes = 0;
+    manager.animateSpring(
+        0.0F, 1.0F, SpringSpec{0.8F, 380.0F}, [](float) {}, [&] { ++completes; }, nullptr, kTol, kTol
+    );
+    for (int i = 0; i < 5; ++i) {
+      manager.tickSprings(kDt);
+    }
+    TEST_CHECK(completes == 0);
+  }
+
+  {
+    AnimationManager manager;
+    int completes = 0;
+    const auto id = manager.animateSpring(
+        0.0F, 1.0F, SpringSpec{1.0F, 1600.0F}, [](float) {}, [&] { ++completes; }, nullptr, kTol, kTol
+    );
+    for (float t = 0.0F; t < 5.0F && manager.hasActiveSprings(); t += kDt) {
+      manager.tickSprings(kDt);
+    }
+    TEST_CHECK(completes == 1);
+    manager.retargetSpring(id, 0.0F);
+    for (float t = 0.0F; t < 5.0F && manager.hasActiveSprings(); t += kDt) {
+      manager.tickSprings(kDt);
+    }
+    TEST_CHECK(completes == 2);
+  }
+
+  {
+    AnimationManager manager;
+    int completes = 0;
+    const auto id = manager.animateSpring(
+        0.0F, 1.0F, SpringSpec{1.0F, 1600.0F}, [](float) {}, [&] { ++completes; }, nullptr, kTol, kTol
+    );
+    for (float t = 0.0F; t < 5.0F && manager.hasActiveSprings(); t += kDt) {
+      manager.tickSprings(kDt);
+    }
+    TEST_CHECK(completes == 1);
+    manager.retargetSpring(id, 0.0F);
+    for (float t = 0.0F; t < 5.0F && manager.hasActiveSprings(); t += kDt) {
+      manager.tickSprings(kDt);
+    }
+    TEST_CHECK(completes == 2);
+    manager.retargetSpring(id, 1.0F);
+    for (float t = 0.0F; t < 5.0F && manager.hasActiveSprings(); t += kDt) {
+      manager.tickSprings(kDt);
+    }
+    TEST_CHECK(completes == 3);
   }
 
   return 0;

@@ -16,10 +16,10 @@ int main() {
     int requests = 0;
     manager.setFrameRequest([&] { ++requests; });
 
-    manager.animateSpring(0.0F, 1.0F, SpringSpec{0.8F, 380.0F}, [](float) {}, nullptr, kTol, kTol);
+    manager.animateSpring(0.0F, 1.0F, SpringSpec{0.8F, 380.0F}, [](float) {}, {}, nullptr, kTol, kTol);
     TEST_CHECK(requests == 1);
 
-    manager.animateSpring(0.0F, 1.0F, SpringSpec{1.0F, 1600.0F}, [](float) {}, nullptr, kTol, kTol);
+    manager.animateSpring(0.0F, 1.0F, SpringSpec{1.0F, 1600.0F}, [](float) {}, {}, nullptr, kTol, kTol);
     TEST_CHECK(requests == 1);
   }
 
@@ -28,9 +28,9 @@ int main() {
     int requests = 0;
     manager.setFrameRequest([&] { ++requests; });
 
-    manager.animateSpring(0.0F, 1.0F, SpringSpec{0.8F, 380.0F}, [](float) {}, nullptr, kTol, kTol);
-    manager.animateSpring(0.0F, 1.0F, SpringSpec{1.0F, 1600.0F}, [](float) {}, nullptr, kTol, kTol);
-    manager.animateSpring(0.0F, 1.0F, SpringSpec{0.6F, 800.0F}, [](float) {}, nullptr, kTol, kTol);
+    manager.animateSpring(0.0F, 1.0F, SpringSpec{0.8F, 380.0F}, [](float) {}, {}, nullptr, kTol, kTol);
+    manager.animateSpring(0.0F, 1.0F, SpringSpec{1.0F, 1600.0F}, [](float) {}, {}, nullptr, kTol, kTol);
+    manager.animateSpring(0.0F, 1.0F, SpringSpec{0.6F, 800.0F}, [](float) {}, {}, nullptr, kTol, kTol);
 
     bool sawActiveRequest = false;
     int frames = 0;
@@ -62,10 +62,10 @@ int main() {
     manager.setFrameRequest([&] { ++requests; });
 
     const auto a =
-        manager.animateSpring(0.0F, 1.0F, SpringSpec{0.8F, 380.0F}, [](float) {}, nullptr, kTol, kTol);
+        manager.animateSpring(0.0F, 1.0F, SpringSpec{0.8F, 380.0F}, [](float) {}, {}, nullptr, kTol, kTol);
     TEST_CHECK(requests == 1);
 
-    manager.animateSpring(0.0F, 1.0F, SpringSpec{0.8F, 380.0F}, [](float) {}, nullptr, kTol, kTol);
+    manager.animateSpring(0.0F, 1.0F, SpringSpec{0.8F, 380.0F}, [](float) {}, {}, nullptr, kTol, kTol);
     TEST_CHECK(requests == 1);
 
     manager.retargetSpring(a, 2.0F);
@@ -80,7 +80,7 @@ int main() {
     int requests = 0;
     manager.setFrameRequest([&] { ++requests; });
 
-    manager.animateSpring(0.0F, 1.0F, SpringSpec{0.8F, 380.0F}, [](float) {}, nullptr, kTol, kTol);
+    manager.animateSpring(0.0F, 1.0F, SpringSpec{0.8F, 380.0F}, [](float) {}, {}, nullptr, kTol, kTol);
     for (int i = 0; i < 1000 && manager.hasActiveSprings(); ++i) {
       manager.tickSprings(kDt);
     }
@@ -91,7 +91,7 @@ int main() {
     }
 
     requests = 0;
-    manager.animateSpring(0.0F, 1.0F, SpringSpec{0.8F, 380.0F}, [](float) {}, nullptr, kTol, kTol);
+    manager.animateSpring(0.0F, 1.0F, SpringSpec{0.8F, 380.0F}, [](float) {}, {}, nullptr, kTol, kTol);
     TEST_CHECK(requests == 1);
 
     manager.tickSprings(kDt);
@@ -104,7 +104,7 @@ int main() {
     manager.setFrameRequest([&] { ++requests; });
 
     const auto id =
-        manager.animateSpring(0.0F, 1.0F, SpringSpec{0.8F, 380.0F}, [](float) {}, nullptr, kTol, kTol);
+        manager.animateSpring(0.0F, 1.0F, SpringSpec{0.8F, 380.0F}, [](float) {}, {}, nullptr, kTol, kTol);
     for (int i = 0; i < 1000 && manager.hasActiveSprings(); ++i) {
       manager.tickSprings(kDt);
     }
@@ -126,7 +126,7 @@ int main() {
     manager.setFrameRequest([&] { ++requests; });
 
     const auto id =
-        manager.animateSpring(0.0F, 1.0F, SpringSpec{0.6F, 800.0F}, [](float) {}, nullptr, kTol, kTol);
+        manager.animateSpring(0.0F, 1.0F, SpringSpec{0.6F, 800.0F}, [](float) {}, {}, nullptr, kTol, kTol);
     manager.tickSprings(kDt);
     requests = 0;
 

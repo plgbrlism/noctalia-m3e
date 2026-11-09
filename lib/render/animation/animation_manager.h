@@ -21,6 +21,7 @@ struct SpringState {
   float eps_x = 0.5F;
   float eps_v = 1.0F;
   std::function<void(float)> setter;
+  std::function<void()> onComplete;
   const void* owner = nullptr;
   bool finished = false;
 };
@@ -58,8 +59,11 @@ public:
   bool hasActive() const;
 
   Id animateSpring(
-      float initial, float target, SpringSpec spec, std::function<void(float)> setter,
-      const void* owner = nullptr, float eps_x = 0.5F, float eps_v = 1.0F
+      float initial, float target, SpringSpec spec,
+      std::function<void(float)> setter,
+      std::function<void()> onComplete = {},
+      const void* owner = nullptr,
+      float eps_x = 0.5F, float eps_v = 1.0F
   );
   bool retargetSpring(Id id, float target);
   bool retargetSpringSpec(Id id, SpringSpec spec);
