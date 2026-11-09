@@ -63,6 +63,9 @@ public:
   );
   bool retargetSpring(Id id, float target);
   bool retargetSpringSpec(Id id, SpringSpec spec);
+  using FrameRequest = std::function<void()>;
+  void setFrameRequest(FrameRequest request);
+  bool hasAnyActive() const; // returns hasActive() || hasActiveSprings()
   void tickSprings(float dt);
   bool hasActiveSprings() const;
   std::optional<float> springValue(Id id) const;
@@ -75,9 +78,13 @@ private:
     Animation animation;
   };
 
+  void requestFrame();
+
   std::vector<Entry> m_animations;
   std::unordered_map<Id, SpringState> m_springs;
   Id m_nextId = 1;
+  FrameRequest m_frameRequest;
+  bool m_frameRequested = false;
 
   Id animateInternal(
       float from, float to, float durationMs, Easing easing, std::function<void(float)> setter,

@@ -20,3 +20,7 @@ Status: `pending-test` | `pass` | `fail` | `reverted`
 [MOT-003] lib/render/animation/animation_manager.h add retargetSpringSpec API pass
 [MOT-003] lib/render/animation/animation_manager.cpp add retargetSpringSpec impl pass
 [MOT-003] tests/spring_test.cpp add target + spec retarget continuity tests pass
+[MOT-005] lib/render/animation/animation_manager.h add FrameRequest/setFrameRequest/hasAnyActive pass
+[MOT-005] lib/render/animation/animation_manager.cpp add requestFrame lifecycle pass
+[MOT-005] tests/idle_test.cpp add idle harness pass
+[MOT-005] meson.build register idle test pass

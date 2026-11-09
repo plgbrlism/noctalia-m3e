@@ -172,6 +172,7 @@ AnimationManager::Id AnimationManager::animateSpring(
               eps_x, eps_v, std::move(setter), owner, false,
           }
   );
+  requestFrame();
   return id;
 }
 
@@ -185,11 +186,15 @@ bool AnimationManager::retargetSpring(Id id, float target) {
   }
 
   auto& state = it->second;
+  const bool wasFinished = state.finished;
   state.x0 = state.x;
   state.v0 = state.v;
   state.elapsed = 0.0F;
   state.target = target;
   state.finished = false;
+  if (wasFinished) {
+    requestFrame();
+  }
   return true;
 }
 
@@ -202,12 +207,16 @@ bool AnimationManager::retargetSpringSpec(Id id, SpringSpec spec) {
     return false;
   }
   auto& state = it->second;
+  const bool wasFinished = state.finished;
   state.x0 = state.x;
   state.v0 = state.v;
   state.elapsed = 0.0F;
   state.dampingRatio = spec.dampingRatio;
   state.stiffness = spec.stiffness;
   state.finished = false;
+  if (wasFinished) {
+    requestFrame();
+  }
   return true;
 }
 
@@ -217,6 +226,8 @@ void AnimationManager::tickSprings(float dt) {
   if (dt > 0.032F) {
     dt = 0.032F;
   }
+
+  m_frameRequested = false;
 
   // Snapshot IDs: setter callbacks may call animateSpring() and rehash
   // m_springs, invalidating any iterator held across the callback.
@@ -286,6 +297,10 @@ void AnimationManager::tickSprings(float dt) {
       state.setter(state.x);
     }
   }
+
+  if (hasActiveSprings()) {
+    requestFrame();
+  }
 }
 
 bool AnimationManager::hasActiveSprings() const {
@@ -307,4 +322,19 @@ std::optional<float> AnimationManager::springValue(Id id) const {
     return std::nullopt;
   }
   return it->second.x;
+}
+
+bool AnimationManager::hasAnyActive() const { return hasActive() || hasActiveSprings(); }
+
+void AnimationManager::setFrameRequest(FrameRequest request) {
+  // m_frameRequested stays true across callback swap — any pending request
+  // was already delivered. New callback serves the next frame.
+  m_frameRequest = std::move(request);
+}
+
+void AnimationManager::requestFrame() {
+  if (!m_frameRequested && m_frameRequest) {
+    m_frameRequested = true;
+    m_frameRequest();
+  }
 }

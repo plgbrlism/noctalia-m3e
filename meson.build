@@ -1233,6 +1233,7 @@ if build_tests
     'i18n_supported_languages',
     'ical_parser',
     'icon_resolver',
+    'idle',
     'image_orientation',
     'ipc_service',
     'iwd_diagnostics',
