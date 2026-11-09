@@ -53,3 +53,5 @@ Status: `pending-test` | `pass` | `fail` | `reverted`
 [SHP-001] lib/ui/controls/button.{h,cpp} add press morph radii animation, clamp, scale, and test support pass
 [SHP-001] tests/button_shape_test.cpp add AT-SHP-01 clamp and AT-SHP-02 fractional scale tests pass
 [SHP-001] lib/wayland/surface.cpp and animation_manager.cpp wire spring tick and frame loop pass
+[SHP-002] lib/ui/controls/button.cpp radii scale plumbing satisfied by SHP-001 (renderer.renderScale() in doLayout + m_cachedContentScale) pass
+[SHP-002] tests/button_shape_test.cpp AT-SHP-02 covers 1.25x and 1.5x pass
