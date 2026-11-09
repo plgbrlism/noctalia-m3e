@@ -82,6 +82,14 @@ Regenerate only via the spec-verify or spec-amend skills.
 - Invariants: INV-01
 - Work items: none
 ---
+## Application lifecycle
+
+- `src/app/application.*` — Application lifecycle, service init, reload callback registration
+- `src/app/application_services.*` — Service accessors and startup wiring (`MotionService::instance()` setup at :558)
+- `src/config/config_service.*` — Config load, validation, reload callback iteration (:630 register, :670/:715 iterate)
+- Invariants: INV-07, INV-09
+- Work items: CFG-001
+---
 ## Services
 
 - `<verify>` — idle, PipeWire, clipboard, brightness, weather paths not stated
