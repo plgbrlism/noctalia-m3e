@@ -1,6 +1,6 @@
 # VG-09 — M3 scheme currency
 Verdict: partial (expressive vendored, unexposed; exposure is trivial, 2025-spec vendor refresh is a future item)
-Baseline commit: e862faaa6a95211216ec47931bcecd359e6cce99
+Baseline commit: ed7a4f167
 Date: 2026-11-09
 
 ## Evidence
