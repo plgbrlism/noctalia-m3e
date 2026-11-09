@@ -9,6 +9,7 @@
 #include "ipc/ipc_arg_parse.h"
 #include "ipc/ipc_service.h"
 #include "render/core/renderer.h"
+#include "render/animation/motion_service.h"
 #include "render/render_context.h"
 #include "render/scene/node.h"
 #include "shell/surface/edge_inset.h"
@@ -990,8 +991,8 @@ void OsdOverlay::animateInstance(Instance& inst) {
     if (inst.showAnimId == 0) {
       inst.sceneRoot->setOpacity(1.0F);
       applyReveal(inst, 0.0F);
-      inst.showAnimId = inst.animations.animate(
-          0.0F, 1.0F, Style::animNormal, Easing::EaseOutCubic, [this, &inst](float v) { applyReveal(inst, v); },
+      inst.showAnimId = inst.animations.animateSpring(
+          0.0F, 1.0F, MotionService::instance().resolve(SpringToken::EffectsFast), [this, &inst](float v) { applyReveal(inst, v); },
           [&inst] {
             inst.showAnimId = 0;
             inst.visible = true;
@@ -1007,8 +1008,8 @@ void OsdOverlay::animateInstance(Instance& inst) {
   inst.hideAnimId = inst.animations.animateTimer(
       1.0F, 0.0F, hideDelayMs, Easing::Linear, [](float /*v*/) {},
       [this, &inst] {
-        inst.hideAnimId = inst.animations.animate(
-            1.0F, 0.0F, Style::animNormal, Easing::EaseInQuad, [this, &inst](float v) { applyReveal(inst, v); },
+        inst.hideAnimId = inst.animations.animateSpring(
+            1.0F, 0.0F, MotionService::instance().resolve(SpringToken::EffectsFast), [this, &inst](float v) { applyReveal(inst, v); },
             [this, &inst] {
               inst.hideAnimId = 0;
               inst.visible = false;

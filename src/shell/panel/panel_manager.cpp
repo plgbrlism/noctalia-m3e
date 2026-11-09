@@ -9,6 +9,7 @@
 #include "core/ui_phase.h"
 #include "ipc/ipc_arg_parse.h"
 #include "ipc/ipc_service.h"
+#include "render/animation/motion_service.h"
 #include "render/render_context.h"
 #include "render/scene/input_area.h"
 #include "scripting/plugin_id.h"
@@ -1534,8 +1535,8 @@ void PanelManager::closePanel(bool animateClose) {
     const std::uint64_t gen = ++m_destroyGeneration;
     if (m_attachedToBar && m_attachedRevealClipNode != nullptr) {
       m_animations.cancelForOwner(m_attachedRevealClipNode);
-      m_animations.animate(
-          m_attachedRevealProgress, 0.0F, Style::animNormal, Easing::EaseInOutQuad,
+      m_animations.animateSpring(
+          m_attachedRevealProgress, 0.0F, MotionService::instance().resolve(SpringToken::SpatialDefault),
           [this](float v) { applyAttachedReveal(v); },
           [this, gen] {
             DeferredCall::callLater([this, gen] {
@@ -1548,8 +1549,8 @@ void PanelManager::closePanel(bool animateClose) {
       );
     } else {
       m_animations.cancelForOwner(m_sceneRoot.get());
-      m_animations.animate(
-          m_detachedRevealProgress, 0.0F, Style::animNormal, Easing::EaseInQuad,
+      m_animations.animateSpring(
+          m_detachedRevealProgress, 0.0F, MotionService::instance().resolve(SpringToken::SpatialDefault),
           [this](float v) { applyDetachedReveal(v); },
           [this, gen] {
             DeferredCall::callLater([this, gen] {
@@ -2367,8 +2368,8 @@ void PanelManager::startAttachedOpenAnimation() {
   }
 
   m_attachedOpenAnimationPending = false;
-  m_animations.animate(
-      m_attachedRevealProgress, 1.0F, Style::animNormal, Easing::EaseOutCubic,
+  m_animations.animateSpring(
+      m_attachedRevealProgress, 1.0F, MotionService::instance().resolve(SpringToken::SpatialFast),
       [this](float v) { applyAttachedReveal(v); }, {}, m_attachedRevealClipNode
   );
 }
@@ -2787,8 +2788,8 @@ void PanelManager::buildScene(std::uint32_t width, std::uint32_t height) {
       m_attachedOpenAnimationPending = true;
     } else {
       applyDetachedReveal(0.0F);
-      m_animations.animate(
-          0.0F, 1.0F, Style::animNormal, Easing::EaseOutCubic, [this](float v) { applyDetachedReveal(v); }, {},
+      m_animations.animateSpring(
+          0.0F, 1.0F, MotionService::instance().resolve(SpringToken::SpatialFast), [this](float v) { applyDetachedReveal(v); }, {},
           m_sceneRoot.get()
       );
     }
@@ -2969,8 +2970,8 @@ void PanelManager::layoutActivePanel(Renderer& renderer) {
       // The open reveal already animates the first appearance.
       setCardHeight(target);
     } else {
-      m_contentFit.animation = m_animations.animate(
-          static_cast<float>(m_panelVisualHeight), static_cast<float>(target), Style::animNormal, Easing::EaseOutCubic,
+      m_contentFit.animation = m_animations.animateSpring(
+          static_cast<float>(m_panelVisualHeight), static_cast<float>(target), MotionService::instance().resolve(SpringToken::SpatialFast),
           [this](float height) {
             if (setCardHeight(static_cast<std::uint32_t>(std::lround(height)))) {
               placePanelChrome();
