@@ -385,7 +385,7 @@ void Surface::handleFrameDone(void* data, wl_callback* callback, std::uint32_t c
   }
   self->m_lastFrameAt = now;
 
-  const bool activeAnimations = self->m_animationManager != nullptr && self->m_animationManager->hasActive();
+  const bool activeAnimations = self->m_animationManager != nullptr && self->m_animationManager->hasAnyActive();
   const bool runFrameTick = self->m_frameCallbackShouldTick || self->m_frameTickPending || activeAnimations;
   self->m_frameCallbackShouldTick = false;
 
@@ -1204,7 +1204,7 @@ void Surface::requestFrame() {
     return;
   }
 
-  const bool activeAnimations = m_animationManager != nullptr && m_animationManager->hasActive();
+  const bool activeAnimations = m_animationManager != nullptr && m_animationManager->hasAnyActive();
   m_frameCallbackShouldTick = m_nextFrameCallbackShouldTick || activeAnimations;
   m_nextFrameCallbackShouldTick = false;
 
@@ -1371,7 +1371,7 @@ void Surface::processQueuedFrameWork() {
 
 void Surface::queueRenderIfNeeded() {
   const bool invalidated = m_sceneRoot != nullptr && (m_sceneRoot->paintDirty() || m_sceneRoot->layoutDirty());
-  const bool animating = m_animationManager != nullptr && m_animationManager->hasActive();
+  const bool animating = m_animationManager != nullptr && m_animationManager->hasAnyActive();
   if (m_redrawRequested || invalidated) {
     queueRender();
   } else if (animating) {

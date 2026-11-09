@@ -50,3 +50,6 @@ Status: `pending-test` | `pass` | `fail` | `reverted`
 [MOT-004] lib/render/animation/animation_manager.cpp uncomment deltaMs in tick(float deltaMs) pass
 [MOT-004] lib/render/animation/animation_manager.cpp extend hasActive() to include hasActiveSprings() pass
 [MOT-004] lib/render/animation/animation_manager.cpp drive tickSprings from tick(deltaMs) pass
+[SHP-001] lib/ui/controls/button.{h,cpp} add press morph radii animation, clamp, scale, and test support pass
+[SHP-001] tests/button_shape_test.cpp add AT-SHP-01 clamp and AT-SHP-02 fractional scale tests pass
+[SHP-001] lib/wayland/surface.cpp and animation_manager.cpp wire spring tick and frame loop pass

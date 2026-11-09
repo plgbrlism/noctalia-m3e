@@ -2,7 +2,9 @@
 
 #include "core/input/keybind_matcher.h"
 #include "render/animation/animation_manager.h"
+#include "render/animation/motion_service.h"
 #include "render/core/renderer.h"
+#include "render/core/render_styles.h"
 #include "render/scene/input_area.h"
 #include "ui/controls/glyph.h"
 #include "ui/controls/label.h"
@@ -379,6 +381,64 @@ void Button::setPressedVisual(bool pressed) {
   applyVisualState();
 }
 
+Radii Button::currentRadiiForTest() const {
+  return m_lastPhysicalRadii;
+}
+
+void Button::setContentScaleForTest(float scale) {
+  m_cachedContentScale = scale;
+  updateButtonRadii();
+}
+
+void Button::updateButtonRadii() {
+  const float w = width();
+  const float h = height();
+  const float maxRadius = std::max(0.0F, std::min(w, h) * 0.5F);
+
+  const float p = std::clamp(m_shapeState.progress, 0.0F, 1.0F);
+  const float rest = Style::scaledRadiusMd(m_cachedContentScale);
+  // Absolute pressed target, independent of corner_radius_scale.
+  // At user scale 0.0 (square rest) → rounds outward on press.
+  // At user scale 2.0 (pill rest) → squares inward on press.
+  // Both converge on the same target — M3E convergence rule.
+  constexpr float kPressedRadiusBasePx = 12.0F;
+  const float pressed = kPressedRadiusBasePx * m_cachedContentScale;
+  const float tl = std::clamp(rest + (pressed - rest) * p, 0.0F, maxRadius);
+  const float tr = std::clamp(rest + (pressed - rest) * p, 0.0F, maxRadius);
+  const float br = std::clamp(rest + (pressed - rest) * p, 0.0F, maxRadius);
+  const float bl = std::clamp(rest + (pressed - rest) * p, 0.0F, maxRadius);
+  Radii physical{tl, tr, br, bl};
+  m_lastPhysicalRadii = physical;
+  setRadii(physical);
+}
+
+void Button::syncPressMorph(bool isPressed) {
+  const float targetProgress = isPressed ? 1.0F : 0.0F;
+  if (m_shapeState.animId == 0
+      && std::abs(m_shapeState.progress - targetProgress) < 0.001F) {
+    return;
+  }
+  if (animationManager() == nullptr) {
+    m_shapeState.progress = targetProgress;
+    updateButtonRadii();
+    markPaintDirty();
+    return;
+  }
+  if (m_shapeState.animId != 0) {
+    animationManager()->cancel(m_shapeState.animId);
+  }
+  m_shapeState.animId = animationManager()->animateSpring(
+      m_shapeState.progress, targetProgress,
+      MotionService::instance().resolve(SpringToken::SpatialFast),
+      [this](float progress) {
+        m_shapeState.progress = progress;
+        updateButtonRadii();
+        markPaintDirty();
+      },
+      [this] { m_shapeState.animId = 0; },
+      this
+  );
+}
 void Button::setCursorShape(std::uint32_t shape) {
   if (m_inputArea != nullptr) {
     m_inputArea->setCursorShape(shape);
@@ -666,6 +726,9 @@ void Button::applyVisualState() {
   Color targetLabel;
   resolveVisualStateColors(targetBg, targetBorder, targetLabel);
 
+  const bool morphPressed = m_enabled && (m_pressedVisual || pressed());
+  syncPressMorph(morphPressed);
+
   if (!m_visualStateInitialized) {
     m_targetBg = targetBg;
     m_targetBorder = targetBorder;
@@ -778,6 +841,9 @@ void Button::doLayout(Renderer& renderer) {
       setSizeFromLayout(squareSize, squareSize);
     }
   }
+
+  m_cachedContentScale = renderer.renderScale();
+  updateButtonRadii();
 
   // After Flex layout the content row is leading-anchored inside the padding.
   // Shift the whole group to honor m_contentAlign (Start leaves it as-is).

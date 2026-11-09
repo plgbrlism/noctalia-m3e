@@ -1,6 +1,7 @@
 #pragma once
 
 #include "render/core/color.h"
+#include "render/core/render_styles.h"
 #include "ui/controls/flex.h"
 #include "ui/signal.h"
 
@@ -95,6 +96,8 @@ public:
   bool pressed() const noexcept;
   bool enabled() const noexcept { return m_enabled; }
   ButtonVariant variant() const noexcept { return m_variant; }
+  Radii currentRadiiForTest() const;
+  void setContentScaleForTest(float scale);
 
   static ButtonPalette defaultPalette(ButtonVariant variant);
 
@@ -125,6 +128,15 @@ private:
   Label* m_badgeLabel = nullptr;
   InputArea* m_inputArea = nullptr;
   std::uint32_t m_animId = 0;
+  struct ShapeState {
+    float progress = 0.0F;
+    std::uint32_t animId = 0;
+  };
+  ShapeState m_shapeState;
+  void updateButtonRadii();
+  void syncPressMorph(bool isPressed);
+  float m_cachedContentScale = 1.0F;
+  Radii m_lastPhysicalRadii{0.0F, 0.0F, 0.0F, 0.0F};
   std::function<void()> m_onClick;
   std::function<void()> m_onRightClick;
   std::function<void(float, float, std::uint32_t, std::uint32_t)> m_onRightClickWithPointer;
