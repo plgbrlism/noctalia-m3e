@@ -4,6 +4,7 @@
 #include "config/config_service.h"
 #include "core/ui_phase.h"
 #include "render/core/render_styles.h"
+#include "render/animation/motion_service.h"
 #include "render/render_context.h"
 #include "render/scene/input_area.h"
 #include "render/scene/node.h"
@@ -313,8 +314,8 @@ namespace shell::dock {
       } else {
         instance.slideRoot->setOpacity(0.0F);
         instance.hideOpacity = 1.0F;
-        instance.animations.animate(
-            0.0F, 1.0F, Style::animSlow, Easing::EaseOutCubic,
+        instance.animations.animateSpring(
+            0.0F, 1.0F, MotionService::instance().resolve(SpringToken::EffectsFast),
             [slide = instance.slideRoot](float v) { slide->setOpacity(v); }, {}, instance.slideRoot
         );
       }
@@ -461,8 +462,8 @@ namespace shell::dock {
       return;
     }
 
-    inst.hideAnimId = inst.animations.animate(
-        current, 1.0F, Style::animNormal, Easing::EaseOutCubic,
+    inst.hideAnimId = inst.animations.animateSpring(
+        current, 1.0F, MotionService::instance().resolve(SpringToken::EffectsFast),
         [&inst](float v) {
           inst.hideOpacity = v;
           syncDockSlideLayerTransform(inst, inst.config);
@@ -484,8 +485,8 @@ namespace shell::dock {
       inst.hideAnimId = 0;
     }
     const float current = inst.hideOpacity;
-    inst.hideAnimId = inst.animations.animate(
-        current, 0.0F, Style::animNormal, Easing::EaseInQuad,
+    inst.hideAnimId = inst.animations.animateSpring(
+        current, 0.0F, MotionService::instance().resolve(SpringToken::EffectsFast),
         [&inst](float v) {
           inst.hideOpacity = v;
           syncDockSlideLayerTransform(inst, inst.config);

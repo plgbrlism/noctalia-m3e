@@ -4,6 +4,7 @@
 #include "core/deferred_call.h"
 #include "core/log.h"
 #include "core/ui_phase.h"
+#include "render/animation/motion_service.h"
 #include "render/render_context.h"
 #include "render/render_target.h"
 #include "render/scene/input_area.h"
@@ -474,8 +475,8 @@ void TooltipManager::dismissPopup() {
     if (m_fadeAnimId != 0) {
       m_animations.cancel(m_fadeAnimId);
     }
-    m_fadeAnimId = m_animations.animate(
-        m_sceneRoot->opacity(), 0.0F, Style::animFast, Easing::EaseOutQuad,
+    m_fadeAnimId = m_animations.animateSpring(
+        m_sceneRoot->opacity(), 0.0F, MotionService::instance().resolve(SpringToken::EffectsDefault),
         [this](float v) {
           if (m_sceneRoot != nullptr) {
             m_sceneRoot->setOpacity(v);
@@ -803,8 +804,8 @@ void TooltipManager::prepareFrame(bool /*needsUpdate*/, bool /*needsLayout*/) {
     if (m_fadeAnimId != 0) {
       m_animations.cancel(m_fadeAnimId);
     }
-    m_fadeAnimId = m_animations.animate(
-        0.0F, 1.0F, Style::animFast, Easing::EaseOutQuad,
+    m_fadeAnimId = m_animations.animateSpring(
+        0.0F, 1.0F, MotionService::instance().resolve(SpringToken::EffectsDefault),
         [this](float v) {
           if (m_sceneRoot != nullptr) {
             m_sceneRoot->setOpacity(v);

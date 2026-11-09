@@ -3,6 +3,7 @@
 #include "config/config_service.h"
 #include "core/ui_phase.h"
 #include "i18n/i18n.h"
+#include "render/animation/motion_service.h"
 #include "render/core/renderer.h"
 #include "render/core/texture_manager.h"
 #include "render/scene/input_area.h"
@@ -342,8 +343,8 @@ namespace {
     if (animId != 0) {
       instance.animations.cancel(animId);
     }
-    animId = instance.animations.animate(
-        visualScale, targetScale, Style::animNormal, Easing::EaseOutCubic,
+    animId = instance.animations.animateSpring(
+        visualScale, targetScale, MotionService::instance().resolve(SpringToken::SpatialFast),
         [node = iconNode, visualScalePtr = &visualScale](float value) {
           *visualScalePtr = value;
           node->setScale(value);
@@ -901,8 +902,8 @@ namespace shell::dock {
             if (item.opacityAnimId != 0) {
               instance.animations.cancel(item.opacityAnimId);
             }
-            item.opacityAnimId = instance.animations.animate(
-                item.visualOpacity, iconOpacity, Style::animNormal, Easing::EaseOutCubic,
+            item.opacityAnimId = instance.animations.animateSpring(
+                item.visualOpacity, iconOpacity, MotionService::instance().resolve(SpringToken::EffectsFast),
                 [node = iconNode, itemPtr = &item](float value) {
                   itemPtr->visualOpacity = value;
                   node->setOpacity(value);

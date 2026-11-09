@@ -44,3 +44,6 @@ Status: `pending-test` | `pass` | `fail` | `reverted`
 [MOT-004] tests/spring_test.cpp add cancelForOwner spring cases E-F pass
 [MOT-004] lib/render/animation/animation_manager.cpp extend cancel/cancelAll to also erase springs pass
 [MOT-004] tests/spring_test.cpp add cancel/cancelAll spring cases G-H pass
+[MOT-004] src/shell/dock/dock_instance.cpp add motion_service.h include + migrate 3 animate() sites to animateSpring() pass
+[MOT-004] src/shell/dock/dock_items.cpp add motion_service.h include + migrate 2 animate() sites to animateSpring() pass
+[MOT-004] src/shell/tooltip/tooltip_manager.cpp add motion_service.h include + migrate 2 animate() sites to animateSpring() pass
