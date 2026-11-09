@@ -397,12 +397,13 @@ void Button::updateButtonRadii() {
 
   const float p = std::clamp(m_shapeState.progress, 0.0F, 1.0F);
   const float rest = Style::scaledRadiusMd(m_cachedContentScale);
-  // Absolute pressed target, independent of corner_radius_scale.
-  // At user scale 0.0 (square rest) → rounds outward on press.
-  // At user scale 2.0 (pill rest) → squares inward on press.
-  // Both converge on the same target — M3E convergence rule.
-  constexpr float kPressedRadiusBasePx = 12.0F;
-  const float pressed = kPressedRadiusBasePx * m_cachedContentScale;
+  // Symmetric morph delta — pressed is always ±delta from rest.
+  // Ensures both extremes (square rest, pill rest) get equal visible morph.
+  // Middle rounding (scale~1) gets small delta — matches M3E convergence
+  // (medium-round buttons are already near the pressed target).
+  constexpr float kMorphDeltaPx = 10.0F;
+  const float delta = kMorphDeltaPx * m_cachedContentScale;
+  const float pressed = (rest < delta) ? delta : (rest - delta);
   const float tl = std::clamp(rest + (pressed - rest) * p, 0.0F, maxRadius);
   const float tr = std::clamp(rest + (pressed - rest) * p, 0.0F, maxRadius);
   const float br = std::clamp(rest + (pressed - rest) * p, 0.0F, maxRadius);

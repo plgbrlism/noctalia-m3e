@@ -46,5 +46,15 @@ void MotionService::setMotionConfig(const MotionConfig& config) { m_motionConfig
 const MotionConfig& MotionService::motionConfig() const { return m_motionConfig; }
 
 SpringSpec MotionService::resolve(SpringToken token) const {
-  return SpringTokenResolver(m_motionConfig).resolve(token);
+  SpringSpec spec = SpringTokenResolver(m_motionConfig).resolve(token);
+  if (!m_enabled) {
+    spec.dampingRatio = 1.0F;
+    spec.stiffness = 1.0e6F;
+    return spec;
+  }
+  if (m_speed != 1.0F && m_speed > 0.0F) {
+    const float kMultiplier = std::clamp(m_speed * m_speed, 0.25F, 4.0F);
+    spec.stiffness *= kMultiplier;
+  }
+  return spec;
 }
