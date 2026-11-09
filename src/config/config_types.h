@@ -5,6 +5,7 @@
 #include "config/widget_setting_value.h"
 #include "core/input/key_chord.h"
 #include "core/input/keybind_action.h"
+#include "render/animation/motion_scheme.h"
 #include "system/sysmon_threshold_profile.h"
 #include "ui/style.h"
 #include "ui/surface_shadow.h"
@@ -2031,6 +2032,7 @@ struct Config {
   ControlCenterConfig controlCenter;
   PluginsConfig plugins;
   AccessibilityConfig accessibility;
+  MotionConfig motion;
 };
 // Which top-level config sections changed across a reload. Default-constructed
 // to all-true (conservative: "assume everything changed") so any path that does
@@ -2065,6 +2067,7 @@ struct ConfigChangeSet {
   bool hotCorners = true;
   bool storage = true;
   bool accessibility = true;
+  bool motion = true;
 
   bool any() const noexcept {
     return bars
@@ -2095,7 +2098,8 @@ struct ConfigChangeSet {
         || plugins
         || hotCorners
         || storage
-        || accessibility;
+        || accessibility
+        || motion;
   }
 };
 

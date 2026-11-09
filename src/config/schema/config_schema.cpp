@@ -1418,6 +1418,155 @@ namespace noctalia::config::schema {
     };
     return s;
   }
+  namespace {
+    struct MotionTokenSlot {
+      std::string_view family;
+      std::string_view size;
+      SpringToken token;
+      bool effects;
+    };
+    constexpr MotionTokenSlot kMotionTokenSlots[] = {
+        {"spatial", "fast", SpringToken::SpatialFast, false},
+        {"spatial", "default", SpringToken::SpatialDefault, false},
+        {"spatial", "slow", SpringToken::SpatialSlow, false},
+        {"effects", "fast", SpringToken::EffectsFast, true},
+        {"effects", "default", SpringToken::EffectsDefault, true},
+        {"effects", "slow", SpringToken::EffectsSlow, true},
+    };
+  } // namespace
+  const Schema<MotionConfig>& motionSchema() {
+    static const Schema<MotionConfig> s = {
+        Field<MotionConfig>{
+            "scheme",
+            [](const toml::table& tbl, MotionConfig& out, std::string_view parentPath, Diagnostics& diag) {
+              MotionConfig staged = out;
+              bool ok = true;
+              const auto fail = [&](const std::string& path, std::string_view msg) {
+                diag.error(path, std::string(msg));
+                ok = false;
+              };
+              if (const toml::node* node = tbl.get("scheme")) {
+                if (auto v = node->value<std::string>()) {
+                  if (auto parsed = SpringTokenResolver::parseScheme(StringUtils::trim(*v))) {
+                    staged.scheme = *parsed;
+                  } else {
+                    fail(joinPath(parentPath, "scheme"), "expected \"standard\" or \"expressive\"");
+                  }
+                } else {
+                  fail(joinPath(parentPath, "scheme"), "expected string");
+                }
+              }
+              if (const toml::node* node = tbl.get("reduce")) {
+                if (auto v = node->value<bool>()) {
+                  staged.reduce = *v;
+                } else {
+                  fail(joinPath(parentPath, "reduce"), "expected bool");
+                }
+              }
+              for (const MotionTokenSlot& slot : kMotionTokenSlots) {
+                const toml::node* familyNode = tbl.get(slot.family);
+                if (familyNode == nullptr) continue;
+                const toml::table* familyTable = familyNode->as_table();
+                const std::string familyPath = joinPath(parentPath, slot.family);
+                if (familyTable == nullptr) {
+                  if (slot.size == "fast") {
+                    fail(familyPath, "expected a table");
+                  }
+                  continue;
+                }
+                const toml::node* sizeNode = familyTable->get(slot.size);
+                if (sizeNode == nullptr) continue;
+                const std::string path = joinPath(familyPath, slot.size);
+                const toml::table* entry = sizeNode->as_table();
+                if (entry == nullptr) {
+                  fail(path, "expected a table");
+                  continue;
+                }
+                const auto damping = finiteDouble((*entry)["damping"]);
+                const auto stiffness = finiteDouble((*entry)["stiffness"]);
+                bool entryOk = true;
+                if (!damping) {
+                  fail(joinPath(path, "damping"), "expected a number");
+                  entryOk = false;
+                } else if (slot.effects ? *damping < 1.0 : *damping <= 0.0) {
+                  fail(joinPath(path, "damping"), slot.effects ? "must be >= 1.0" : "must be > 0");
+                  entryOk = false;
+                }
+                if (!stiffness) {
+                  fail(joinPath(path, "stiffness"), "expected a number");
+                  entryOk = false;
+                } else if (*stiffness <= 0.0) {
+                  fail(joinPath(path, "stiffness"), "must be > 0");
+                  entryOk = false;
+                }
+                if (!entryOk) {
+                  ok = false;
+                  continue;
+                }
+                staged.overrides[static_cast<std::size_t>(slot.token)] = SpringSpec{
+                    static_cast<float>(*damping), static_cast<float>(*stiffness)
+                };
+              }
+              if (ok) {
+                out = staged;
+              }
+            },
+            [](toml::table& tbl, const MotionConfig& in) {
+              tbl.insert_or_assign("scheme", std::string(SpringTokenResolver::toString(in.scheme)));
+              tbl.insert_or_assign("reduce", in.reduce);
+              toml::table spatial;
+              toml::table effects;
+              for (const MotionTokenSlot& slot : kMotionTokenSlots) {
+                const auto& spec = in.overrides[static_cast<std::size_t>(slot.token)];
+                if (!spec) {
+                  continue;
+                }
+                toml::table entry;
+                entry.insert_or_assign("damping", static_cast<double>(spec->dampingRatio));
+                entry.insert_or_assign("stiffness", static_cast<double>(spec->stiffness));
+                (slot.family == "spatial" ? spatial : effects).insert_or_assign(slot.size, std::move(entry));
+              }
+              if (!spatial.empty()) tbl.insert_or_assign("spatial", std::move(spatial));
+              if (!effects.empty()) tbl.insert_or_assign("effects", std::move(effects));
+            },
+            [](const toml::table& tbl, std::string_view parentPath, std::vector<std::string>& unknown) {
+              for (const auto& [rootKey, rootNode] : tbl) {
+                if (rootKey.str() != "spatial" && rootKey.str() != "effects") {
+                  continue;
+                }
+                const toml::table* familyTable = rootNode.as_table();
+                if (familyTable == nullptr) {
+                  continue;
+                }
+                for (const auto& [sizeKey, sizeNode] : *familyTable) {
+                  const std::string sizePath = joinPath(joinPath(parentPath, rootKey.str()), sizeKey.str());
+                  if (sizeKey.str() != "fast" && sizeKey.str() != "default" && sizeKey.str() != "slow") {
+                    unknown.push_back(sizePath);
+                    continue;
+                  }
+                  const toml::table* entry = sizeNode.as_table();
+                  if (entry == nullptr) {
+                    continue;
+                  }
+                  for (const auto& [fieldKey, fieldNode] : *entry) {
+                    (void)fieldNode;
+                    if (fieldKey.str() != "damping" && fieldKey.str() != "stiffness") {
+                      unknown.push_back(joinPath(sizePath, fieldKey.str()));
+                    }
+                  }
+                }
+              }
+            },
+        },
+        Field<MotionConfig>{"reduce", [](const toml::table&, MotionConfig&, std::string_view, Diagnostics&) {},
+                            [](toml::table&, const MotionConfig&) {}},
+        Field<MotionConfig>{"spatial", [](const toml::table&, MotionConfig&, std::string_view, Diagnostics&) {},
+                            [](toml::table&, const MotionConfig&) {}},
+        Field<MotionConfig>{"effects", [](const toml::table&, MotionConfig&, std::string_view, Diagnostics&) {},
+                            [](toml::table&, const MotionConfig&) {}},
+    };
+    return s;
+  }
 
   namespace {
     // Plain string, but emitted only when non-empty (shell.lang).

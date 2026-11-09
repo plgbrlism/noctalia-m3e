@@ -40,3 +40,7 @@ void MotionService::setEnabled(bool enabled) {
 }
 
 void MotionService::setSpeed(float speed) { m_speed = std::clamp(speed, 0.05F, 4.0F); }
+
+void MotionService::setMotionConfig(const MotionConfig& config) { m_motionConfig = config; }
+
+const MotionConfig& MotionService::motionConfig() const { return m_motionConfig; }

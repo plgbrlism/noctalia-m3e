@@ -1,5 +1,7 @@
 #pragma once
 
+#include <array>
+#include <cstddef>
 #include <optional>
 #include <string_view>
 
@@ -20,6 +22,18 @@ enum class SpringToken {
 struct SpringSpec {
     float dampingRatio;
     float stiffness;
+
+    bool operator==(const SpringSpec&) const = default;
+};
+
+constexpr std::size_t kSpringTokenCount = 6;
+
+struct MotionConfig {
+    MotionScheme scheme = MotionScheme::Expressive;
+    bool reduce = false;
+    std::array<std::optional<SpringSpec>, kSpringTokenCount> overrides{};
+
+    bool operator==(const MotionConfig&) const = default;
 };
 
 constexpr MotionScheme kDefaultMotionScheme = MotionScheme::Expressive;
@@ -27,6 +41,7 @@ constexpr MotionScheme kDefaultMotionScheme = MotionScheme::Expressive;
 class SpringTokenResolver {
 public:
     explicit SpringTokenResolver(MotionScheme scheme = kDefaultMotionScheme) noexcept;
+    explicit SpringTokenResolver(const MotionConfig& config) noexcept;
 
     MotionScheme scheme() const noexcept;
     void setScheme(MotionScheme scheme) noexcept;
@@ -41,5 +56,5 @@ public:
     static std::string_view toInternalId(MotionScheme scheme, SpringToken token) noexcept;
 
 private:
-    MotionScheme scheme_;
+    MotionConfig config_;
 };

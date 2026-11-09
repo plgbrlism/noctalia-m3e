@@ -65,23 +65,32 @@ constexpr std::array<std::array<std::string_view, 6>, 2> kInternalIds = {{
 } // namespace
 
 SpringTokenResolver::SpringTokenResolver(MotionScheme scheme) noexcept
-    : scheme_(scheme)
+{
+    config_.scheme = scheme;
+}
+
+SpringTokenResolver::SpringTokenResolver(const MotionConfig& config) noexcept
+    : config_(config)
 {
 }
 
 MotionScheme SpringTokenResolver::scheme() const noexcept
 {
-    return scheme_;
+    return config_.scheme;
 }
 
 void SpringTokenResolver::setScheme(MotionScheme scheme) noexcept
 {
-    scheme_ = scheme;
+    config_.scheme = scheme;
 }
 
 SpringSpec SpringTokenResolver::resolve(SpringToken token) const noexcept
 {
-    return kSprings[schemeIndex(scheme_)][tokenIndex(token)];
+    const auto idx = tokenIndex(token);
+    if (config_.overrides[idx]) {
+        return *config_.overrides[idx];
+    }
+    return kSprings[schemeIndex(config_.scheme)][idx];
 }
 
 std::optional<SpringSpec> SpringTokenResolver::tryResolve(std::string_view configKey) const noexcept

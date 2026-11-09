@@ -1,5 +1,7 @@
 #pragma once
 
+#include "render/animation/motion_scheme.h"
+
 #include <cstdint>
 #include <unordered_set>
 
@@ -18,6 +20,9 @@ public:
   void setEnabled(bool enabled);
   void setSpeed(float speed);
 
+  void setMotionConfig(const MotionConfig& config);
+  const MotionConfig& motionConfig() const;
+
   bool enabled() const noexcept { return m_enabled; }
   float speed() const noexcept { return m_speed; }
 
@@ -26,5 +31,6 @@ private:
 
   bool m_enabled = true;
   float m_speed = 1.0F;
+  MotionConfig m_motionConfig;
   std::unordered_set<AnimationManager*> m_managers;
 };

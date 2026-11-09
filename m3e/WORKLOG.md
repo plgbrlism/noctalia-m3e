@@ -24,3 +24,7 @@ Status: `pending-test` | `pass` | `fail` | `reverted`
 [MOT-005] lib/render/animation/animation_manager.cpp add requestFrame lifecycle pass
 [MOT-005] tests/idle_test.cpp add idle harness pass
 [MOT-005] meson.build register idle test pass
+[CFG-001] lib/render/animation/motion_scheme.h add MotionConfig/kSpringTokenCount/config ctor pass
+[CFG-001] lib/render/animation/motion_scheme.cpp add MotionConfig ctor/overlay resolve pass
+[CFG-001] tests/config_motion_test.cpp add schema coverage pass
+[CFG-001] meson.build register config_motion test pass

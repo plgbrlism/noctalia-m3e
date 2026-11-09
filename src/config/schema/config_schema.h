@@ -36,6 +36,7 @@ namespace noctalia::config::schema {
   const Schema<IdleConfig>& idleSchema();
   const Schema<WallpaperConfig>& wallpaperSchema();
   const Schema<ThemeConfig>& themeSchema();
+  const Schema<MotionConfig>& motionSchema();
   // Parses a name-keyed [custom_colors] map (bare string or { color, color_dark,
   // color_light, blend } table). Appends valid entries to `out`; entries and keys
   // of the wrong type are skipped with a warning under `path`.
