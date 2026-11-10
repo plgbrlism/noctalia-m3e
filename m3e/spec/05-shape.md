@@ -31,3 +31,12 @@ Cookie shapes are for loaders, avatars, decoration. They are opt-in press target
 | custom | Uniform `{r=Style::scaledRadiusMd() × [shell.corner_radius_scale]}` on all corners |
 
 `Button::updateButtonRadii()` consults `Style::shapeRestRadii()` for rest radii instead of `scaledRadiusMd` directly. Press morph (SHP-001) unchanged — still ±10px × scale delta from rest.
+
+## 3.4 Corner style (DES-004)
+
+| [theme].corner_style | Press morph behavior |
+|---|---|
+| material (default) | Morph enabled — press animates corner radii (current behavior) |
+| fixed | Morph disabled — corners stay at rest radii, no animation on press |
+
+Only shown in GUI when [theme].design_system = expressive. Under design_system = classic, corner_style is inert (morph behavior follows design_system as before). Corner_style=fixed differs from design_system=classic: classic = all expressive features off, sliders drive everything; fixed = expressive mode otherwise active (motion preset, panel motion, palette), but press morph specifically disabled.

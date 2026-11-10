@@ -25,3 +25,5 @@
 | M4 | COL-003, SHP-003 to 007 | VG-05 | r(theta) shapes, controller, tier-1 wiring | +4-5 weeks |
 | M5 | CMP-001 to 003 | — | Expressive components | +3 weeks |
 | M6 | TYP, CHO | VG-03 | Type scale, variable fonts, choreography | +2-3 weeks |
+| M7 | Dux preset adoption (rev6) | REV-001..005, SHP-008, MOT-007 | All reversions landed, `[shell].shape` and `[motion].scheme` accepted in config, no legacy float keys in schema | +1-2 weeks |
+| M8 | Design system polish (DES-004 preset layer + DES-005 panel motion) | DES-004, DES-005 | All 5 new config fields parse and gate correctly; GUI shows all presets under Expressive; 4 panel motion variants ship and pass AT-PANEL-01..04; reduce motion respected | +2-3 weeks |

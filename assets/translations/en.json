@@ -1,4 +1,19 @@
 {
+  "motion": {
+    "preset": {
+      "smooth": "Smooth",
+      "balanced": "Balanced",
+      "playful": "Playful",
+      "custom": "Custom"
+    },
+    "ripple": "Ripple effects",
+    "panel": {
+      "standard": "Standard",
+      "directional": "Directional",
+      "depth": "Depth",
+      "fluid": "Fluid"
+    }
+  },
   "auth": {
     "fingerprint": {
       "disconnected": "Fingerprint reader disconnected",
@@ -2051,7 +2066,16 @@
         "wallpaper-generation-scheme": {
           "description": "Choose how wallpaper colors are converted into a palette",
           "label": "Wallpaper Generation Scheme"
-        }
+        },
+        "design-system": {
+          "description": "Expressive preset (opinionated M3E defaults) or Classic (respect all sliders)",
+          "label": "Design System"
+        },
+        "theme-density": { "label": "Density", "description": "Interface density preset" },
+        "theme-corner-style": { "label": "Corner Style", "description": "Material (morphing) or Fixed (uniform)" },
+        "theme-motion-preset": { "label": "Motion Preset", "description": "Smooth, Balanced, or Playful spring motion" },
+        "theme-motion-ripple": { "label": "Ripple Effects", "description": "Press ripple on buttons" },
+        "theme-panel-motion": { "label": "Panel Motion", "description": "Standard, Directional, Depth, or Fluid panel reveal" }
       },
       "backdrop": {
         "blur-intensity": {
@@ -5334,6 +5358,21 @@
     }
   },
   "theme": {
+    "design-system": {
+      "expressive": "Expressive",
+      "custom": "Classic"
+    },
+    "density": {
+      "spacious": "Spacious",
+      "comfortable": "Comfortable",
+      "compact": "Compact",
+      "dense": "Dense",
+      "custom": "Custom"
+    },
+    "corner-style": {
+      "material": "Material",
+      "fixed": "Fixed"
+    },
     "scheme": {
        "dysfunctional": "Dysfunctional",
        "faithful": "Faithful",
