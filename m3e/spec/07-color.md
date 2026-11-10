@@ -7,3 +7,4 @@
 | COL-R-03 | Expressive scheme is selectable with fallback to existing schemes |
 | COL-R-04 | OSD and notifications use `surface_container_high` + `on_surface` |
 | COL-R-05 | "color role" in UI strings; "theme" means the `[theme]` subsystem |
+| COL-R-06 | `[theme].design_system` is theme-level. When = expressive, settings GUI recommends `[theme].wallpaper_scheme = "m3-expressive"` (existing user value preserved if set). Palette generation unchanged — UX guidance only. |

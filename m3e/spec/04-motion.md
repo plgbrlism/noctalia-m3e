@@ -16,3 +16,12 @@ Springs are damping ratio, mass 1. Config keys use lowercase dot form; internal 
 | Position, size, radius, morph amount | spatial | requestFrameTick |
 | Discrete shape switch | spatial (retarget) | requestLayout |
 | Color, opacity, elevation | effects | requestRedraw |
+
+## 4.5 Design system gating
+
+| [theme].design_system | MotionService::resolve() behavior |
+|---|---|
+| expressive | Returns SpringToken table values directly, no speed multiplier. |
+| custom | Returns SpringToken values × [shell.animation].speed² stiffness (existing behavior). |
+
+*Note:* `[motion].scheme` and `[motion.reduce]` still apply in both modes — they're spec tokens and accessibility, not sliders.

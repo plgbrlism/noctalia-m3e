@@ -3,7 +3,7 @@
 | Layer | Decision |
 |---|---|
 | Phase 1 (MVP) | Per-corner radii `(tl, tr, br, bl)` animated by spatial springs on the existing rect primitive. Press morph = radii change, e.g. round to squarer. Uneven radii allowed (example 4/12/4/12) |
-| Phase 2 | Named shapes as polar profiles `r(theta)`, N samples (start 64), baked in `lib/render/core/` |
+| Phase 2 | Named shaped as polar profiles `r(theta)`, N samples (start 64), baked in `lib/render/core/` |
 | Morph | Lerp between two profile arrays by `amount` in `[0,1]`; no neutral-polygon path, no blending arbitrary SDFs |
 | Generators | `sides`/`style` are offline or init-time generators for the tables, not runtime uniforms |
 | Star-convex | r(theta) is valid only for shapes star-convex about their origin. Candidates that may fail: heart, arch, semicircle, fan, ghost-ish. Per name: use an origin offset, or fall back to the radii path. Record result per name |
@@ -22,3 +22,12 @@ Cookie shapes are for loaders, avatars, decoration. They are opt-in press target
 |---|---|---|
 | Interactive | buttons, switches, chips, bar capsules, session actions, control-center shortcuts | ShapeController: radii (later shape) morph on press/hover/select |
 | Static | clock, sysmon, media art, sticker, audio visualizer, tray icons | Fixed shape, no controller, no spring |
+
+## 3.3 Design system gating
+
+| [theme].design_system | Style::shapeRestRadii() return |
+|---|---|
+| expressive | Per-corner asymmetric: `{tl=4, tr=12, br=4, bl=12}` × contentScale |
+| custom | Uniform `{r=Style::scaledRadiusMd() × [shell.corner_radius_scale]}` on all corners |
+
+`Button::updateButtonRadii()` consults `Style::shapeRestRadii()` for rest radii instead of `scaledRadiusMd` directly. Press morph (SHP-001) unchanged — still ±10px × scale delta from rest.

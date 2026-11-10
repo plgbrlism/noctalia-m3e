@@ -20,5 +20,20 @@ Keep these even solo. Everything else is Opt.
 | AT-PHASE-01 | Debug assertions | No Render-phase mutation; correct request types |
 | AT-INV-01 | Include-path audit | No `src/` includes in `lib/` |
 | AT-INV-02 | Grep gate | No raw nodes in `src/shell/` |
+| AT-PRESET-01 | `[shell].shape = "expressive"` | `Style::shapeRestRadii()` returns `{4,12,4,12}` at scale=1.0 |
+| AT-PRESET-02 | `[shell].shape = "classic"` | `Style::shapeRestRadii()` returns uniform `Style::scaledRadiusMd()` |
+| AT-PRESET-03 | `[motion].scheme = "expressive"` | `MotionService::resolve` returns token table values |
+| AT-PRESET-04 | `[motion].scheme = "off"` | `MotionService::resolve` returns zeta=1.0, k=1e6 (snap) |
+| AT-PRESET-05 | Legacy `[shell.animation].speed` in config | Config parse rejects with clear error (key removed) |
+| AT-PRESET-06 | Legacy `[shell].corner_radius_scale` in config | Config parse rejects with clear error |
+| AT-PRESET-07 | Border config key removed from schema | Config parse rejects `[shell].button_borders` |
+| AT-DES-01 | `[theme].design_system = "expressive"` (default) | `Style::designSystem()` = Expressive; `shapeRestRadii()` = `{4,12,4,12}` at scale 1.0; `MotionService::resolve` ignores speed |
+| AT-DES-02 | `[theme].design_system = "custom"` | `Style::designSystem()` = Custom; `shapeRestRadii()` uniform; `MotionService::resolve` applies speed² multiplier |
+| AT-DES-03 | Invalid `design_system` value | Parse rejects; no partial apply |
+| AT-DES-04 | Hot reload: change `design_system` | `Style::setDesignSystem` updates; relayout triggered; AT-SHP-01/02 pass in new mode |
+| AT-DES-05 | Expressive + all border config = true | No borders rendered |
+| AT-DES-06 | Custom + speed = 3.35 | Spring feel matches pre-DES-001 baseline |
+
+*Note:* AT-PRESET-05/06/07 verify removals — legacy config files fail fast with actionable errors, no silent ignore.
 
 P2 adds: AT-SHP all-35 render, star-convex per name, AA thin features, cross-profile morph interruptibility, AT-CMP golden checks, AT-COL contrast checker.
