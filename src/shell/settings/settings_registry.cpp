@@ -21,6 +21,7 @@
 #include "system/sysmon_threshold_profile.h"
 #include "theme/builtin_palettes.h"
 #include "theme/builtin_templates.h"
+#include "ui/style.h"
 #include "util/file_utils.h"
 #include "util/string_utils.h"
 
@@ -267,6 +268,14 @@ namespace settings {
       );
     }
 
+    SelectSetting designSystemSelect(Style::DesignSystem selected) {
+      return plainSelect(
+          {{"expressive", "theme.design-system.expressive"},
+           {"custom", "theme.design-system.custom"}},
+          selected == Style::DesignSystem::Expressive ? "expressive" : "custom"
+      );
+    }
+
     std::vector<SelectOption> controlCenterShortcutOptions(const Config& cfg) {
       auto catalog = ShortcutRegistry::catalog();
       std::vector<SelectOption> opts;
@@ -508,6 +517,11 @@ namespace settings {
           builtinPaletteSelect(cfg.theme.builtinPalette, shellThemeMode(cfg.theme)), "builtin palette colors"
       ));
     } else if (cfg.theme.source == PaletteSource::Wallpaper) {
+      entries.push_back(makeEntry(
+          SettingsSection::Appearance, "theme", tr("settings.schema.appearance.design-system.label"),
+          tr("settings.schema.appearance.design-system.description"), {"theme", "design_system"},
+          designSystemSelect(cfg.theme.designSystem), "design system expressive custom preset"
+      ));
       entries.push_back(makeEntry(
           SettingsSection::Appearance, "theme", tr("settings.schema.appearance.wallpaper-generation-scheme.label"),
           tr("settings.schema.appearance.wallpaper-generation-scheme.description"), {"theme", "wallpaper_scheme"},

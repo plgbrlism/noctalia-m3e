@@ -1797,6 +1797,11 @@ constexpr EnumOption<ControlCenterSidebarMode> kControlCenterSidebarModes[] = {
     {ControlCenterSidebarMode::None, "none", "settings.options.control-center.sidebar.none"},
 };
 
+constexpr EnumOption<Style::DesignSystem> kDesignSystems[] = {
+    {Style::DesignSystem::Expressive, "expressive", "theme.design-system.expressive"},
+    {Style::DesignSystem::Custom, "custom", "theme.design-system.custom"},
+};
+
 struct ThemeConfig {
   struct TemplateColorConfig {
     std::string name;
@@ -1857,6 +1862,7 @@ struct ThemeConfig {
   std::string communityPalette = "Oxocarbon";
   std::string customPalette;
   std::string wallpaperScheme = "m3-content";
+  Style::DesignSystem designSystem = Style::DesignSystem::Expressive;
   ThemeMode mode = ThemeMode::Dark;
   ShellThemeMode shellMode = ShellThemeMode::Follow;
   bool pureBlackDark = false;

@@ -12,6 +12,7 @@ namespace {
   bool g_popupShadowsEnabled = true;
   bool g_cardBordersEnabled = true;
   bool g_closeButtonsEnabled = true;
+  Style::DesignSystem g_designSystem = Style::DesignSystem::Expressive;
 
 } // namespace
 
@@ -65,7 +66,12 @@ namespace Style {
   bool closeButtonsEnabled() noexcept { return g_closeButtonsEnabled; }
   void setCloseButtonsEnabled(bool enabled) { g_closeButtonsEnabled = enabled; }
 
-  float scaledRadius(float radius, float localScale) noexcept { return radius * localScale * g_cornerRadiusScale; }
+  float scaledRadius(float radius, float localScale) noexcept {
+    const float cs = (g_designSystem == DesignSystem::Expressive)
+                         ? 1.0F
+                         : g_cornerRadiusScale;
+    return radius * localScale * cs;
+  }
 
   float scaledRadiusSm(float localScale) noexcept { return scaledRadius(radiusSm, localScale); }
 
@@ -74,5 +80,9 @@ namespace Style {
   float scaledRadiusLg(float localScale) noexcept { return scaledRadius(radiusLg, localScale); }
 
   float scaledRadiusXl(float localScale) noexcept { return scaledRadius(radiusXl, localScale); }
+
+  DesignSystem designSystem() noexcept { return g_designSystem; }
+
+  void setDesignSystem(DesignSystem ds) noexcept { g_designSystem = ds; }
 
 } // namespace Style

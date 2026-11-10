@@ -1,8 +1,14 @@
 #pragma once
 
+#include <cstdint>
 #include "ui/signal.h"
 
 namespace Style {
+
+  enum class DesignSystem : std::uint8_t {
+    Expressive = 0,
+    Custom = 1,
+  };
 
   inline constexpr int barThicknessDefault = 34;
 
@@ -128,5 +134,8 @@ namespace Style {
   float scaledRadiusMd(float localScale = 1.0F) noexcept;
   float scaledRadiusLg(float localScale = 1.0F) noexcept;
   float scaledRadiusXl(float localScale = 1.0F) noexcept;
+
+  DesignSystem designSystem() noexcept;
+  void setDesignSystem(DesignSystem ds) noexcept;
 
 } // namespace Style

@@ -1,6 +1,7 @@
 #include "render/animation/motion_service.h"
 
 #include "render/animation/animation_manager.h"
+#include "ui/style.h"
 
 #include <algorithm>
 #include <vector>
@@ -52,7 +53,8 @@ SpringSpec MotionService::resolve(SpringToken token) const {
     spec.stiffness = 1.0e6F;
     return spec;
   }
-  if (m_speed != 1.0F && m_speed > 0.0F) {
+  if (Style::designSystem() == Style::DesignSystem::Custom
+      && m_speed != 1.0F && m_speed > 0.0F) {
     const float kMultiplier = std::clamp(m_speed * m_speed, 0.25F, 4.0F);
     spec.stiffness *= kMultiplier;
   }
