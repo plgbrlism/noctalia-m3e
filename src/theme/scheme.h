@@ -18,6 +18,7 @@ namespace noctalia::theme {
     FruitSalad,
     Rainbow,
     Monochrome,
+    Expressive,
     Vibrant,
     Faithful,
     Soft,
@@ -25,12 +26,13 @@ namespace noctalia::theme {
     Muted,
   };
 
-  inline constexpr std::array<std::pair<std::string_view, Scheme>, 10> kSchemeEntries{{
+  inline constexpr std::array<std::pair<std::string_view, Scheme>, 11> kSchemeEntries{{
       {"m3-tonal-spot", Scheme::TonalSpot},
       {"m3-content", Scheme::Content},
       {"m3-fruit-salad", Scheme::FruitSalad},
       {"m3-rainbow", Scheme::Rainbow},
       {"m3-monochrome", Scheme::Monochrome},
+      {"m3-expressive", Scheme::Expressive},
       {"vibrant", Scheme::Vibrant},
       {"faithful", Scheme::Faithful},
       {"soft", Scheme::Soft},
@@ -52,7 +54,8 @@ namespace noctalia::theme {
         || s == Scheme::Content
         || s == Scheme::FruitSalad
         || s == Scheme::Rainbow
-        || s == Scheme::Monochrome;
+        || s == Scheme::Monochrome
+        || s == Scheme::Expressive;
   }
 
   // Parse a scheme from its CLI string (e.g. "m3-tonal-spot", "vibrant").

@@ -252,12 +252,13 @@ namespace settings {
 
     SelectSetting wallpaperSchemeSelect(std::string_view selected) {
       return plainSelect(
-          {{"m3-content", "theme.scheme.m3-content"},
-           {"m3-tonal-spot", "theme.scheme.m3-tonal-spot"},
-           {"m3-fruit-salad", "theme.scheme.m3-fruit-salad"},
-           {"m3-rainbow", "theme.scheme.m3-rainbow"},
-           {"m3-monochrome", "theme.scheme.m3-monochrome"},
-           {"vibrant", "theme.scheme.vibrant"},
+           {{"m3-content", "theme.scheme.m3-content"},
+            {"m3-tonal-spot", "theme.scheme.m3-tonal-spot"},
+            {"m3-fruit-salad", "theme.scheme.m3-fruit-salad"},
+            {"m3-rainbow", "theme.scheme.m3-rainbow"},
+            {"m3-monochrome", "theme.scheme.m3-monochrome"},
+            {"m3-expressive", "theme.scheme.m3-expressive"},
+            {"vibrant", "theme.scheme.vibrant"},
            {"faithful", "theme.scheme.faithful"},
            {"soft", "theme.scheme.soft"},
            {"dysfunctional", "theme.scheme.dysfunctional"},

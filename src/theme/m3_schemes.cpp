@@ -5,6 +5,7 @@
 #include "cpp/quantize/lab.h"
 #include "cpp/quantize/wu.h"
 #include "cpp/scheme/scheme_content.h"
+#include "cpp/scheme/scheme_expressive.h"
 #include "cpp/scheme/scheme_fruit_salad.h"
 #include "cpp/scheme/scheme_monochrome.h"
 #include "cpp/scheme/scheme_rainbow.h"
@@ -364,6 +365,8 @@ namespace noctalia::theme {
         return std::make_unique<mcu::SchemeRainbow>(source, isDark, 0.0);
       case Scheme::Monochrome:
         return std::make_unique<mcu::SchemeMonochrome>(source, isDark, 0.0);
+      case Scheme::Expressive:
+        return std::make_unique<mcu::SchemeExpressive>(source, isDark, 0.0);
       default:
         // Custom schemes are not handled here.
         return std::make_unique<mcu::SchemeTonalSpot>(source, isDark, 0.0);
