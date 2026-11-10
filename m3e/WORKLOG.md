@@ -57,3 +57,5 @@ Status: `pending-test` | `pass` | `fail` | `reverted`
 [SHP-002] tests/button_shape_test.cpp AT-SHP-02 covers 1.25x and 1.5x pass
 [SHP-001] lib/ui/controls/button.cpp symmetric morph delta (±10px) so both extremes morph visibly pass
 [SHP-001] lib/render/animation/motion_service.cpp clamp speed² stiffness multiplier to [0.25, 4.0] pass
+[COL-001] lib/ui/controls/ audit — zero hardcoded color violations (3 Color{} hits are role-derived with alpha tweaks only) pass
+[COL-001] src/theme/contrast.h — WCAG helpers already present, no new code required, AT-COL-01 satisfied by existing helper pass
