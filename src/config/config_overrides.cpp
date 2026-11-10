@@ -423,7 +423,10 @@ namespace {
         && a.theme == b.theme
         && a.accessibility == b.accessibility
         && a.controlCenter == b.controlCenter
-        && pluginsConfigEqual(a.plugins, b.plugins);
+        && pluginsConfigEqual(a.plugins, b.plugins)
+        && a.storage == b.storage
+        && a.motion == b.motion
+        && a.motionPreset == b.motionPreset;
   }
 
   toml::table* ensureTable(toml::table& parent, std::string_view key) {
