@@ -397,13 +397,16 @@ void Button::updateButtonRadii() {
 
   const float p = std::clamp(m_shapeState.progress, 0.0F, 1.0F);
   const float rest = Style::scaledRadiusMd(m_cachedContentScale);
-  // Symmetric morph delta — pressed is always ±delta from rest.
-  // Ensures both extremes (square rest, pill rest) get equal visible morph.
-  // Middle rounding (scale~1) gets small delta — matches M3E convergence
-  // (medium-round buttons are already near the pressed target).
   constexpr float kMorphDeltaPx = 10.0F;
   const float delta = kMorphDeltaPx * m_cachedContentScale;
-  const float pressed = (rest < delta) ? delta : (rest - delta);
+
+  // Choose morph direction by which has more room — always visible delta.
+  const float growRoom = maxRadius - rest;
+  const float shrinkRoom = rest;
+  const float pressed = (growRoom >= shrinkRoom)
+      ? std::min(rest + delta, maxRadius)
+      : std::max(rest - delta, 0.0F);
+
   const float tl = std::clamp(rest + (pressed - rest) * p, 0.0F, maxRadius);
   const float tr = std::clamp(rest + (pressed - rest) * p, 0.0F, maxRadius);
   const float br = std::clamp(rest + (pressed - rest) * p, 0.0F, maxRadius);
@@ -414,6 +417,17 @@ void Button::updateButtonRadii() {
 }
 
 void Button::syncPressMorph(bool isPressed) {
+  if (Style::designSystem() == Style::DesignSystem::Expressive
+      && Style::cornerStyle() == Style::CornerStyle::Fixed) {
+    if (m_shapeState.animId != 0 && animationManager() != nullptr) {
+      animationManager()->cancel(m_shapeState.animId);
+      m_shapeState.animId = 0;
+    }
+    m_shapeState.progress = 0.0F;
+    updateButtonRadii();
+    markPaintDirty();
+    return;
+  }
   const float targetProgress = isPressed ? 1.0F : 0.0F;
   if (m_shapeState.animId == 0
       && std::abs(m_shapeState.progress - targetProgress) < 0.001F) {

@@ -10,6 +10,18 @@ namespace Style {
     Custom = 1,
   };
 
+  enum class CornerStyle : std::uint8_t {
+    Material = 0,
+    Fixed = 1,
+  };
+
+  enum class MotionPreset : std::uint8_t {
+    Custom = 0,
+    Smooth = 1,
+    Balanced = 2,
+    Playful = 3,
+  };
+
   inline constexpr int barThicknessDefault = 34;
 
   inline constexpr int animFast = 100;
@@ -137,5 +149,9 @@ namespace Style {
 
   DesignSystem designSystem() noexcept;
   void setDesignSystem(DesignSystem ds) noexcept;
+  CornerStyle cornerStyle() noexcept;
+  void setCornerStyle(CornerStyle cs) noexcept;
+  MotionPreset motionPreset() noexcept;
+  void setMotionPreset(MotionPreset p) noexcept;
 
 } // namespace Style

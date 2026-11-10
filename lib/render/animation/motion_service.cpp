@@ -11,6 +11,27 @@ MotionService& MotionService::instance() {
   return service;
 }
 
+namespace {
+
+  SpringToken mapPresetToken(SpringToken requested, Style::MotionPreset p) noexcept {
+    const bool isEffects = (requested == SpringToken::EffectsFast
+                         || requested == SpringToken::EffectsDefault
+                         || requested == SpringToken::EffectsSlow);
+    switch (p) {
+    case Style::MotionPreset::Smooth:
+      return SpringToken::EffectsDefault;
+    case Style::MotionPreset::Balanced:
+      return isEffects ? SpringToken::EffectsDefault : SpringToken::SpatialDefault;
+    case Style::MotionPreset::Playful:
+      return isEffects ? SpringToken::EffectsFast : SpringToken::SpatialFast;
+    case Style::MotionPreset::Custom:
+    default:
+      return requested;
+    }
+  }
+
+} // namespace
+
 void MotionService::registerManager(AnimationManager* manager) {
   if (manager == nullptr) {
     return;
@@ -53,8 +74,12 @@ SpringSpec MotionService::resolve(SpringToken token) const {
     spec.stiffness = 1.0e6F;
     return spec;
   }
-  if (Style::designSystem() == Style::DesignSystem::Custom
-      && m_speed != 1.0F && m_speed > 0.0F) {
+  if (Style::designSystem() == Style::DesignSystem::Expressive
+      && Style::motionPreset() != Style::MotionPreset::Custom) {
+    const SpringToken effective = mapPresetToken(token, Style::motionPreset());
+    spec = SpringTokenResolver(m_motionConfig).resolve(effective);
+  }
+  if (m_speed != 1.0F && m_speed > 0.0F) {
     const float kMultiplier = std::clamp(m_speed * m_speed, 0.25F, 4.0F);
     spec.stiffness *= kMultiplier;
   }

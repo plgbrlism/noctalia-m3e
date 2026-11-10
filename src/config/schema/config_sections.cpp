@@ -51,6 +51,7 @@ namespace noctalia::config::schema {
 
         t.push_back(makeSection("theme", &Config::theme, themeSchema()));
         t.push_back(makeSection("motion", &Config::motion, motionSchema()));
+        t.push_back(makeSection("motion_preset", &Config::motionPreset, motionPresetSchema()));
         t.push_back(makeSection("backdrop", &Config::backdrop, backdropSchema()));
         t.push_back(makeSection("lockscreen", &Config::lockscreen, lockscreenSchema()));
         t.push_back(makeSection("notification", &Config::notification, notificationSchema()));

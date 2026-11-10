@@ -1197,6 +1197,7 @@ if build_tests
     'clipboard_storage_permissions',
     'config_migration',
     'config_motion',
+    'des_presets',
     'design_system',
     'config_override_mutation',
     'config_path_resolution',

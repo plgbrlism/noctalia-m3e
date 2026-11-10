@@ -1802,7 +1802,56 @@ constexpr EnumOption<Style::DesignSystem> kDesignSystems[] = {
     {Style::DesignSystem::Custom, "custom", "theme.design-system.custom"},
 };
 
-struct ThemeConfig {
+  enum class DensityPreset : std::uint8_t {
+    Spacious = 0,
+    Comfortable = 1,
+    Compact = 2,
+    Dense = 3,
+    Custom = 4,
+  };
+
+  constexpr EnumOption<DensityPreset> kDensityPresets[] = {
+      {DensityPreset::Spacious, "spacious", "theme.density.spacious"},
+      {DensityPreset::Comfortable, "comfortable", "theme.density.comfortable"},
+      {DensityPreset::Compact, "compact", "theme.density.compact"},
+      {DensityPreset::Dense, "dense", "theme.density.dense"},
+      {DensityPreset::Custom, "custom", "theme.density.custom"},
+  };
+
+  constexpr EnumOption<Style::MotionPreset> kMotionPresets[] = {
+      {Style::MotionPreset::Custom, "custom", "motion.preset.custom"},
+      {Style::MotionPreset::Smooth, "smooth", "motion.preset.smooth"},
+      {Style::MotionPreset::Balanced, "balanced", "motion.preset.balanced"},
+      {Style::MotionPreset::Playful, "playful", "motion.preset.playful"},
+  };
+
+  enum class PanelMotion : std::uint8_t {
+    Standard = 0,
+    Directional = 1,
+    Depth = 2,
+    Fluid = 3,
+  };
+
+  constexpr EnumOption<PanelMotion> kPanelMotions[] = {
+      {PanelMotion::Standard, "standard", "motion.panel.standard"},
+      {PanelMotion::Directional, "directional", "motion.panel.directional"},
+      {PanelMotion::Depth, "depth", "motion.panel.depth"},
+      {PanelMotion::Fluid, "fluid", "motion.panel.fluid"},
+  };
+
+  struct MotionPresetConfig {
+    Style::MotionPreset preset = Style::MotionPreset::Custom;
+    bool ripple = true;
+    PanelMotion panel = PanelMotion::Standard;
+    bool operator==(const MotionPresetConfig&) const = default;
+  };
+
+  constexpr EnumOption<Style::CornerStyle> kCornerStyles[] = {
+      {Style::CornerStyle::Material, "material", "theme.corner-style.material"},
+      {Style::CornerStyle::Fixed, "fixed", "theme.corner-style.fixed"},
+  };
+
+  struct ThemeConfig {
   struct TemplateColorConfig {
     std::string name;
     std::string color;
@@ -1863,6 +1912,8 @@ struct ThemeConfig {
   std::string customPalette;
   std::string wallpaperScheme = "m3-content";
   Style::DesignSystem designSystem = Style::DesignSystem::Expressive;
+  DensityPreset density = DensityPreset::Custom;
+  Style::CornerStyle cornerStyle = Style::CornerStyle::Material;
   ThemeMode mode = ThemeMode::Dark;
   ShellThemeMode shellMode = ShellThemeMode::Follow;
   bool pureBlackDark = false;
@@ -2039,6 +2090,7 @@ struct Config {
   PluginsConfig plugins;
   AccessibilityConfig accessibility;
   MotionConfig motion;
+  MotionPresetConfig motionPreset;
 };
 // Which top-level config sections changed across a reload. Default-constructed
 // to all-true (conservative: "assume everything changed") so any path that does
@@ -2074,6 +2126,7 @@ struct ConfigChangeSet {
   bool storage = true;
   bool accessibility = true;
   bool motion = true;
+  bool motionPreset = true;
 
   bool any() const noexcept {
     return bars
@@ -2105,7 +2158,8 @@ struct ConfigChangeSet {
         || hotCorners
         || storage
         || accessibility
-        || motion;
+        || motion
+        || motionPreset;
   }
 };
 

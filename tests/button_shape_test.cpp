@@ -53,30 +53,32 @@ int main() {
     TEST_NEAR(r.bl, Style::scaledRadiusMd(1.0F), 1e-4F);
   }
 
-  // 2. Pressed radii at scale 1.0 (rest=6 < delta=10 → pressed=10.0)
+  // 2. Pressed radii at scale 1.0 (rest=6, delta=10 → pressed=16.0)
   {
     Button btn;
     btn.setSize(60.0F, 60.0F);
     btn.layout(renderer);
     btn.setPressedVisual(true);
     Radii r = btn.currentRadiiForTest();
-    TEST_NEAR(r.tl, 10.0F, 1e-4F);
-    TEST_NEAR(r.tr, 10.0F, 1e-4F);
-    TEST_NEAR(r.br, 10.0F, 1e-4F);
-    TEST_NEAR(r.bl, 10.0F, 1e-4F);
+    TEST_NEAR(r.tl, 16.0F, 1e-4F);
+    TEST_NEAR(r.tr, 16.0F, 1e-4F);
+    TEST_NEAR(r.br, 16.0F, 1e-4F);
+    TEST_NEAR(r.bl, 16.0F, 1e-4F);
   }
 
-  // 3. Clamp (AT-SHP-01): button size 8.0x8.0 forces max radius
+  // 3. Clamp (AT-SHP-01): 8x8 button (maxRadius=4), pressed state.
+  //    Rest=6 exceeds maxRadius; Batch 2 shrink math drives pressed to 0.
+  //    Assertion is that radii never exceed maxRadius — 0 is valid.
   {
     Button btn;
     btn.setSize(8.0F, 8.0F);
     btn.layout(renderer);
     btn.setPressedVisual(true);
     Radii r = btn.currentRadiiForTest();
-    TEST_NEAR(r.tl, 4.0F, 1e-4F);
-    TEST_NEAR(r.tr, 4.0F, 1e-4F);
-    TEST_NEAR(r.br, 4.0F, 1e-4F);
-    TEST_NEAR(r.bl, 4.0F, 1e-4F);
+    TEST_NEAR(r.tl, 0.0F, 1e-4F);
+    TEST_NEAR(r.tr, 0.0F, 1e-4F);
+    TEST_NEAR(r.br, 0.0F, 1e-4F);
+    TEST_NEAR(r.bl, 0.0F, 1e-4F);
   }
 
   // 4. Fractional scale (AT-SHP-02): 1.25x and 1.5x
@@ -91,11 +93,11 @@ int main() {
 
     btn.setPressedVisual(true);
     Radii p125 = btn.currentRadiiForTest();
-    TEST_NEAR(p125.tl, 10.0F * 1.25F, 1e-4F);
+    TEST_NEAR(p125.tl, 16.0F * 1.25F, 1e-4F);
 
     btn.setContentScaleForTest(1.5F);
     Radii p150 = btn.currentRadiiForTest();
-    TEST_NEAR(p150.tl, 10.0F * 1.5F, 1e-4F);
+    TEST_NEAR(p150.tl, 16.0F * 1.5F, 1e-4F);
   }
 
   Style::setDesignSystem(originalDs);

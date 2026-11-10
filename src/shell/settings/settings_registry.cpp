@@ -268,13 +268,7 @@ namespace settings {
       );
     }
 
-    SelectSetting designSystemSelect(Style::DesignSystem selected) {
-      return plainSelect(
-          {{"expressive", "theme.design-system.expressive"},
-           {"custom", "theme.design-system.custom"}},
-          selected == Style::DesignSystem::Expressive ? "expressive" : "custom"
-      );
-    }
+
 
     std::vector<SelectOption> controlCenterShortcutOptions(const Config& cfg) {
       auto catalog = ShortcutRegistry::catalog();
@@ -516,12 +510,46 @@ namespace settings {
           tr("settings.schema.appearance.builtin-palette.description"), {"theme", "builtin"},
           builtinPaletteSelect(cfg.theme.builtinPalette, shellThemeMode(cfg.theme)), "builtin palette colors"
       ));
-    } else if (cfg.theme.source == PaletteSource::Wallpaper) {
+    } else       if (cfg.theme.source == PaletteSource::Wallpaper) {
       entries.push_back(makeEntry(
           SettingsSection::Appearance, "theme", tr("settings.schema.appearance.design-system.label"),
           tr("settings.schema.appearance.design-system.description"), {"theme", "design_system"},
-          designSystemSelect(cfg.theme.designSystem), "design system expressive custom preset"
+          asSegmented(enumSelect(kDesignSystems, cfg.theme.designSystem)), "design system expressive custom preset"
       ));
+      if (cfg.theme.designSystem == Style::DesignSystem::Expressive) {
+        entries.push_back(makeEntry(
+            SettingsSection::Appearance, "accessibility",
+            tr("settings.schema.appearance.theme-density.label"),
+            tr("settings.schema.appearance.theme-density.description"), {"theme", "density"},
+            asSegmented(enumSelect(kDensityPresets, cfg.theme.density)), "density preset spacious compact"
+        ));
+        entries.push_back(makeEntry(
+            SettingsSection::Appearance, "interface",
+            tr("settings.schema.appearance.theme-corner-style.label"),
+            tr("settings.schema.appearance.theme-corner-style.description"), {"theme", "corner_style"},
+            asSegmented(enumSelect(kCornerStyles, cfg.theme.cornerStyle)), "corner style material fixed"
+        ));
+        entries.push_back(makeEntry(
+            SettingsSection::Appearance, "motion",
+            tr("settings.schema.appearance.theme-motion-preset.label"),
+            tr("settings.schema.appearance.theme-motion-preset.description"), {"motion_preset", "preset"},
+            asSegmented(enumSelect(kMotionPresets, cfg.motionPreset.preset)), "motion preset smooth balanced playful"
+        ));
+        // Hidden until DES-004b (ripple) and DES-005 (panel motion) implement
+        // the visual behavior. Config fields still parse and work.
+        // entries.push_back(makeEntry(
+        //     SettingsSection::Appearance, "effects",
+        //     tr("settings.schema.appearance.theme-motion-ripple.label"),
+        //     tr("settings.schema.appearance.theme-motion-ripple.description"), {"motion_preset", "ripple"},
+        //     ToggleSetting{cfg.motionPreset.ripple}, "ripple effects"
+        // ));
+        // entries.push_back(makeEntry(
+        //     SettingsSection::Appearance, "panels",
+        //     tr("settings.schema.appearance.theme-panel-motion.label"),
+        //     tr("settings.schema.appearance.theme-panel-motion.description"), {"motion_preset", "panel"},
+        //     panelMotionSelect(cfg.motionPreset.panel), "panel motion standard depth directional fluid"
+        // ));
+      }
       entries.push_back(makeEntry(
           SettingsSection::Appearance, "theme", tr("settings.schema.appearance.wallpaper-generation-scheme.label"),
           tr("settings.schema.appearance.wallpaper-generation-scheme.description"), {"theme", "wallpaper_scheme"},

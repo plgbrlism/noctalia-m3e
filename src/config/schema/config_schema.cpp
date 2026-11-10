@@ -1405,12 +1405,14 @@ namespace noctalia::config::schema {
   const Schema<ThemeConfig>& themeSchema() {
     static const Schema<ThemeConfig> s = {
         enumField(&ThemeConfig::source, "source", kPaletteSources),
-         field(&ThemeConfig::builtinPalette, "builtin"),
-         field(&ThemeConfig::communityPalette, "community_palette"),
-         field(&ThemeConfig::customPalette, "custom_palette"),
-         field(&ThemeConfig::wallpaperScheme, "wallpaper_scheme"),
-         enumField(&ThemeConfig::designSystem, "design_system", kDesignSystems),
-         enumField(&ThemeConfig::mode, "mode", kThemeModes),
+        field(&ThemeConfig::builtinPalette, "builtin"),
+        field(&ThemeConfig::communityPalette, "community_palette"),
+        field(&ThemeConfig::customPalette, "custom_palette"),
+        field(&ThemeConfig::wallpaperScheme, "wallpaper_scheme"),
+        enumField(&ThemeConfig::designSystem, "design_system", kDesignSystems),
+        enumField(&ThemeConfig::density, "density", kDensityPresets),
+        enumField(&ThemeConfig::cornerStyle, "corner_style", kCornerStyles),
+        enumField(&ThemeConfig::mode, "mode", kThemeModes),
         enumField(&ThemeConfig::shellMode, "shell_mode", kShellThemeModes),
         field(&ThemeConfig::pureBlackDark, "pure_black_dark"),
         enumField(&ThemeConfig::terminalColors, "terminal_colors", kTerminalColorsOptions),
@@ -1435,6 +1437,14 @@ namespace noctalia::config::schema {
         {"effects", "slow", SpringToken::EffectsSlow, true},
     };
   } // namespace
+  const Schema<MotionPresetConfig>& motionPresetSchema() {
+    static const Schema<MotionPresetConfig> s = {
+        enumField(&MotionPresetConfig::preset, "preset", kMotionPresets),
+        field(&MotionPresetConfig::ripple, "ripple"),
+        enumField(&MotionPresetConfig::panel, "panel", kPanelMotions),
+    };
+    return s;
+  }
   const Schema<MotionConfig>& motionSchema() {
     static const Schema<MotionConfig> s = {
         Field<MotionConfig>{
