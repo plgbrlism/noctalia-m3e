@@ -169,6 +169,7 @@ private:
   bool m_visualStateInitialized = false;
   Signal<>::ScopedConnection m_paletteConn;
   Signal<>::ScopedConnection m_buttonBordersConn;
+  Signal<>::ScopedConnection m_designSystemConn;
 };
 
 class Renderer;

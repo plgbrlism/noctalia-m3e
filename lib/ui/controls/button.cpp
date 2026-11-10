@@ -259,6 +259,16 @@ Button::Button() {
   });
   m_buttonBordersConn =
       Style::buttonBordersChanged().connect([this] { setBorder(m_targetBorder, effectiveBorderWidth()); });
+  m_designSystemConn = Style::designSystemChanged().connect([this] {
+    if (m_shapeState.animId != 0 && animationManager() != nullptr) {
+      animationManager()->cancel(m_shapeState.animId);
+      m_shapeState.animId = 0;
+    }
+    m_shapeState.progress = 0.0F;
+    updateButtonRadii();
+    markLayoutDirty();
+    markPaintDirty();
+  });
 }
 
 Button::~Button() {
@@ -417,8 +427,7 @@ void Button::updateButtonRadii() {
 }
 
 void Button::syncPressMorph(bool isPressed) {
-  if (Style::designSystem() == Style::DesignSystem::Expressive
-      && Style::cornerStyle() == Style::CornerStyle::Fixed) {
+  if (Style::designSystem() != Style::DesignSystem::Expressive) {
     if (m_shapeState.animId != 0 && animationManager() != nullptr) {
       animationManager()->cancel(m_shapeState.animId);
       m_shapeState.animId = 0;

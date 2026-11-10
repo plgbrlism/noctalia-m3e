@@ -16,10 +16,9 @@ namespace Style {
   };
 
   enum class MotionPreset : std::uint8_t {
-    Custom = 0,
-    Smooth = 1,
-    Balanced = 2,
-    Playful = 3,
+    Smooth = 0,
+    Balanced = 1,
+    Playful = 2,
   };
 
   inline constexpr int barThicknessDefault = 34;
@@ -149,8 +148,12 @@ namespace Style {
 
   DesignSystem designSystem() noexcept;
   void setDesignSystem(DesignSystem ds) noexcept;
+  Signal<>& designSystemChanged();
+
   CornerStyle cornerStyle() noexcept;
   void setCornerStyle(CornerStyle cs) noexcept;
+  Signal<>& cornerStyleChanged();
+
   MotionPreset motionPreset() noexcept;
   void setMotionPreset(MotionPreset p) noexcept;
 

@@ -36,7 +36,7 @@ namespace {
 int main() {
   const auto originalDs = Style::designSystem();
   const float originalScale = Style::cornerRadiusScale();
-  Style::setDesignSystem(Style::DesignSystem::Custom);
+  Style::setDesignSystem(Style::DesignSystem::Expressive);
   Style::setCornerRadiusScale(1.0F);
 
   StubRenderer renderer;

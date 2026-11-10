@@ -1797,29 +1797,11 @@ constexpr EnumOption<ControlCenterSidebarMode> kControlCenterSidebarModes[] = {
     {ControlCenterSidebarMode::None, "none", "settings.options.control-center.sidebar.none"},
 };
 
-constexpr EnumOption<Style::DesignSystem> kDesignSystems[] = {
-    {Style::DesignSystem::Expressive, "expressive", "theme.design-system.expressive"},
-    {Style::DesignSystem::Custom, "custom", "theme.design-system.custom"},
-};
 
-  enum class DensityPreset : std::uint8_t {
-    Spacious = 0,
-    Comfortable = 1,
-    Compact = 2,
-    Dense = 3,
-    Custom = 4,
-  };
 
-  constexpr EnumOption<DensityPreset> kDensityPresets[] = {
-      {DensityPreset::Spacious, "spacious", "theme.density.spacious"},
-      {DensityPreset::Comfortable, "comfortable", "theme.density.comfortable"},
-      {DensityPreset::Compact, "compact", "theme.density.compact"},
-      {DensityPreset::Dense, "dense", "theme.density.dense"},
-      {DensityPreset::Custom, "custom", "theme.density.custom"},
-  };
+
 
   constexpr EnumOption<Style::MotionPreset> kMotionPresets[] = {
-      {Style::MotionPreset::Custom, "custom", "motion.preset.custom"},
       {Style::MotionPreset::Smooth, "smooth", "motion.preset.smooth"},
       {Style::MotionPreset::Balanced, "balanced", "motion.preset.balanced"},
       {Style::MotionPreset::Playful, "playful", "motion.preset.playful"},
@@ -1840,8 +1822,9 @@ constexpr EnumOption<Style::DesignSystem> kDesignSystems[] = {
   };
 
   struct MotionPresetConfig {
-    Style::MotionPreset preset = Style::MotionPreset::Custom;
+    Style::MotionPreset preset = Style::MotionPreset::Balanced;
     bool ripple = true;
+    bool reduce = false;
     PanelMotion panel = PanelMotion::Standard;
     bool operator==(const MotionPresetConfig&) const = default;
   };
@@ -1911,8 +1894,7 @@ constexpr EnumOption<Style::DesignSystem> kDesignSystems[] = {
   std::string communityPalette = "Oxocarbon";
   std::string customPalette;
   std::string wallpaperScheme = "m3-content";
-  Style::DesignSystem designSystem = Style::DesignSystem::Expressive;
-  DensityPreset density = DensityPreset::Custom;
+  bool expressive = true;
   Style::CornerStyle cornerStyle = Style::CornerStyle::Material;
   ThemeMode mode = ThemeMode::Dark;
   ShellThemeMode shellMode = ShellThemeMode::Follow;

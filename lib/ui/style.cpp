@@ -14,7 +14,7 @@ namespace {
   bool g_closeButtonsEnabled = true;
   Style::DesignSystem g_designSystem = Style::DesignSystem::Expressive;
   Style::CornerStyle g_cornerStyle = Style::CornerStyle::Material;
-  Style::MotionPreset g_motionPreset = Style::MotionPreset::Custom;
+  Style::MotionPreset g_motionPreset = Style::MotionPreset::Balanced;
 
 } // namespace
 
@@ -80,11 +80,31 @@ namespace Style {
 
   DesignSystem designSystem() noexcept { return g_designSystem; }
 
-  void setDesignSystem(DesignSystem ds) noexcept { g_designSystem = ds; }
+  void setDesignSystem(DesignSystem ds) noexcept {
+    if (g_designSystem != ds) {
+      g_designSystem = ds;
+      designSystemChanged().emit();
+    }
+  }
+
+  Signal<>& designSystemChanged() {
+    static Signal<> s;
+    return s;
+  }
 
   CornerStyle cornerStyle() noexcept { return g_cornerStyle; }
 
-  void setCornerStyle(CornerStyle cs) noexcept { g_cornerStyle = cs; }
+  void setCornerStyle(CornerStyle cs) noexcept {
+    if (g_cornerStyle != cs) {
+      g_cornerStyle = cs;
+      cornerStyleChanged().emit();
+    }
+  }
+
+  Signal<>& cornerStyleChanged() {
+    static Signal<> s;
+    return s;
+  }
 
   MotionPreset motionPreset() noexcept { return g_motionPreset; }
 

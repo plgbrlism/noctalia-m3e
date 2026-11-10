@@ -3,8 +3,7 @@
     "preset": {
       "smooth": "Smooth",
       "balanced": "Balanced",
-      "playful": "Playful",
-      "custom": "Custom"
+      "playful": "Playful"
     },
     "ripple": "Ripple effects",
     "panel": {
@@ -2067,15 +2066,24 @@
           "description": "Choose how wallpaper colors are converted into a palette",
           "label": "Wallpaper Generation Scheme"
         },
-        "design-system": {
-          "description": "Expressive preset (opinionated M3E defaults) or Classic (respect all sliders)",
-          "label": "Design System"
+        "expressive": {
+          "description": "Enable M3 Expressive morphing on buttons — turn off for vanilla noctalia",
+          "label": "Expressive"
         },
-        "theme-density": { "label": "Density", "description": "Interface density preset" },
+        "motion-ripple": {
+          "description": "Click ripple on buttons",
+          "label": "Ripple Effects"
+        },
+        "motion-reduce": {
+          "description": "Disable spatial overshoot and choreography",
+          "label": "Reduce Motion"
+        },
+        "motion-panel": {
+          "description": "Panel reveal animation style (implementation pending)",
+          "label": "Panel Motion"
+        },
         "theme-corner-style": { "label": "Corner Style", "description": "Material (morphing) or Fixed (uniform)" },
-        "theme-motion-preset": { "label": "Motion Preset", "description": "Smooth, Balanced, or Playful spring motion" },
-        "theme-motion-ripple": { "label": "Ripple Effects", "description": "Press ripple on buttons" },
-        "theme-panel-motion": { "label": "Panel Motion", "description": "Standard, Directional, Depth, or Fluid panel reveal" }
+        "theme-motion-preset": { "label": "Spring", "description": "Smooth, Balanced, or Playful spring motion" }
       },
       "backdrop": {
         "blur-intensity": {
@@ -5358,17 +5366,6 @@
     }
   },
   "theme": {
-    "design-system": {
-      "expressive": "Expressive",
-      "custom": "Classic"
-    },
-    "density": {
-      "spacious": "Spacious",
-      "comfortable": "Comfortable",
-      "compact": "Compact",
-      "dense": "Dense",
-      "custom": "Custom"
-    },
     "corner-style": {
       "material": "Material",
       "fixed": "Fixed"

@@ -554,53 +554,21 @@ void Application::initStyleThemeAndWayland() {
   std::signal(SIGTERM, signal_handler);
   std::signal(SIGINT, signal_handler);
 
-  auto densityPresetToScale = [](DensityPreset d) -> float {
-    switch (d) {
-      case DensityPreset::Spacious: return 1.30F;
-      case DensityPreset::Comfortable: return 1.15F;
-      case DensityPreset::Compact: return 1.00F;
-      case DensityPreset::Dense: return 0.90F;
-      default: return 1.0F;
-    }
-  };
-  auto motionPresetToSpeed = [](Style::MotionPreset p) -> float {
-    switch (p) {
-      case Style::MotionPreset::Smooth: return 1.5F;
-      case Style::MotionPreset::Balanced: return 2.5F;
-      case Style::MotionPreset::Playful: return 3.5F;
-      default: return 1.0F;
-    }
-  };
-
-  auto applyMotionConfig = [this, motionPresetToSpeed] {
+  auto applyMotionConfig = [this] {
     auto& motion = MotionService::instance();
     auto& cfg = m_configService.config();
     Style::setMotionPreset(cfg.motionPreset.preset);
-    float speed = cfg.shell.animation.speed;
-    if (cfg.motionPreset.preset != Style::MotionPreset::Custom) {
-      const float presetSpeed = motionPresetToSpeed(cfg.motionPreset.preset);
-      if (std::abs(speed - 1.0F) < 1e-4F) {
-        speed = presetSpeed;
-      } else if (std::abs(speed - presetSpeed) > 1e-4F) {
-        const_cast<Config&>(cfg).motionPreset.preset = Style::MotionPreset::Custom;
-      }
-    }
-    motion.setSpeed(speed);
+    motion.setSpeed(cfg.shell.animation.speed);
     motion.setEnabled(cfg.shell.animation.enabled);
+    motion.setReduceMotion(cfg.motionPreset.reduce);
     motion.setMotionConfig(cfg.motion);
   };
-  auto applyStyleConfig = [this, densityPresetToScale, lastCornerRadiusScale = std::numeric_limits<float>::quiet_NaN()] mutable {
+  auto applyStyleConfig = [this, lastCornerRadiusScale = std::numeric_limits<float>::quiet_NaN()] mutable {
     auto& cfg = m_configService.config();
-    Style::setDesignSystem(cfg.theme.designSystem);
+    Style::setDesignSystem(cfg.theme.expressive
+        ? Style::DesignSystem::Expressive
+        : Style::DesignSystem::Custom);
     Style::setCornerStyle(cfg.theme.cornerStyle);
-    if (cfg.theme.density != DensityPreset::Custom) {
-      const float presetValue = densityPresetToScale(cfg.theme.density);
-      if (std::abs(cfg.accessibility.uiScale - 1.0F) < 1e-4F) {
-        const_cast<Config&>(cfg).accessibility.uiScale = presetValue;
-      } else if (std::abs(cfg.accessibility.uiScale - presetValue) > 1e-4F) {
-        const_cast<Config&>(cfg).theme.density = DensityPreset::Custom;
-      }
-    }
     const float corner = cfg.shell.cornerRadiusScale;
     const bool cornerChanged =
         std::isfinite(lastCornerRadiusScale) && std::abs(corner - lastCornerRadiusScale) > 1.0e-4F;
