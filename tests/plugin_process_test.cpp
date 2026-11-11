@@ -1,6 +1,7 @@
 #include "config/toml.h"
 #include "render/core/color.h"
 #include "scripting/luau_host.h"
+#include "scripting/plugin_bindings.h"
 #include "scripting/script_api_context.h"
 #include "system/process.h"
 #include "ui/palette.h"
@@ -30,6 +31,10 @@ int main() {
   api.setConfigSnapshot(std::make_shared<const toml::table>(toml::parse("[shell]\noffline_mode = true")));
   api.setWallpaperPaths({{"DP-1", "/tmp/wallpaper.png"}});
   LuauHost host(api, "test/plugin:service");
+  scripting::PluginBindingContext bindingContext;
+  bindingContext.ownerId = "test/plugin:service";
+  bindingContext.host = &host;
+  host.setScriptContext(&bindingContext);
 
   std::mutex mutex;
   std::condition_variable ready;
@@ -112,6 +117,80 @@ noctalia.setWallpaperMask("DP-1", nil)
            "getColor should track restored palette and return nil for invalid roles"
        )
       && ok;
+
+  api.setNightLightState({
+      .enabled = true,
+      .force = false,
+      .active = true,
+      .transitioning = true,
+      .phase = "night",
+      .currentTemperature = 4200,
+      .targetTemperature = 4000,
+      .dayTemperature = 6500,
+      .nightTemperature = 4000,
+  });
+  ok = expect(host.exec(
+      "=nightlight-state",
+      "local s = noctalia.nightlight.state()\n"
+      "assert(s.enabled == true and s.force == false and s.active == true)\n"
+      "assert(s.transitioning == true and s.phase == 'night')\n"
+      "assert(s.currentTemperature == 4200 and s.targetTemperature == 4000)\n"
+      "assert(s.dayTemperature == 6500 and s.nightTemperature == 4000)\n"
+  ), "nightlight state readable") && ok;
+
+  bindingContext.beginCall({});
+  ok = expect(host.exec(
+      "=nightlight-actions",
+      "noctalia.nightlight.setEnabled(false)\n"
+      "noctalia.nightlight.toggle()\n"
+      "noctalia.nightlight.setForce(true)\n"
+      "noctalia.nightlight.toggleForce()\n"
+  ), "nightlight actions dispatch") && ok;
+  ok = expect(bindingContext.sideEffects.size() == 4, "nightlight actions produce four side effects") && ok;
+  ok = expect(
+      bindingContext.sideEffects[0].kind == scripting::ScriptSideEffectKind::NightLightCommand
+      && bindingContext.sideEffects[0].nightLightCommand == scripting::ScriptNightLightCommand::SetEnabled
+      && !bindingContext.sideEffects[0].flag,
+      "nightlight setEnabled side effect"
+  ) && ok;
+  ok = expect(
+      bindingContext.sideEffects[1].nightLightCommand == scripting::ScriptNightLightCommand::Toggle,
+      "nightlight toggle side effect"
+  ) && ok;
+  ok = expect(
+      bindingContext.sideEffects[2].nightLightCommand == scripting::ScriptNightLightCommand::SetForce
+      && bindingContext.sideEffects[2].flag,
+      "nightlight setForce side effect"
+  ) && ok;
+  ok = expect(
+      bindingContext.sideEffects[3].nightLightCommand == scripting::ScriptNightLightCommand::ToggleForce,
+      "nightlight toggleForce side effect"
+  ) && ok;
+
+  bindingContext.beginCall({});
+  ok = expect(host.exec(
+      "=nightlight-watch",
+      "watched = nil\n"
+      "nightlightWatchId = noctalia.nightlight.watch(function(state) watched = state end)\n"
+  ), "nightlight watch registers") && ok;
+  ok = expect(
+      bindingContext.sideEffects.size() == 1
+      && bindingContext.sideEffects[0].kind == scripting::ScriptSideEffectKind::NightLightWatch,
+      "nightlight watch side effect"
+  ) && ok;
+  const int watchId = bindingContext.sideEffects[0].callbackRef;
+  ok = expect(host.hasNightLightWatchCallback(watchId), "nightlight watch callback stored") && ok;
+  ok = expect(
+      host.callNightLightWatchCallback(watchId, api.nightLightState(), std::chrono::milliseconds(50)),
+      "nightlight watch callback invoked"
+  ) && ok;
+  ok = expect(host.exec(
+      "=nightlight-watched", "assert(watched ~= nil and watched.enabled == true and watched.phase == 'night')\n"
+  ), "nightlight watch receives state") && ok;
+  bindingContext.beginCall({});
+  ok = expect(host.exec("=nightlight-unwatch", "assert(noctalia.nightlight.unwatch(nightlightWatchId) == true)\n"),
+              "nightlight unwatch") && ok;
+  ok = expect(!host.hasNightLightWatchCallback(watchId), "nightlight watch callback removed") && ok;
 
   return ok ? 0 : 1;
 }
