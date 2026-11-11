@@ -3193,6 +3193,84 @@ namespace settings {
       }
     }
 
+    // Scheduled brightness is independent of night light, it follows the [location] schedule.
+    {
+      auto e = makeEntry(
+          SettingsSection::Location, "night-light", tr("settings.schema.services.scheduled-brightness.label"),
+          tr("settings.schema.services.scheduled-brightness.description"),
+          {"brightness", "enable_scheduled_brightness"}, ToggleSetting{cfg.brightness.enableScheduledBrightness},
+          "scheduled brightness schedule"
+      );
+      entries.push_back(std::move(e));
+    }
+    const SettingVisibility scheduledBrightOn = [](const Config& c) { return c.brightness.enableScheduledBrightness; };
+
+    {
+      auto e = makeEntry(
+          SettingsSection::Location, "night-light", tr("settings.schema.services.scheduled-day-brightness.label"),
+          tr("settings.schema.services.scheduled-day-brightness.description"),
+          {"brightness", "scheduled_day_brightness"},
+          sliderFor(cfg.brightness.scheduledDayBrightness, noctalia::config::schema::kUnitRange, false),
+          "day brightness scheduled"
+      );
+      e.visibleWhen = scheduledBrightOn;
+      entries.push_back(std::move(e));
+    }
+    {
+      auto e = makeEntry(
+          SettingsSection::Location, "night-light", tr("settings.schema.services.scheduled-night-brightness.label"),
+          tr("settings.schema.services.scheduled-night-brightness.description"),
+          {"brightness", "scheduled_night_brightness"},
+          sliderFor(cfg.brightness.scheduledNightBrightness, noctalia::config::schema::kUnitRange, false),
+          "night brightness scheduled"
+      );
+      e.visibleWhen = scheduledBrightOn;
+      entries.push_back(std::move(e));
+    }
+
+    const SettingVisibility perMonitorScheduledVisible = [](const Config& c) {
+      return c.brightness.enableScheduledBrightness && !c.brightness.syncBrightnessOfAllMonitors;
+    };
+    for (const auto& outputOpt : env.availableOutputs) {
+      const std::string& connector = outputOpt.value;
+      if (connector.empty()) {
+        continue;
+      }
+      const BrightnessMonitorOverride* ovr = nullptr;
+      for (const auto& candidate : cfg.brightness.monitorOverrides) {
+        if (candidate.match == connector) {
+          ovr = &candidate;
+          break;
+        }
+      }
+      const float dayValue = ovr && ovr->scheduledDayBrightness.has_value() ? *ovr->scheduledDayBrightness
+                                                                            : cfg.brightness.scheduledDayBrightness;
+      const float nightValue = ovr && ovr->scheduledNightBrightness.has_value()
+          ? *ovr->scheduledNightBrightness
+          : cfg.brightness.scheduledNightBrightness;
+      {
+        auto e = makeEntry(
+            SettingsSection::Location, "monitors", connector,
+            tr("settings.schema.services.scheduled-day-brightness.label"),
+            {"brightness", "monitor", connector, "scheduled_day_brightness"},
+            sliderFor(dayValue, noctalia::config::schema::kUnitRange, false), "day brightness scheduled monitor", true
+        );
+        e.visibleWhen = perMonitorScheduledVisible;
+        entries.push_back(std::move(e));
+      }
+      {
+        auto e = makeEntry(
+            SettingsSection::Location, "monitors", connector,
+            tr("settings.schema.services.scheduled-night-brightness.label"),
+            {"brightness", "monitor", connector, "scheduled_night_brightness"},
+            sliderFor(nightValue, noctalia::config::schema::kUnitRange, false), "night brightness scheduled monitor",
+            true
+        );
+        e.visibleWhen = perMonitorScheduledVisible;
+        entries.push_back(std::move(e));
+      }
+    }
+
     const SettingVisibility calendarOn = [](const Config& c) { return c.calendar.enabled; };
     entries.push_back(makeEntry(
         SettingsSection::Calendar, "general", tr("settings.schema.services.calendar.label"),
