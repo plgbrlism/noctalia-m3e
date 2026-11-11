@@ -1756,6 +1756,7 @@
         "window-switcher-style": {
           "carousel": "Carousel",
           "compact": "Compact",
+          "grid": "Grid",
           "icons": "Icons Only"
         }
       },
@@ -3860,7 +3861,7 @@
           "label": "Show Window Count"
         },
         "window-switcher-style": {
-          "description": "Choose the preview carousel, compact preview strip, or icons-only grid",
+          "description": "Choose the preview carousel, compact preview strip, preview grid, or icons-only grid",
           "label": "Switcher Style"
         }
       },
