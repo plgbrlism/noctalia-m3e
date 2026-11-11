@@ -1809,14 +1809,12 @@ constexpr EnumOption<ControlCenterSidebarMode> kControlCenterSidebarModes[] = {
 
   enum class PanelMotion : std::uint8_t {
     Standard = 0,
-    Directional = 1,
-    Depth = 2,
-    Fluid = 3,
+    Depth = 1,
+    Fluid = 2,
   };
 
   constexpr EnumOption<PanelMotion> kPanelMotions[] = {
       {PanelMotion::Standard, "standard", "motion.panel.standard"},
-      {PanelMotion::Directional, "directional", "motion.panel.directional"},
       {PanelMotion::Depth, "depth", "motion.panel.depth"},
       {PanelMotion::Fluid, "fluid", "motion.panel.fluid"},
   };

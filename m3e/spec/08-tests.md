@@ -35,13 +35,13 @@ Keep these even solo. Everything else is Opt.
 | AT-DES-06 | Custom + speed = 3.35 | Spring feel matches pre-DES-001 baseline |
 | AT-DES-07 | `[theme].density = "spacious"` | `[accessibility].ui_scale` set to 1.30; density=compact after slider drag sets ui_scale manually |
 | AT-DES-08 | `[theme].corner_style = "fixed"` | `Button::syncPressMorph` does not start spring; progress stays 0; radii static across press |
-| AT-DES-09 | `[motion].preset = "playful"` | `[shell.animation].speed` set to 3.5; `MotionService::resolve` uses spatial.fast tokens; preset=custom after manual speed drag |
-| AT-DES-10 | `[motion].preset = "smooth"` | `MotionService::resolve` returns effects.default (no overshoot regardless of speed slider) |
+| AT-DES-09 | `[motion_preset].preset = "playful"` | `[shell.animation].speed` set to 3.5; `MotionService::resolve` uses spatial.fast tokens; preset=custom after manual speed drag |
+| AT-DES-10 | `[motion_preset].preset = "smooth"` | `MotionService::resolve` returns effects.default (no overshoot regardless of speed slider) |
 | AT-DES-11 | design_system=classic + `[theme].density` set | Preset inert; ui_scale unchanged from config value |
-| AT-PANEL-01 | `[motion].panel = "standard"` | Panel reveal matches current behavior (regression) |
-| AT-PANEL-02 | `[motion].panel = "depth"` | Panel scale animates 0.92→1.0 on entry, 1.0→0.92 on exit |
-| AT-PANEL-03 | `[motion].panel = "directional"` | Floating panel enters from nearest edge based on position |
-| AT-PANEL-04 | `[motion].panel = "fluid"` + reduce=true | Panel snaps to final state, no animation, all variants |
+| AT-PANEL-01 | `[motion_preset].panel = "standard"` | Panel reveal matches current behavior (regression) |
+| AT-PANEL-02 | `[motion_preset].panel = "depth"` | Panel scale animates 0.92→1.0 on entry, 1.0→0.92 on exit |
+| AT-PANEL-04 | `[motion_preset].panel = "fluid"` + reduce=true | Panel snaps to final state, no animation, all variants |
+| AT-PANEL-05 | `[motion_preset].panel = "fluid"` | Transform identity at p=1; non-identity at p=0. Down: offsetY<0, scaleX>1. Up: offsetY>0, scaleX>1. Right: offsetX<0, scaleY>1. Left: offsetX>0, scaleY>1. Reduce motion: identity at any progress. |
 | AT-DES-12 | Invalid enum value for density/corner_style/preset/panel | Config parse rejects with clear error; no partial apply |
 
 *Note:* AT-PRESET-05/06/07 verify removals — legacy config files fail fast with actionable errors, no silent ignore.

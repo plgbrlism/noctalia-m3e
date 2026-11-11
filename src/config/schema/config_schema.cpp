@@ -1440,6 +1440,7 @@ namespace noctalia::config::schema {
     static const Schema<MotionPresetConfig> s = {
         enumField(&MotionPresetConfig::preset, "preset", kMotionPresets),
         field(&MotionPresetConfig::ripple, "ripple"),
+        field(&MotionPresetConfig::reduce, "reduce"),
         enumField(&MotionPresetConfig::panel, "panel", kPanelMotions),
     };
     return s;

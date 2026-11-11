@@ -1264,6 +1264,7 @@ if build_tests
     'notification_inline_reply',
     'notification_icon_source',
     'notification_internal_history',
+    'panel_reveal',
     'path_browse',
     'pipewire_error',
     'umbriel_audio_provider',
