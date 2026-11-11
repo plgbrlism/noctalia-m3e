@@ -48,6 +48,8 @@ public:
 
   InputArea* focusArea() const noexcept { return m_focusArea; }
 
+  bool participatesInRowGrouping() const noexcept override { return false; }
+
   void doLayout(Renderer& renderer) override;
 
 private:

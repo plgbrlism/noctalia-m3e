@@ -35,6 +35,13 @@ enum class FlexSizePolicy : std::uint8_t {
   Fill,
 };
 
+enum class FlexRowPosition : std::uint8_t {
+  Alone,
+  First,
+  Middle,
+  Last,
+};
+
 class Flex : public Node {
 public:
   Flex();
@@ -79,6 +86,12 @@ public:
 
   void setRowLayout();
   void setChildGapExcluded(Node* child, bool excluded);
+  void setRowGrouping(bool enabled) noexcept;
+  bool rowGrouping() const noexcept;
+
+  virtual bool participatesInRowGrouping() const noexcept { return false; }
+  virtual FlexRowPosition rowPosition() const noexcept { return FlexRowPosition::Alone; }
+  virtual void setRowPosition(FlexRowPosition) {}
 
   // Keep the gap-excluded set in sync with the child list so a freed-then-reused Node address never inherits
   // a stale exclusion (which would collapse the gap around it).
@@ -125,6 +138,7 @@ private:
   void ensureBackground();
   void applyPalette();
   LayoutSize runLayout(Renderer& renderer, const LayoutConstraints& constraints, bool arrangeChildren);
+  void applyRowGroupingRow(std::size_t begin, std::size_t end, bool mirrored);
 
   RectNode* m_background = nullptr;
   ColorSpec m_fill = clearColorSpec();
@@ -150,4 +164,5 @@ private:
   bool m_explicitWidth = false;
   bool m_explicitHeight = false;
   std::unordered_set<const Node*> m_gapExcludedChildren;
+  bool m_rowGrouping = false;
 };

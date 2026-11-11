@@ -124,6 +124,33 @@ void PolkitPanel::create() {
   );
   root->addChild(std::move(topContent));
 
+  auto buttonRow = ui::row(
+      {
+          .align = FlexAlign::Center,
+          .justify = FlexJustify::End,
+          .wrap = true,
+          .gap = Style::spaceSm * scale,
+          .fillWidth = true,
+      },
+      ui::button({
+          .out = &m_cancelButton,
+          .text = i18n::tr("common.actions.cancel"),
+          .variant = ButtonVariant::Outline,
+          .onClick =
+              [this] {
+                cancelAuth();
+                PanelManager::instance().close();
+              },
+      }),
+      ui::button({
+          .out = &m_submitButton,
+          .text = i18n::tr("auth.polkit.authenticate"),
+          .variant = ButtonVariant::Primary,
+          .onClick = [this] { submit(); },
+      })
+  );
+  buttonRow->setRowGrouping(true);
+
   auto bottomContent = ui::column(
       {.align = FlexAlign::Stretch, .gap = Style::spaceSm * scale},
       ui::label({
@@ -153,31 +180,7 @@ void PolkitPanel::create() {
           .color = colorSpecFromRole(ColorRole::OnSurfaceVariant),
           .maxLines = 4,
       }),
-      ui::row(
-          {
-              .align = FlexAlign::Center,
-              .justify = FlexJustify::End,
-              .wrap = true,
-              .gap = Style::spaceSm * scale,
-              .fillWidth = true,
-          },
-          ui::button({
-              .out = &m_cancelButton,
-              .text = i18n::tr("common.actions.cancel"),
-              .variant = ButtonVariant::Outline,
-              .onClick =
-                  [this] {
-                    cancelAuth();
-                    PanelManager::instance().close();
-                  },
-          }),
-          ui::button({
-              .out = &m_submitButton,
-              .text = i18n::tr("auth.polkit.authenticate"),
-              .variant = ButtonVariant::Primary,
-              .onClick = [this] { submit(); },
-          })
-      )
+      std::move(buttonRow)
   );
   root->addChild(std::move(bottomContent));
   setRoot(std::move(root));

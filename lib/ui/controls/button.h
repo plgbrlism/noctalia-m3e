@@ -99,6 +99,10 @@ public:
   Radii currentRadiiForTest() const;
   void setContentScaleForTest(float scale);
 
+  bool participatesInRowGrouping() const noexcept override;
+  FlexRowPosition rowPosition() const noexcept override;
+  void setRowPosition(FlexRowPosition pos) override;
+
   static ButtonPalette defaultPalette(ButtonVariant variant);
 
 private:
@@ -133,6 +137,8 @@ private:
     std::uint32_t animId = 0;
   };
   ShapeState m_shapeState;
+  FlexRowPosition m_rowPosition = FlexRowPosition::Alone;
+  Signal<>::ScopedConnection m_cornerStyleConn;
   void updateButtonRadii();
   void syncPressMorph(bool isPressed);
   float m_cachedContentScale = 1.0F;

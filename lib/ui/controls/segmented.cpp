@@ -35,6 +35,7 @@ Segmented::Segmented() {
       }
   );
   m_rovingNav.bindFocusArea(m_focusArea);
+  setRowGrouping(true);
 }
 
 std::size_t Segmented::addOption(std::string_view label) { return addOption(label, std::string_view{}); }
@@ -238,23 +239,11 @@ void Segmented::setEqualSegmentWidths(bool equalWidths) {
 
 void Segmented::refreshVariants() {
   const std::size_t n = m_buttons.size();
-  const float r = Style::scaledRadiusMd(m_scale);
   for (std::size_t i = 0; i < n; ++i) {
     if (m_buttons[i] == nullptr) {
       continue;
     }
     m_buttons[i]->setVariant(i == m_selected ? ButtonVariant::TabActive : ButtonVariant::Tab);
-    Radii radii;
-    if (n == 1) {
-      radii = Radii{r, r, r, r};
-    } else if (i == 0) {
-      radii = Radii{r, 0.0F, 0.0F, r};
-    } else if (i == n - 1) {
-      radii = Radii{0.0F, r, r, 0.0F};
-    } else {
-      radii = Radii{0.0F};
-    }
-    m_buttons[i]->setRadii(radii);
   }
 }
 

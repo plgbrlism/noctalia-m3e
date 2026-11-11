@@ -1179,6 +1179,7 @@ if build_tests
     'battery_warning_threshold',
     'bluetooth_uuid_names',
     'button_layout',
+    'button_row_group',
     'button_shape',
     'caldav_client',
     'calendar_cache_permissions',

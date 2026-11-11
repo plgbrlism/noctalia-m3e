@@ -250,8 +250,7 @@ namespace settings {
         )
     );
 
-    root->addChild(
-        ui::row(
+    auto buttonRow = ui::row(
             {
                 .align = FlexAlign::Center,
                 .justify = FlexJustify::End,
@@ -293,8 +292,9 @@ namespace settings {
                   });
                 },
             })
-        )
     );
+    buttonRow->setRowGrouping(true);
+    root->addChild(std::move(buttonRow));
 
     return root;
   }

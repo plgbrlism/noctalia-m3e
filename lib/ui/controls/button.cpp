@@ -269,6 +269,10 @@ Button::Button() {
     markLayoutDirty();
     markPaintDirty();
   });
+  m_cornerStyleConn = Style::cornerStyleChanged().connect([this] {
+    updateButtonRadii();
+    markPaintDirty();
+  });
 }
 
 Button::~Button() {
@@ -400,27 +404,87 @@ void Button::setContentScaleForTest(float scale) {
   updateButtonRadii();
 }
 
+bool Button::participatesInRowGrouping() const noexcept { return true; }
+
+FlexRowPosition Button::rowPosition() const noexcept { return m_rowPosition; }
+
+void Button::setRowPosition(FlexRowPosition pos) {
+  if (m_rowPosition == pos) {
+    return;
+  }
+  m_rowPosition = pos;
+  updateButtonRadii();
+  markPaintDirty();
+}
+
 void Button::updateButtonRadii() {
-  const float w = width();
-  const float h = height();
-  const float maxRadius = std::max(0.0F, std::min(w, h) * 0.5F);
+  const float r = Style::scaledRadiusMd(m_cachedContentScale);
+  const float s = Style::scaledRadiusSm(m_cachedContentScale);
+
+  float restTl = r;
+  float restTr = r;
+  float restBr = r;
+  float restBl = r;
+  if (Style::cornerStyle() == Style::CornerStyle::Material) {
+    switch (m_rowPosition) {
+    case FlexRowPosition::Alone:
+      break;
+    case FlexRowPosition::First:
+      restTr = s;
+      restBr = s;
+      break;
+    case FlexRowPosition::Middle:
+      restTl = s;
+      restTr = s;
+      restBr = s;
+      restBl = s;
+      break;
+    case FlexRowPosition::Last:
+      restTl = s;
+      restBl = s;
+      break;
+    }
+  }
 
   const float p = std::clamp(m_shapeState.progress, 0.0F, 1.0F);
-  const float rest = Style::scaledRadiusMd(m_cachedContentScale);
   constexpr float kMorphDeltaPx = 10.0F;
   const float delta = kMorphDeltaPx * m_cachedContentScale;
+  const float maxRadius = std::max(0.0F, std::min(width(), height()) * 0.5F);
 
-  // Choose morph direction by which has more room — always visible delta.
-  const float growRoom = maxRadius - rest;
-  const float shrinkRoom = rest;
-  const float pressed = (growRoom >= shrinkRoom)
-      ? std::min(rest + delta, maxRadius)
-      : std::max(rest - delta, 0.0F);
+  float tl, tr, br, bl;
+  const bool groupedPill =
+      Style::cornerStyle() == Style::CornerStyle::Material
+      && m_rowPosition != FlexRowPosition::Alone;
 
-  const float tl = std::clamp(rest + (pressed - rest) * p, 0.0F, maxRadius);
-  const float tr = std::clamp(rest + (pressed - rest) * p, 0.0F, maxRadius);
-  const float br = std::clamp(rest + (pressed - rest) * p, 0.0F, maxRadius);
-  const float bl = std::clamp(rest + (pressed - rest) * p, 0.0F, maxRadius);
+  if (groupedPill) {
+    // Decide direction once from max rest corner. If all corners are
+    // already near-square (roundness ≈ 0), shrink produces no visible
+    // change — grow instead so square buttons round out on press,
+    // matching standalone/M3E behavior.
+    const float maxRest = std::max({restTl, restTr, restBr, restBl});
+    const bool canShrink = maxRest > 1.0F;
+    const float deltaSigned = canShrink ? -delta : +delta;
+    tl = std::clamp(restTl + deltaSigned * p, 0.0F, maxRadius);
+    tr = std::clamp(restTr + deltaSigned * p, 0.0F, maxRadius);
+    br = std::clamp(restBr + deltaSigned * p, 0.0F, maxRadius);
+    bl = std::clamp(restBl + deltaSigned * p, 0.0F, maxRadius);
+  } else {
+    // Alone / Fixed: per-corner morph with grow/shrink decision.
+    // Rest radii uniform → uniform result → no inversion possible.
+    auto morphCorner = [&](float rest) {
+      const float growRoom = maxRadius - rest;
+      const float shrinkRoom = rest;
+      const float target = (growRoom >= shrinkRoom)
+          ? std::min(rest + delta, maxRadius)
+          : std::max(rest - delta, 0.0F);
+      return std::clamp(rest + (target - rest) * p, 0.0F, maxRadius);
+    };
+    tl = morphCorner(restTl);
+    tr = morphCorner(restTr);
+    br = morphCorner(restBr);
+    bl = morphCorner(restBl);
+  }
+
   Radii physical{tl, tr, br, bl};
   m_lastPhysicalRadii = physical;
   setRadii(physical);

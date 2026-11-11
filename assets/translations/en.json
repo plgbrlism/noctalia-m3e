@@ -2082,7 +2082,7 @@
           "description": "Panel reveal animation style (implementation pending)",
           "label": "Panel Motion"
         },
-        "theme-corner-style": { "label": "Corner Style", "description": "Material (morphing) or Fixed (uniform)" },
+        "theme-corner-style": { "label": "Corner Style", "description": "Material (grouped pill rows) or Fixed (uniform isolated pills)" },
         "theme-motion-preset": { "label": "Spring", "description": "Smooth, Balanced, or Playful spring motion" }
       },
       "backdrop": {

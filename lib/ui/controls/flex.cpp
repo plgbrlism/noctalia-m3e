@@ -350,6 +350,51 @@ void Flex::setChildGapExcluded(Node* child, bool excluded) {
   markLayoutDirty();
 }
 
+void Flex::setRowGrouping(bool enabled) noexcept {
+  if (m_rowGrouping != enabled) {
+    m_rowGrouping = enabled;
+    markLayoutDirty();
+  }
+}
+
+bool Flex::rowGrouping() const noexcept { return m_rowGrouping; }
+
+void Flex::applyRowGroupingRow(std::size_t begin, std::size_t end, bool mirrored) {
+  if (!m_rowGrouping) return;
+
+  std::vector<Node*> nodes;
+  nodes.reserve(children().size());
+  for (const auto& child : children()) {
+    if (!child->visible() || !child->participatesInLayout()
+        || child.get() == m_background) {
+      continue;
+    }
+    nodes.push_back(child.get());
+  }
+  if (begin >= nodes.size()) return;
+  end = std::min(end, nodes.size());
+
+  std::vector<std::size_t> groupable;
+  for (std::size_t i = begin; i < end; ++i) {
+    auto* flexChild = dynamic_cast<Flex*>(nodes[i]);
+    if (flexChild != nullptr && flexChild->participatesInRowGrouping()) {
+      groupable.push_back(i);
+    }
+  }
+
+  const std::size_t len = groupable.size();
+  for (std::size_t k = 0; k < len; ++k) {
+    auto* flexChild = dynamic_cast<Flex*>(nodes[groupable[k]]);
+    if (flexChild == nullptr) continue;
+    FlexRowPosition pos;
+    if (len == 1) pos = FlexRowPosition::Alone;
+    else if (k == 0) pos = mirrored ? FlexRowPosition::Last : FlexRowPosition::First;
+    else if (k == len - 1) pos = mirrored ? FlexRowPosition::First : FlexRowPosition::Last;
+    else pos = FlexRowPosition::Middle;
+    if (flexChild->rowPosition() != pos) flexChild->setRowPosition(pos);
+  }
+}
+
 Node* Flex::addChild(std::unique_ptr<Node> child) {
   Node* raw = Node::addChild(std::move(child));
   m_gapExcludedChildren.erase(raw);
@@ -655,6 +700,7 @@ LayoutSize Flex::runLayout(Renderer& renderer, const LayoutConstraints& constrai
           );
           cursor += items[i].main;
         }
+        applyRowGroupingRow(begin, end, mirrored);
         crossCursor += bandCross + m_gap;
       }
     }
@@ -736,6 +782,7 @@ LayoutSize Flex::runLayout(Renderer& renderer, const LayoutConstraints& constrai
         );
         cursor += item.main;
       }
+      applyRowGroupingRow(0, items.size(), mirrored);
     }
   }
 

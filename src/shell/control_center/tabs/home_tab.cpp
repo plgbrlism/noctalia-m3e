@@ -702,6 +702,7 @@ std::unique_ptr<Flex> HomeTab::createHeaderActions() {
           .configure = [scale](Button& button) { panel_button_style::configureHeaderIconButton(button, scale); },
       })
   );
+  row->setRowGrouping(true);
   syncHeaderActions();
   return row;
 }

@@ -271,8 +271,7 @@ void FileDialogView::create() {
       },
   });
 
-  listCard->addChild(
-      ui::row(
+  auto sortRow = ui::row(
           {
               .align = FlexAlign::Center,
               .gap = Style::spaceSm * scale,
@@ -336,8 +335,9 @@ void FileDialogView::create() {
                 });
               },
           })
-      )
   );
+  sortRow->setRowGrouping(true);
+  listCard->addChild(std::move(sortRow));
 
   listCard->addChild(ui::separator({.gradientEdges = false}));
 
