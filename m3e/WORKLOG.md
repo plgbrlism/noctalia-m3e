@@ -59,3 +59,12 @@ Status: `pending-test` | `pass` | `fail` | `reverted`
 [SHP-001] lib/render/animation/motion_service.cpp clamp speed² stiffness multiplier to [0.25, 4.0] pass
 [COL-001] lib/ui/controls/ audit — zero hardcoded color violations (3 Color{} hits are role-derived with alpha tweaks only) pass
 [COL-001] src/theme/contrast.h — WCAG helpers already present, no new code required, AT-COL-01 satisfied by existing helper pass
+
+## Git history appended (paul, since c4c25c8)
+- ffe2cd703 2026-11-10 docs(m3e): rev6 Design System coordinator spec
+- b056bdd31 2026-11-10 docs(m3e): rev7 DES-004 preset layer + DES-005 panel motion
+- 934382179 2026-11-10 feat(m3e): DES-001+002 Design System Expressive|Custom
+- eb1c89f1a 2026-11-10 feat(m3e): DES-004 preset layer
+- d127eb777 2026-11-11 fix(m3e): configEqual persistence + Smooth mapping
+- efbfd6ac7 2026-11-11 feat(m3e): DES-004 restructure — Expressive bool + 3-preset spring
+- b4c9be656 2026-11-11 feat(m3e): DES-005 panel motion — Depth + Fluid, drop Directional
