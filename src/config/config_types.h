@@ -1127,6 +1127,12 @@ struct ShellConfig {
     bool operator==(const AnimationConfig&) const = default;
   };
 
+  struct TooltipConfig {
+    bool border = true;
+
+    bool operator==(const TooltipConfig&) const = default;
+  };
+
   struct PanelConfig {
     PanelTransparencyMode transparencyMode = PanelTransparencyMode::Solid;
     bool borders = true; // outline on floating panel surfaces
@@ -1359,6 +1365,7 @@ struct ShellConfig {
   /// Readline-style editing shortcuts in every text input (Ctrl+A moves to the start instead of selecting all).
   bool readlineShortcuts = false;
   AnimationConfig animation;
+  TooltipConfig tooltip;
   std::string avatarPath;
   bool settingsShowAdvanced = true;
   bool settingsExpandAllGroups = false;

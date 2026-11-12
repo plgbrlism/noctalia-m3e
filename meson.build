@@ -1305,6 +1305,8 @@ if build_tests
     'template_hook_runner',
     'theme_shell_mode',
     'time_format',
+    'tooltip_border',
+    'tooltip_surface',
     'toplevel_thumbnail_capture',
     'tray_identifier',
     'tray_theme_path_index',

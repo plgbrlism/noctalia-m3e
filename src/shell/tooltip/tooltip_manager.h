@@ -3,6 +3,7 @@
 #include "core/timer_manager.h"
 #include "render/animation/animation_manager.h"
 #include "render/scene/tooltip_content.h"
+#include "ui/palette.h"
 #include "ui/signal.h"
 
 #include <memory>
@@ -20,6 +21,17 @@ class WaylandConnection;
 struct wl_output;
 struct xdg_surface;
 struct zwlr_layer_surface_v1;
+
+struct TooltipSurfaceRoles {
+  ColorRole background;
+  ColorRole text;
+};
+
+inline TooltipSurfaceRoles resolveTooltipRoles(bool borderOn) noexcept {
+  return borderOn
+      ? TooltipSurfaceRoles{ColorRole::Surface, ColorRole::OnSurface}
+      : TooltipSurfaceRoles{ColorRole::SurfaceContainerHighest, ColorRole::OnSurface};
+}
 
 class TooltipManager {
 public:
@@ -61,6 +73,8 @@ private:
   void refreshPopupContent();
   void scheduleProviderRefresh();
   Size measureContent(Renderer& renderer, const TooltipContent& content);
+  // Border width in logical px; 0 when [shell.tooltip].border is false.
+  float tooltipBorderWidth() const;
   // Configured render scale of m_pendingOutput, for pre-surface measurement.
   float pendingOutputScale() const;
   void buildScene(const TooltipContent& content, float w, float h, float opacity = 0.0F);

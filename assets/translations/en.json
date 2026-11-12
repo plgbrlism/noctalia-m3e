@@ -2034,6 +2034,10 @@
           "description": "Draw drop shadows behind popups and dropdowns",
           "label": "Popup Shadows"
         },
+        "tooltip-border": {
+          "label": "Tooltip Borders",
+          "description": "Draw outline around tooltips"
+        },
         "pure-black-dark": {
           "description": "Anchor dark surfaces to true black, preventing banding on OLED panels (dark mode only)",
           "label": "Pure Black"

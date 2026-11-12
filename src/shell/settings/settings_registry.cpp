@@ -709,6 +709,11 @@ namespace settings {
         ToggleSetting{cfg.shell.cardBorders}, "card section outline border flat minimal"
     ));
     entries.push_back(makeEntry(
+        SettingsSection::Appearance, "borders", tr("settings.schema.appearance.tooltip-border.label"),
+        tr("settings.schema.appearance.tooltip-border.description"), {"shell", "tooltip", "border"},
+        ToggleSetting{cfg.shell.tooltip.border}, "tooltip hover outline border"
+    ));
+    entries.push_back(makeEntry(
         SettingsSection::Appearance, "effects", tr("settings.schema.shared.shadow-direction.label"),
         tr("settings.schema.appearance.global-shadow-direction.description"), {"shell", "shadow", "direction"},
         enumSelect(kShadowDirections, cfg.shell.shadow.direction), "shadow direction"

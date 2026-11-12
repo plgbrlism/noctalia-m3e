@@ -1607,6 +1607,13 @@ namespace noctalia::config::schema {
       return s;
     }
 
+    const Schema<ShellConfig::TooltipConfig>& shellTooltipSchema() {
+      static const Schema<ShellConfig::TooltipConfig> s = {
+          field(&ShellConfig::TooltipConfig::border, "border"),
+      };
+      return s;
+    }
+
     const Schema<ShadowStyle>& shellShadowSchema() {
       static const Schema<ShadowStyle> s = {
           enumField(&ShadowStyle::direction, "direction", kShadowDirections),
@@ -2033,6 +2040,7 @@ namespace noctalia::config::schema {
         field(&ShellConfig::clipboardImageActionCommand, "clipboard_image_action_command"),
         pathStringField(&ShellConfig::avatarPath, "avatar_path"),
         subTable(&ShellConfig::animation, "animation", shellAnimationSchema()),
+        subTable(&ShellConfig::tooltip, "tooltip", shellTooltipSchema()),
         subTable(&ShellConfig::shadow, "shadow", shellShadowSchema()),
         subTable(&ShellConfig::panel, "panel", shellPanelSchema()),
         subTable(&ShellConfig::launcher, "launcher", shellLauncherSchema()),
