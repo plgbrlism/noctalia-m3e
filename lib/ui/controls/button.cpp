@@ -136,8 +136,10 @@ namespace {
       return Button::ButtonPalette{
           .borderWidth = 0.0F,
           .normal = makeState(clearColorSpec(), clearColorSpec(), colorSpecFromRole(ColorRole::OnSurface)),
-          .hover =
-              makeState(colorSpecFromRole(ColorRole::Hover), clearColorSpec(), colorSpecFromRole(ColorRole::OnHover)),
+          .hover = makeState(
+              colorSpecFromRole(ColorRole::SurfaceContainerHighest), clearColorSpec(),
+              colorSpecFromRole(ColorRole::OnSurface)
+          ),
           .pressed = makeState(
               colorSpecFromRole(ColorRole::SurfaceContainer), clearColorSpec(), colorSpecFromRole(ColorRole::OnSurface)
           ),
@@ -148,13 +150,21 @@ namespace {
     case ButtonVariant::Tab:
       return Button::ButtonPalette{
           .borderWidth = 0.0F,
-          .normal = makeState(clearColorSpec(), clearColorSpec(), colorSpecFromRole(ColorRole::OnSurface)),
-          .hover =
-              makeState(colorSpecFromRole(ColorRole::Hover), clearColorSpec(), colorSpecFromRole(ColorRole::OnHover)),
+          .normal = makeState(
+              colorSpecFromRole(ColorRole::SurfaceContainerHigh), clearColorSpec(),
+              colorSpecFromRole(ColorRole::OnSurface)
+          ),
+          .hover = makeState(
+              colorSpecFromRole(ColorRole::SurfaceContainerHighest), clearColorSpec(),
+              colorSpecFromRole(ColorRole::OnSurface)
+          ),
           .pressed = makeState(
               colorSpecFromRole(ColorRole::SurfaceContainer), clearColorSpec(), colorSpecFromRole(ColorRole::OnSurface)
           ),
-          .disabled = makeState(clearColorSpec(), clearColorSpec(), colorSpecFromRole(ColorRole::OnSurface)),
+          .disabled = makeState(
+              colorSpecFromRole(ColorRole::SurfaceContainerLow), clearColorSpec(),
+              colorSpecFromRole(ColorRole::OnSurfaceVariant)
+          ),
           .selected = std::nullopt,
       };
     case ButtonVariant::TabActive:

@@ -13,7 +13,6 @@
 
 class Button;
 class InputArea;
-class Separator;
 
 class Segmented : public Flex {
 public:
@@ -53,7 +52,6 @@ public:
   void doLayout(Renderer& renderer) override;
 
 private:
-  [[nodiscard]] std::unique_ptr<Separator> makeSegmentSeparator();
   [[nodiscard]] std::unique_ptr<Button>
   makeSegmentButton(std::string_view label, std::string_view glyph, std::size_t index);
   void applyButtonMetrics(Button& button) const;
@@ -62,7 +60,6 @@ private:
   float effectiveFontSize() const noexcept;
 
   RovingListNavController m_rovingNav;
-  std::vector<Separator*> m_separators;
   std::vector<Button*> m_buttons;
   InputArea* m_focusArea = nullptr;
   std::size_t m_selected = 0;

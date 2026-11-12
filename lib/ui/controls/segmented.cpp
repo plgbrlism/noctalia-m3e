@@ -5,7 +5,6 @@
 #include "ui/controls/button.h"
 #include "ui/controls/flex.h"
 #include "ui/controls/roving_list_nav.h"
-#include "ui/controls/separator.h"
 #include "ui/palette.h"
 #include "ui/style.h"
 
@@ -16,8 +15,9 @@
 Segmented::Segmented() {
   setDirection(FlexDirection::Horizontal);
   setAlign(FlexAlign::Stretch);
-  setGap(0.0F);
-  applyOuterStyle();
+  setGap(6.0F * m_scale);
+  clearFill();
+  clearBorder();
 
   auto area = std::make_unique<InputArea>();
   area->setFocusable(true);
@@ -42,11 +42,6 @@ std::size_t Segmented::addOption(std::string_view label) { return addOption(labe
 
 std::size_t Segmented::addOption(std::string_view label, std::string_view glyph) {
   const std::size_t index = m_buttons.size();
-  if (index > 0) {
-    auto sep = makeSegmentSeparator();
-    m_separators.push_back(sep.get());
-    addChild(std::move(sep));
-  }
   auto btn = makeSegmentButton(label, glyph, index);
   Button* raw = btn.get();
   m_buttons.push_back(raw);
@@ -81,6 +76,7 @@ void Segmented::setFontSize(float size) {
 
 void Segmented::setScale(float scale) {
   m_scale = std::max(0.1F, scale);
+  setGap(6.0F * m_scale);
   applyOuterStyle();
   const float fs = effectiveFontSize();
   for (Button* btn : m_buttons) {
@@ -88,12 +84,6 @@ void Segmented::setScale(float scale) {
       applyButtonMetrics(*btn);
       btn->setFontSize(fs);
       btn->setGlyphSize(fs);
-    }
-  }
-  const float ruleW = std::max(1.0F, Style::borderWidth * m_scale);
-  for (Separator* sep : m_separators) {
-    if (sep != nullptr) {
-      sep->setThickness(ruleW);
     }
   }
   refreshVariants();
@@ -140,13 +130,7 @@ void Segmented::clearOptions() {
       removeChild(btn);
     }
   }
-  for (Separator* sep : m_separators) {
-    if (sep != nullptr) {
-      removeChild(sep);
-    }
-  }
   m_buttons.clear();
-  m_separators.clear();
   m_rovingNav.clearItems();
   m_selected = 0;
   markLayoutDirty();
@@ -182,15 +166,6 @@ void Segmented::setEnabled(bool enabled) {
     }
   }
   setOpacity(enabled ? 1.0F : 0.55F);
-}
-
-std::unique_ptr<Separator> Segmented::makeSegmentSeparator() {
-  auto sep = std::make_unique<Separator>();
-  sep->setOrientation(SeparatorOrientation::VerticalRule);
-  sep->setThickness(std::max(1.0F, Style::borderWidth * m_scale));
-  sep->setColor(colorSpecFromRole(ColorRole::OutlineVariant));
-  sep->setFlexGrow(0.0F);
-  return sep;
 }
 
 std::unique_ptr<Button>
@@ -248,10 +223,9 @@ void Segmented::refreshVariants() {
 }
 
 void Segmented::applyOuterStyle() {
-  Flex::setPadding(m_outerPadding);
-  setFill(colorSpecFromRole(m_surfaceRole, m_surfaceOpacity));
+  Flex::setPadding(0.0F);
+  clearFill();
   clearBorder();
-  setRadius(Style::scaledRadiusMd(m_scale));
 }
 
 void Segmented::doLayout(Renderer& renderer) {
