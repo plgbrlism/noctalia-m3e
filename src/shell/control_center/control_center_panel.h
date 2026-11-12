@@ -146,8 +146,6 @@ private:
   }};
 
   void selectTab(TabId tab, bool animated = false);
-  void selectAdjacentVisibleTab(int direction);
-  void wireSidebarScroll(InputArea* area);
   void scrollFocusedInputIntoView(InputArea* area) override;
   void scrollSidebarNodeIntoView(const Node* node);
   void scheduleMprisRefreshFor(TabId tab);
@@ -180,7 +178,6 @@ private:
   ScrollView* m_sidebarScrollView = nullptr;
   ScrollViewState m_sidebarScrollState{};
   RovingListNavHost* m_sidebarNav = nullptr;
-  InputArea* m_sidebarScrollArea = nullptr;
   Flex* m_content = nullptr;
   InputArea* m_contentDismissArea = nullptr;
   Flex* m_contentHeader = nullptr;

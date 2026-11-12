@@ -119,6 +119,9 @@ void ControlCenterPanel::create() {
   });
 
   if (m_showSidebar) {
+    const std::optional<float> sidebarScrollWidth =
+        m_compact ? std::optional<float>{48.0F * scale} : std::nullopt;
+
     auto sidebar = ui::column({
         .out = &m_sidebar,
         .align = FlexAlign::Start,
@@ -126,6 +129,7 @@ void ControlCenterPanel::create() {
         .padding = 0.0F,
         .fillWidth = false,
         .fillHeight = true,
+        .width = sidebarScrollWidth,
         .configure = [](Flex& column) {
           column.clearFill();
           column.clearBorder();
@@ -134,29 +138,26 @@ void ControlCenterPanel::create() {
         },
     });
 
-    auto sidebarScrollArea = ui::inputArea({});
-    sidebarScrollArea->setParticipatesInLayout(false);
-    sidebarScrollArea->setZIndex(-1);
-    m_sidebarScrollArea = sidebarScrollArea.get();
-    wireSidebarScroll(m_sidebarScrollArea);
-    sidebar->addChild(std::move(sidebarScrollArea));
-
-    const std::optional<float> sidebarScrollWidth =
-        m_compact ? std::optional<float>{48.0F * scale} : std::nullopt;
-
     auto sidebarScroll = ui::scrollView({
         .out = &m_sidebarScrollView,
         .state = &m_sidebarScrollState,
         .contentScale = scale,
-        .scrollbarVisible = true,
+        .scrollbarVisible = false,
         .viewportPaddingH = 0.0F,
         .viewportPaddingV = 0.0F,
         .fillWidth = false,
         .fillHeight = true,
         .width = sidebarScrollWidth,
+        .flexGrow = 1.0F,
         .configure = [](ScrollView& scrollView) {
           scrollView.clearFill();
           scrollView.clearBorder();
+          scrollView.setClipChildren(true);
+          if (scrollView.content() != nullptr) {
+            scrollView.content()->setClipChildren(true);
+            scrollView.content()->setFillWidth(true);
+            scrollView.content()->setAlign(FlexAlign::Stretch);
+          }
         },
     });
 
@@ -169,13 +170,9 @@ void ControlCenterPanel::create() {
         .syncIndexFromSelection = {},
     });
     sidebarNav->setTabFocusKey("control-center.sidebar");
-    if (!m_compact) {
-      sidebarNav->setAlign(FlexAlign::Stretch);
-      sidebarNav->setFillWidth(true);
-    } else {
-      sidebarNav->setAlign(FlexAlign::Start);
-    }
-    sidebarNav->setGap(Style::spaceXs * scale);
+    sidebarNav->setFillWidth(true);
+    sidebarNav->setAlign(FlexAlign::Stretch);
+    sidebarNav->setGap(Style::spaceMd * scale);
     m_sidebarNav = sidebarNav.get();
 
     for (const auto& tab : kTabs) {
@@ -193,19 +190,18 @@ void ControlCenterPanel::create() {
               .contentAlign = m_compact ? ButtonContentAlign::Center : ButtonContentAlign::Start,
               .variant = (tab.id == m_activeTab) ? ButtonVariant::TabActive : ButtonVariant::Ghost,
               .tooltip = m_compact ? i18n::tr(tab.titleKey) : std::string{},
-              .minWidth = m_compact ? std::optional<float>{48.0F * scale} : std::optional<float>{},
-              .minHeight = Style::controlHeight * scale,
-              .paddingV = m_compact ? (Style::spaceXs * scale) : (Style::spaceLg * scale),
-              .paddingH = (m_compact ? Style::spaceXs : Style::spaceSm) * scale,
+              .minHeight = m_compact ? (48.0F * scale) : (Style::controlHeight * scale),
+              .paddingV = m_compact ? (Style::spaceSm * scale) : (Style::spaceLg * scale),
+              .paddingH = m_compact ? 0.0F : (Style::spaceSm * scale),
               .gap = Style::spaceSm * scale,
               .radius = Style::scaledRadiusLg(scale),
+              .width = m_compact ? std::optional<float>{48.0F * scale} : std::nullopt,
               .onClick = onClick,
               .configure = [this, scale](Button& button) {
                 if (button.label() != nullptr) {
                   button.label()->setFontWeight(FontWeight::Bold);
                   button.label()->setFontSize(Style::fontSizeBody * scale);
                 }
-                wireSidebarScroll(button.inputArea());
               },
           })
       );
@@ -213,10 +209,12 @@ void ControlCenterPanel::create() {
     }
 
     if (sidebarScroll->content() != nullptr) {
-      if (!m_compact) {
-        sidebarScroll->content()->setAlign(FlexAlign::Stretch);
-      }
+      sidebarScroll->content()->setAlign(FlexAlign::Stretch);
       sidebarScroll->content()->addChild(std::move(sidebarNav));
+      sidebarScroll->content()->addChild(ui::box({
+          .fill = clearColorSpec(),
+          .height = Style::spaceLg * scale,
+      }));
     }
     sidebar->addChild(std::move(sidebarScroll));
     rootLayout->addChild(std::move(sidebar));
@@ -349,11 +347,6 @@ void ControlCenterPanel::doLayout(Renderer& renderer, float width, float height)
   const float bodyHeight = m_tabBodies->height();
   const float bodyContentHeight = tabContentHeight(bodyHeight);
 
-  if (m_sidebarScrollArea != nullptr && m_sidebar != nullptr) {
-    m_sidebarScrollArea->setPosition(0.0F, 0.0F);
-    m_sidebarScrollArea->setSize(m_sidebar->width(), m_sidebar->height());
-  }
-
   if (m_contentDismissArea != nullptr) {
     m_contentDismissArea->setPosition(0.0F, 0.0F);
     m_contentDismissArea->setFrameSize(m_content->width(), m_content->height());
@@ -460,7 +453,6 @@ void ControlCenterPanel::onClose() {
   m_sidebarScrollView = nullptr;
   m_sidebarScrollState = {};
   m_sidebarNav = nullptr;
-  m_sidebarScrollArea = nullptr;
   m_content = nullptr;
   m_contentDismissArea = nullptr;
   m_contentHeader = nullptr;
@@ -598,7 +590,7 @@ void ControlCenterPanel::updateTabChrome(TabId tab) {
     }
     if (m_tabButtons[idx] != nullptr) {
       m_tabButtons[idx]->setVisible(tabEnabled);
-      m_tabButtons[idx]->setVariant(meta.id == tab ? ButtonVariant::TabActive : ButtonVariant::Tab);
+      m_tabButtons[idx]->setVariant(meta.id == tab ? ButtonVariant::TabActive : ButtonVariant::Ghost);
     }
     if (meta.id == tab && m_contentTitle != nullptr) {
       m_contentTitle->setText(i18n::tr(meta.titleKey));
@@ -748,46 +740,6 @@ void ControlCenterPanel::finishTabTransition() {
   applyTabContainerVisibility(m_activeTab);
 }
 
-void ControlCenterPanel::wireSidebarScroll(InputArea* area) {
-  if (area == nullptr) {
-    return;
-  }
-  area->setOnAxis([this](const InputArea::PointerData& data) {
-    if (data.axis != WL_POINTER_AXIS_VERTICAL_SCROLL) {
-      return;
-    }
-    const float steps = data.scrollSteps();
-    if (steps == 0.0F) {
-      return;
-    }
-    selectAdjacentVisibleTab(steps > 0.0F ? 1 : -1);
-  });
-}
-
-void ControlCenterPanel::selectAdjacentVisibleTab(int direction) {
-  if (direction == 0) {
-    return;
-  }
-
-  const int activeOrdinal = visibleTabOrdinal(m_activeTab);
-  const int targetOrdinal = activeOrdinal + direction;
-
-  int ordinal = 0;
-  for (const auto& meta : kTabs) {
-    if (!isTabShown(meta.id)) {
-      continue;
-    }
-    if (ordinal == targetOrdinal) {
-      if (meta.id != m_activeTab) {
-        selectTab(meta.id, true);
-        PanelManager::instance().refresh();
-      }
-      return;
-    }
-    ++ordinal;
-  }
-}
-
 void ControlCenterPanel::selectTab(TabId tab, bool animated) {
   if (!isTabFeatureAvailable(tab)) {
     tab = firstVisibleTab();
@@ -892,18 +844,7 @@ void ControlCenterPanel::layoutFullSidebarWidth(Renderer& renderer) {
 
   const float minWidth = Style::controlHeightSm * scale;
   const float contentWidth = std::max(minWidth, std::ceil(maxTabWidth));
-
-  // Scrollbar gutter lives inside the scroll viewport; reserve it only when the nav overflows.
-  float targetWidth = contentWidth;
-  const float scrollHeight = m_sidebarScrollView->height();
-  if (scrollHeight > 0.0F) {
-    LayoutConstraints navConstraints;
-    navConstraints.setExactWidth(contentWidth);
-    const float navHeight = m_sidebarNav->measure(renderer, navConstraints).height;
-    if (navHeight > scrollHeight + 0.5F) {
-      targetWidth = contentWidth + m_sidebarScrollView->scrollbarGutter();
-    }
-  }
+  const float targetWidth = contentWidth;
 
   if (std::abs(m_sidebarScrollView->width() - targetWidth) > 0.5F) {
     m_sidebarScrollView->setSize(targetWidth, m_sidebarScrollView->height());
