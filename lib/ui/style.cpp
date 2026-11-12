@@ -4,7 +4,7 @@
 
 namespace {
 
-  float g_cornerRadiusScale = 1.0F;
+  Style::CornerShapePreset g_cornerShape = Style::CornerShapePreset::Standard;
   bool g_buttonBordersEnabled = true;
   bool g_inputBordersEnabled = true;
   bool g_popupBordersEnabled = true;
@@ -20,9 +20,19 @@ namespace {
 
 namespace Style {
 
-  float cornerRadiusScale() noexcept { return g_cornerRadiusScale; }
+  CornerShapePreset cornerShape() noexcept { return g_cornerShape; }
 
-  void setCornerRadiusScale(float scale) noexcept { g_cornerRadiusScale = std::clamp(scale, 0.0F, 2.0F); }
+  void setCornerShape(CornerShapePreset shape) noexcept {
+    if (g_cornerShape != shape) {
+      g_cornerShape = shape;
+      cornerShapeChanged().emit();
+    }
+  }
+
+  Signal<>& cornerShapeChanged() {
+    static Signal<> s;
+    return s;
+  }
 
   bool buttonBordersEnabled() noexcept { return g_buttonBordersEnabled; }
 
@@ -68,7 +78,12 @@ namespace Style {
   bool closeButtonsEnabled() noexcept { return g_closeButtonsEnabled; }
   void setCloseButtonsEnabled(bool enabled) { g_closeButtonsEnabled = enabled; }
 
-  float scaledRadius(float radius, float localScale) noexcept { return radius * localScale * g_cornerRadiusScale; }
+  float scaledRadius(float radius, float localScale) noexcept {
+    const float s = (g_cornerShape == CornerShapePreset::Sharp) ? 0.0F
+                  : (g_cornerShape == CornerShapePreset::Round) ? 2.0F
+                  : 1.0F;
+    return radius * localScale * s;
+  }
 
   float scaledRadiusSm(float localScale) noexcept { return scaledRadius(radiusSm, localScale); }
 

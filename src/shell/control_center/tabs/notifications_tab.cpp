@@ -755,7 +755,7 @@ public:
     }
     const bool expanded = m_owner.m_expandedIds.contains(entry->notification.id);
     std::uint64_t revision = revisionForEntry(*entry, expanded, m_owner.m_lastRelativeTimeSlot);
-    revision ^= static_cast<std::uint64_t>(Style::cornerRadiusScale() * 10000.0F) * 0xC2B2AE3D27D4EB4FULL;
+    revision ^= static_cast<std::uint64_t>(static_cast<int>(Style::cornerShape())) * 0xC2B2AE3D27D4EB4FULL;
     revision ^= (static_cast<std::uint64_t>(item.totalCount) << 16U);
     revision ^= (static_cast<std::uint64_t>(item.kind) << 48U);
     return revision;

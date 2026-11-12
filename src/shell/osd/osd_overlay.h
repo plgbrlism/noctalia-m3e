@@ -2,6 +2,7 @@
 
 #include "render/animation/animation_manager.h"
 #include "shell/wayland/layer_surface.h"
+#include "ui/style.h"
 
 #include <cstdint>
 #include <memory>
@@ -111,7 +112,7 @@ private:
     AnimationManager::Id hideAnimId = 0;
     bool showPending = false;
     bool visible = false;
-    float appliedCornerRadiusScale = -1.0F;
+    std::optional<Style::CornerShapePreset> appliedCornerShape;
   };
 
   SurfaceMargins surfaceMarginsForPosition(
@@ -138,7 +139,7 @@ private:
   std::string m_lastOrientation;
   bool m_lastShowProgress = true;
   float m_lastLayoutScale = 1.0F;
-  float m_lastCornerRadiusScale = 1.0F;
+  Style::CornerShapePreset m_lastCornerShape = Style::CornerShapePreset::Standard;
   std::vector<std::string> m_lastMonitorSelectors;
   bool m_followFocusedOutput = false;
   wl_output* m_targetOutput = nullptr;

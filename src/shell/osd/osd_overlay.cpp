@@ -520,7 +520,7 @@ void OsdOverlay::ensureSurfaces() {
     destroySurfaces();
   }
 
-  if (!m_instances.empty() && std::abs(Style::cornerRadiusScale() - m_lastCornerRadiusScale) > 1.0e-4F) {
+  if (!m_instances.empty() && Style::cornerShape() != m_lastCornerShape) {
     destroySurfaces();
   }
 
@@ -534,7 +534,7 @@ void OsdOverlay::ensureSurfaces() {
   m_lastOrientation = orientation;
   m_lastShowProgress = showProgress;
   m_lastLayoutScale = layoutScale;
-  m_lastCornerRadiusScale = Style::cornerRadiusScale();
+  m_lastCornerShape = Style::cornerShape();
   m_lastMonitorSelectors = selectedMonitors;
 
   const bool anyConfiguredPresent =
@@ -697,8 +697,8 @@ void OsdOverlay::prepareFrame(Instance& inst, bool needsUpdate, bool needsLayout
   }
 
   if (inst.sceneRoot != nullptr && inst.background != nullptr) {
-    const float corner = Style::cornerRadiusScale();
-    if (std::abs(corner - inst.appliedCornerRadiusScale) > 1.0e-4F) {
+    const Style::CornerShapePreset corner = Style::cornerShape();
+    if (!inst.appliedCornerShape.has_value() || *inst.appliedCornerShape != corner) {
       const float s = inst.uiLayoutScale;
       const float cw = cardWidth(s, m_lastOrientation);
       const float ch = cardHeight(s, m_lastOrientation, m_lastShowProgress);
@@ -706,7 +706,7 @@ void OsdOverlay::prepareFrame(Instance& inst, bool needsUpdate, bool needsLayout
       if (inst.progress != nullptr) {
         inst.progress->setRadius(osdProgressRadius(s));
       }
-      inst.appliedCornerRadiusScale = corner;
+      inst.appliedCornerShape = corner;
       inst.surface->requestRedraw();
     }
   }
@@ -830,7 +830,7 @@ void OsdOverlay::buildScene(Instance& inst, std::uint32_t width, std::uint32_t h
 
   inst.sceneRoot->addChild(std::move(card));
 
-  inst.appliedCornerRadiusScale = Style::cornerRadiusScale();
+  inst.appliedCornerShape = Style::cornerShape();
 }
 
 void OsdOverlay::updateInstanceContent(Instance& inst) {

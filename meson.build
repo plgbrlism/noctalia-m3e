@@ -1295,6 +1295,7 @@ if build_tests
     'settings_search',
     'spring',
     'state_store',
+    'style',
     'surface_blur_region',
     'sway_workspace_backend',
     'system_monitor_service',

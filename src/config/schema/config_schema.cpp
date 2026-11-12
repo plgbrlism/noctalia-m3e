@@ -1411,6 +1411,7 @@ namespace noctalia::config::schema {
         field(&ThemeConfig::wallpaperScheme, "wallpaper_scheme"),
          field(&ThemeConfig::expressive, "expressive"),
          enumField(&ThemeConfig::cornerStyle, "corner_style", kCornerStyles),
+         enumField(&ThemeConfig::cornerShape, "corner_shape", kCornerShapePresets),
          enumField(&ThemeConfig::mode, "mode", kThemeModes),
         enumField(&ThemeConfig::shellMode, "shell_mode", kShellThemeModes),
         field(&ThemeConfig::pureBlackDark, "pure_black_dark"),
@@ -1980,7 +1981,6 @@ namespace noctalia::config::schema {
 
   const Schema<ShellConfig>& shellSchema() {
     static const Schema<ShellConfig> s = {
-        field(&ShellConfig::cornerRadiusScale, "corner_radius_scale", kCornerRadiusScaleRange),
         field(&ShellConfig::buttonBorders, "button_borders"),
         field(&ShellConfig::inputBorders, "input_borders"),
         field(&ShellConfig::popupBorders, "popup_borders"),

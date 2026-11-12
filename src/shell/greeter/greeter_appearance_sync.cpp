@@ -440,7 +440,10 @@ namespace {
     toml::table appearance;
     appearance.insert_or_assign("scheme", "Synced");
     appearance.insert_or_assign("theme_mode", std::string(resolvedMode));
-    appearance.insert_or_assign("corner_radius_scale", static_cast<double>(config.shell.cornerRadiusScale));
+    const float greeterScale = (Style::cornerShape() == Style::CornerShapePreset::Sharp) ? 0.0F
+        : (Style::cornerShape() == Style::CornerShapePreset::Round) ? 2.0F
+        : 1.0F;
+    appearance.insert_or_assign("corner_radius_scale", static_cast<double>(greeterScale));
     if (!config.shell.fontFamily.empty()) {
       appearance.insert_or_assign("font_family", config.shell.fontFamily);
     }

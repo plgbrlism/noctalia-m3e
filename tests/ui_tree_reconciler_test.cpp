@@ -1357,8 +1357,9 @@ int main() {
          )
         && ok;
     if (zone != nullptr) {
-      const float previousCornerScale = Style::cornerRadiusScale();
-      Style::setCornerRadiusScale(1.5F);
+      const auto previousCornerShape = Style::cornerShape();
+      // 1.5F had no exact preset; mapped to Standard.
+      Style::setCornerShape(Style::CornerShapePreset::Standard);
       reconciler.reconcile(host, tree, renderer);
       zone->setDragOver(true);
       const auto background = std::ranges::find_if(zone->children(), [](const auto& child) {
@@ -1372,7 +1373,7 @@ int main() {
            )
           && ok;
       zone->setDragOver(false);
-      Style::setCornerRadiusScale(previousCornerScale);
+      Style::setCornerShape(previousCornerShape);
       reconciler.reconcile(host, tree, renderer);
     }
 

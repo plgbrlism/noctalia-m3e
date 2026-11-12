@@ -35,6 +35,7 @@ namespace noctalia::config {
     constexpr int kSettingsCustomScheduleMigrationVersion = 17;
     constexpr int kWorkspacesMonitorsMigrationVersion = 18;
     constexpr int kAppIconColorizationMigrationVersion = 19;
+    constexpr int kCornerShapePresetMigrationVersion = 20;
     constexpr std::int64_t kMaxBarRadius = 500;
     constexpr std::array<std::string_view, 5> kBarRadiusKeys = {
         "radius", "radius_top_left", "radius_top_right", "radius_bottom_left", "radius_bottom_right",
@@ -995,6 +996,43 @@ namespace noctalia::config {
       );
     }
 
+    // `[shell].corner_radius_scale` became the three-value `[theme].corner_shape` preset.
+    template <typename OnChanged> void migrateCornerRadiusScale(toml::table& root, OnChanged&& onChanged) {
+      auto* shell = root["shell"].as_table();
+      if (shell == nullptr || !shell->contains("corner_radius_scale")) {
+        return;
+      }
+
+      const auto& node = (*shell)["corner_radius_scale"];
+      double scale = 0.0;
+      if (const auto value = node.value<double>()) {
+        scale = *value;
+      } else if (const auto intValue = node.value<std::int64_t>()) {
+        scale = static_cast<double>(*intValue);
+      } else {
+        return;
+      }
+
+      const std::string_view shape = scale < 0.5 ? "sharp" : scale >= 1.5 ? "round" : "standard";
+      shell->erase("corner_radius_scale");
+
+      toml::table theme;
+      if (auto* existing = root["theme"].as_table()) {
+        theme = *existing;
+      }
+      if (!theme.contains("corner_shape")) {
+        theme.insert_or_assign("corner_shape", std::string(shape));
+      }
+      root.insert_or_assign("theme", std::move(theme));
+      onChanged("shell.corner_radius_scale");
+    }
+
+    void migrateCornerRadiusScaleSidecar(toml::table& root, const toml::table& /*base*/, schema::Diagnostics& diag) {
+      migrateCornerRadiusScale(root, [&diag](const std::string& path) {
+        diag.warn(path, "migrated legacy corner_radius_scale to theme.corner_shape");
+      });
+    }
+
     std::uint64_t stableIssueHash(int migrationVersion, std::string_view path) {
       constexpr std::uint64_t kOffset = 14695981039346656037ULL;
       constexpr std::uint64_t kPrime = 1099511628211ULL;
@@ -1126,6 +1164,11 @@ namespace noctalia::config {
             .toVersion = kAppIconColorizationMigrationVersion,
             .summary = "icons: split global app icon colorization into component settings",
             .apply = migrateAppIconColorizationSidecar,
+        },
+        {
+            .toVersion = kCornerShapePresetMigrationVersion,
+            .summary = "theme: replace shell corner_radius_scale with theme corner_shape",
+            .apply = migrateCornerRadiusScaleSidecar,
         },
     };
     return migrations;
@@ -1316,6 +1359,13 @@ namespace noctalia::config {
           .migrationVersion = kAppIconColorizationMigrationVersion,
           .path = path,
           .message = "app_icon_colorize is now colorize_icons in each component's settings",
+      });
+    });
+    migrateCornerRadiusScale(root, [&issues](const std::string& path) {
+      issues.push_back({
+          .migrationVersion = kCornerShapePresetMigrationVersion,
+          .path = path,
+          .message = "corner_radius_scale is now theme.corner_shape",
       });
     });
   }

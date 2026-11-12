@@ -611,10 +611,12 @@ namespace settings {
         asSegmented(enumSelect(kCornerStyles, cfg.theme.cornerStyle)), "corner style material fixed"
     ));
     entries.push_back(makeEntry(
-        SettingsSection::Appearance, "interface", tr("settings.schema.appearance.corner-roundness.label"),
-        tr("settings.schema.appearance.corner-roundness.description"), {"shell", "corner_radius_scale"},
-        sliderFor(cfg.shell.cornerRadiusScale, noctalia::config::schema::kCornerRadiusScaleRange, false),
-        "rounded corners radius"
+        SettingsSection::Appearance, "interface",
+        tr("settings.schema.appearance.corner-shape.label"),
+        tr("settings.schema.appearance.corner-shape.description"),
+        {"theme", "corner_shape"},
+        asSegmented(enumSelect(kCornerShapePresets, cfg.theme.cornerShape)),
+        "rounded corners radius shape"
     ));
     {
       const ColorSpec pickerColor = *effectiveShellAppIconColorizationTint(cfg.shell, true);

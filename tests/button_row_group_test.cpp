@@ -35,8 +35,8 @@ namespace {
 int main() {
   const auto originalStyle = Style::cornerStyle();
   const auto originalDs = Style::designSystem();
-  const float originalScale = Style::cornerRadiusScale();
-  Style::setCornerRadiusScale(1.0F);
+  const auto originalShape = Style::cornerShape();
+  Style::setCornerShape(Style::CornerShapePreset::Standard);
 
   StubRenderer renderer;
   const float md = Style::scaledRadiusMd(1.0F);
@@ -96,11 +96,11 @@ int main() {
     TEST_NEAR(r.br, md, 1e-4F);
   }
 
-  // Material First, roundness 0.0 → grow on press (square rounds out).
+  // Material First, Sharp shape → grow on press (square rounds out).
   {
     Style::setCornerStyle(Style::CornerStyle::Material);
     Style::setDesignSystem(Style::DesignSystem::Expressive);
-    Style::setCornerRadiusScale(0.0F);
+    Style::setCornerShape(Style::CornerShapePreset::Sharp);
     Button b;
     b.setSize(60.0F, 60.0F);
     b.layout(renderer);
@@ -111,7 +111,7 @@ int main() {
     auto pressed = b.currentRadiiForTest();
     TEST_CHECK(pressed.tl > 0.001F);
     Style::setDesignSystem(originalDs);
-    Style::setCornerRadiusScale(1.0F);
+    Style::setCornerShape(Style::CornerShapePreset::Standard);
   }
 
   // cornerStyle toggle mid-life re-applies radii.
@@ -133,6 +133,6 @@ int main() {
   }
 
   Style::setCornerStyle(originalStyle);
-  Style::setCornerRadiusScale(originalScale);
+  Style::setCornerShape(originalShape);
   return 0;
 }

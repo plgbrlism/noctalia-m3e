@@ -15,6 +15,12 @@ namespace Style {
     Fixed = 1,
   };
 
+  enum class CornerShapePreset : std::uint8_t {
+    Sharp = 0,
+    Standard = 1,
+    Round = 2,
+  };
+
   enum class MotionPreset : std::uint8_t {
     Smooth = 0,
     Balanced = 1,
@@ -114,8 +120,9 @@ namespace Style {
   inline constexpr float sliderThumbSize = 18.0F;
   inline constexpr float sliderHorizontalPadding = 2.0F;
 
-  float cornerRadiusScale() noexcept;
-  void setCornerRadiusScale(float scale) noexcept;
+  CornerShapePreset cornerShape() noexcept;
+  void setCornerShape(CornerShapePreset shape) noexcept;
+  Signal<>& cornerShapeChanged();
 
   bool buttonBordersEnabled() noexcept;
   void setButtonBordersEnabled(bool enabled);

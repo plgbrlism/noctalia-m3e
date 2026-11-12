@@ -1335,7 +1335,6 @@ struct ShellConfig {
     bool operator==(const WindowSwitcherConfig&) const = default;
   };
 
-  float cornerRadiusScale = 1.0F;
   bool buttonBorders = true;
   bool inputBorders = true;
   bool popupBorders = true;
@@ -1839,6 +1838,12 @@ constexpr EnumOption<ControlCenterSidebarMode> kControlCenterSidebarModes[] = {
       {Style::CornerStyle::Fixed, "fixed", "theme.corner-style.fixed"},
   };
 
+  constexpr EnumOption<Style::CornerShapePreset> kCornerShapePresets[] = {
+      {Style::CornerShapePreset::Sharp, "sharp", "theme.corner-shape.sharp"},
+      {Style::CornerShapePreset::Standard, "standard", "theme.corner-shape.standard"},
+      {Style::CornerShapePreset::Round, "round", "theme.corner-shape.round"},
+  };
+
   struct ThemeConfig {
   struct TemplateColorConfig {
     std::string name;
@@ -1901,6 +1906,7 @@ constexpr EnumOption<ControlCenterSidebarMode> kControlCenterSidebarModes[] = {
   std::string wallpaperScheme = "m3-content";
   bool expressive = true;
   Style::CornerStyle cornerStyle = Style::CornerStyle::Material;
+  Style::CornerShapePreset cornerShape = Style::CornerShapePreset::Standard;
   ThemeMode mode = ThemeMode::Dark;
   ShellThemeMode shellMode = ShellThemeMode::Follow;
   bool pureBlackDark = false;

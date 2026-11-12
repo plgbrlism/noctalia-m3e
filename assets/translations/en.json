@@ -1985,9 +1985,9 @@
           "label": "Community Palette",
           "search-placeholder": "Search palettes…"
         },
-        "corner-roundness": {
-          "description": "Scale corner radius across shell UI containers and controls",
-          "label": "Corner Roundness"
+        "corner-shape": {
+          "description": "Corner roundness preset: Sharp, Standard, or Round",
+          "label": "Corner Shape"
         },
         "custom-palette": {
           "description": "Choose a palette from ~/.config/noctalia/palettes/",
@@ -5370,6 +5370,11 @@
     }
   },
   "theme": {
+    "corner-shape": {
+      "round": "Round",
+      "sharp": "Sharp",
+      "standard": "Standard"
+    },
     "corner-style": {
       "material": "Material",
       "fixed": "Fixed"

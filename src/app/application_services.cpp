@@ -563,23 +563,22 @@ void Application::initStyleThemeAndWayland() {
     motion.setReduceMotion(cfg.motionPreset.reduce);
     motion.setMotionConfig(cfg.motion);
   };
-  auto applyStyleConfig = [this, lastCornerRadiusScale = std::numeric_limits<float>::quiet_NaN()] mutable {
+  auto applyStyleConfig = [this, lastCornerShape = std::optional<Style::CornerShapePreset>{}] mutable {
     auto& cfg = m_configService.config();
     Style::setDesignSystem(cfg.theme.expressive
         ? Style::DesignSystem::Expressive
         : Style::DesignSystem::Custom);
     Style::setCornerStyle(cfg.theme.cornerStyle);
-    const float corner = cfg.shell.cornerRadiusScale;
-    const bool cornerChanged =
-        std::isfinite(lastCornerRadiusScale) && std::abs(corner - lastCornerRadiusScale) > 1.0e-4F;
-    Style::setCornerRadiusScale(corner);
+    const Style::CornerShapePreset cornerShape = cfg.theme.cornerShape;
+    const bool cornerChanged = lastCornerShape.has_value() && *lastCornerShape != cornerShape;
+    Style::setCornerShape(cornerShape);
     Style::setButtonBordersEnabled(m_configService.config().shell.buttonBorders);
     Style::setInputBordersEnabled(m_configService.config().shell.inputBorders);
     Style::setPopupBordersEnabled(m_configService.config().shell.popupBorders);
     Style::setPopupShadowsEnabled(m_configService.config().shell.popupShadows);
     Style::setCardBordersEnabled(m_configService.config().shell.cardBorders);
     Style::setCloseButtonsEnabled(m_configService.config().shell.showCloseButtons);
-    lastCornerRadiusScale = corner;
+    lastCornerShape = cornerShape;
     if (cornerChanged) {
       m_notificationToast.requestLayout();
       m_panelManager.requestLayout();

@@ -35,9 +35,9 @@ namespace {
 
 int main() {
   const auto originalDs = Style::designSystem();
-  const float originalScale = Style::cornerRadiusScale();
+  const auto originalShape = Style::cornerShape();
   Style::setDesignSystem(Style::DesignSystem::Expressive);
-  Style::setCornerRadiusScale(1.0F);
+  Style::setCornerShape(Style::CornerShapePreset::Standard);
 
   StubRenderer renderer;
 
@@ -101,6 +101,6 @@ int main() {
   }
 
   Style::setDesignSystem(originalDs);
-  Style::setCornerRadiusScale(originalScale);
+  Style::setCornerShape(originalShape);
   return 0;
 }
