@@ -123,15 +123,14 @@ void ControlCenterPanel::create() {
         .out = &m_sidebar,
         .align = FlexAlign::Start,
         .gap = 0.0F,
-        .padding = Style::spaceMd * scale,
+        .padding = 0.0F,
         .fillWidth = false,
         .fillHeight = true,
-        .configure = [this, scale](Flex& column) {
-          column.setFill(colorSpecFromRole(ColorRole::SurfaceContainer, panelCardOpacity()));
-          column.setRadius(Style::scaledRadiusXl(scale));
-          if (Style::cardBordersEnabled()) {
-            column.setBorder(colorSpecFromRole(ColorRole::OutlineVariant), Style::borderWidth);
-          }
+        .configure = [](Flex& column) {
+          column.clearFill();
+          column.clearBorder();
+          column.setRadius(0.0F);
+          column.setPadding(0.0F);
         },
     });
 
@@ -143,7 +142,7 @@ void ControlCenterPanel::create() {
     sidebar->addChild(std::move(sidebarScrollArea));
 
     const std::optional<float> sidebarScrollWidth =
-        m_compact ? std::optional<float>{Style::controlHeightSm * scale} : std::nullopt;
+        m_compact ? std::optional<float>{48.0F * scale} : std::nullopt;
 
     auto sidebarScroll = ui::scrollView({
         .out = &m_sidebarScrollView,
@@ -192,11 +191,11 @@ void ControlCenterPanel::create() {
               .glyph = tab.glyph,
               .glyphSize = 21.0F * scale,
               .contentAlign = m_compact ? ButtonContentAlign::Center : ButtonContentAlign::Start,
-              .variant = ButtonVariant::Tab,
+              .variant = (tab.id == m_activeTab) ? ButtonVariant::TabActive : ButtonVariant::Ghost,
               .tooltip = m_compact ? i18n::tr(tab.titleKey) : std::string{},
-              .minWidth = m_compact ? std::optional<float>{Style::controlHeightSm * scale} : std::optional<float>{},
-              .minHeight = Style::controlHeightSm * scale,
-              .paddingV = Style::spaceXs * scale,
+              .minWidth = m_compact ? std::optional<float>{48.0F * scale} : std::optional<float>{},
+              .minHeight = Style::controlHeight * scale,
+              .paddingV = m_compact ? (Style::spaceXs * scale) : (Style::spaceLg * scale),
               .paddingH = (m_compact ? Style::spaceXs : Style::spaceSm) * scale,
               .gap = Style::spaceSm * scale,
               .radius = Style::scaledRadiusLg(scale),

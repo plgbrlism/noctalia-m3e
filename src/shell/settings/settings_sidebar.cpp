@@ -22,10 +22,10 @@ namespace settings {
 
     constexpr float kSidebarWidth = 200.0F;
     constexpr float kSidebarPadding = 6.0F;
-    constexpr float kSidebarGap = 2.0F;
-    constexpr float kPrimaryNavGlyphSize = 18.0F;
-    constexpr float kPrimaryNavGap = 6.0F;
-    constexpr float kPrimaryNavPaddingH = 10.0F;
+    constexpr float kSidebarGap = 8.0F;
+    constexpr float kPrimaryNavGlyphSize = 20.0F;
+    constexpr float kPrimaryNavGap = 8.0F;
+    constexpr float kPrimaryNavPaddingH = 16.0F;
 
     void addNavButton(RovingListNavHost& nav, std::unique_ptr<Button> button, std::function<void()> onClick) {
       Button* raw = button.get();
@@ -72,12 +72,13 @@ namespace settings {
           .fontSize = Style::fontSizeCaption * scale,
           .glyphSize = kPrimaryNavGlyphSize * scale,
           .contentAlign = ButtonContentAlign::Start,
-          .variant = selected ? ButtonVariant::TabActive : ButtonVariant::Tab,
-          .minHeight = Style::controlHeightSm * scale,
-          .paddingV = Style::spaceXs * scale,
+          .variant = selected ? ButtonVariant::TabActive : ButtonVariant::Ghost,
+          .minHeight = Style::controlHeightLg * scale,
+          .paddingV = Style::spaceLg * scale,
           .paddingH = kPrimaryNavPaddingH * scale,
           .gap = kPrimaryNavGap * scale,
           .radius = Style::scaledRadiusMd(scale),
+          .flexGrow = 1.0F,
           .onClick = std::move(onClick),
           .configure = [](Button& button) {
             makeButtonLabelBold(button);
@@ -94,16 +95,17 @@ namespace settings {
           .text = std::move(text),
           .glyph = std::string(glyph),
           .fontSize = Style::fontSizeCaption * scale,
-          .glyphSize = Style::fontSizeCaption * scale,
+          .glyphSize = 20.0F * scale,
           .contentAlign = ButtonContentAlign::Start,
-          .variant = selected ? ButtonVariant::TabActive : ButtonVariant::Tab,
-          .minHeight = Style::controlHeightSm * scale,
-          .paddingTop = Style::spaceXs * scale,
-          .paddingRight = Style::spaceMd * scale,
-          .paddingBottom = Style::spaceXs * scale,
+          .variant = selected ? ButtonVariant::TabActive : ButtonVariant::Ghost,
+          .minHeight = Style::controlHeightLg * scale,
+          .paddingTop = Style::spaceLg * scale,
+          .paddingRight = Style::spaceLg * scale,
+          .paddingBottom = Style::spaceLg * scale,
           .paddingLeft = Style::spaceLg * scale,
           .gap = Style::spaceXs * scale,
           .radius = Style::scaledRadiusMd(scale),
+          .flexGrow = 1.0F,
           .onClick = std::move(onClick),
           .configure = [](Button& button) { button.setTabStop(false); },
       });
@@ -164,13 +166,16 @@ namespace settings {
         .scrollbarVisible = true,
         .viewportPaddingH = 0.0F,
         .viewportPaddingV = 0.0F,
-        .fill = ctx.config.shell.settingsWindowTranslucent ? clearColorSpec() : colorSpecFromRole(ColorRole::Surface),
-        .radius = Style::scaledRadiusXl(scale),
+        .fill = clearColorSpec(),
+        .radius = 0.0F,
         .minWidth = kSidebarWidth * scale,
         .fillHeight = true,
         .width = kSidebarWidth * scale,
         .height = 0.0F,
-        .configure = [](ScrollView& scrollView) { scrollView.clearBorder(); },
+        .configure = [](ScrollView& scrollView) {
+          scrollView.clearFill();
+          scrollView.clearBorder();
+        },
     });
 
     auto sidebarNav = std::make_unique<RovingListNavHost>(RovingListNavController::Options{
@@ -250,7 +255,7 @@ namespace settings {
                 .text = i18n::tr("settings.entities.monitor-override.new"),
                 .glyph = "add",
                 .fontSize = Style::fontSizeCaption * scale,
-                .glyphSize = Style::fontSizeCaption * scale,
+                .glyphSize = 20.0F * scale,
                 .contentAlign = ButtonContentAlign::Start,
                 .variant = ButtonVariant::Ghost,
                 .minHeight = Style::controlHeightSm * scale,
