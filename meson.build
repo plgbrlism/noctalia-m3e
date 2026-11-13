@@ -1241,6 +1241,7 @@ if build_tests
     'ical_parser',
     'icon_resolver',
     'idle',
+    'icon_resolver_cache',
     'image_orientation',
     'ipc_service',
     'iwd_diagnostics',
