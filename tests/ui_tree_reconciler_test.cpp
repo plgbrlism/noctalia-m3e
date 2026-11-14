@@ -5,6 +5,7 @@
 #include "render/scene/glyph_node.h"
 #include "render/scene/input_area.h"
 #include "render/scene/rect_node.h"
+#include "render/scene/ring_node.h"
 #include "scripting/ui/ui_tree.h"
 #include "scripting/ui/ui_tree_reconciler.h"
 #include "shell/visuals/graph.h"
@@ -16,6 +17,7 @@
 #include "ui/controls/glyph.h"
 #include "ui/controls/input.h"
 #include "ui/controls/label.h"
+#include "ui/controls/ring.h"
 #include "ui/controls/scroll_view.h"
 #include "ui/controls/select.h"
 #include "ui/controls/slider.h"
@@ -26,6 +28,7 @@
 #include "ui/style.h"
 
 #include <cstdlib>
+#include <limits>
 #include <optional>
 #include <print>
 #include <string>
@@ -2949,6 +2952,61 @@ int main() {
       source->inputArea()->dispatchPress(localX, localY, BTN_LEFT, false);
       ok = expect(fired.empty(), "a release after the cancel fires neither onDrop nor onClick") && ok;
     }
+  }
+
+  // Ring: progress clamps at both endpoints, props scale with the surface, and a retained ring
+  // updates in place, with dropped props returning to their defaults.
+  {
+    ui::UiTreeReconciler reconciler;
+    reconciler.setScale(1.5F);
+    Flex host;
+
+    ui::UiTreeNode tree = makeNode("ring");
+    tree.props.emplace("progress", 0.4);
+    tree.props.emplace("fill", std::string("#ff0000"));
+    tree.props.emplace("track", std::string("#00ff00"));
+    tree.props.emplace("thickness", 2.0);
+    tree.props.emplace("width", 14.0);
+    tree.props.emplace("height", 10.0);
+    ok = expect(reconciler.reconcile(host, tree, renderer), "ring reconciles") && ok;
+    auto* ring = dynamic_cast<Ring*>(host.children().front().get());
+    auto* ringNode = ring != nullptr ? findFirst<RingNode>(*ring) : nullptr;
+    ok = expect(ring != nullptr && ringNode != nullptr, "ring and ring node exist") && ok;
+    ok = expect(ring->width() == 21.0F && ring->height() == 15.0F, "ring scales with surface") && ok;
+    ok = expect(ringNode->width() == 21.0F && ringNode->height() == 15.0F, "ring node scales with surface") && ok;
+    ok = expect(ringNode->style().progress == 0.4F, "ring progress set") && ok;
+    ok = expect(ringNode->style().thickness == 3.0F, "ring thickness scales") && ok;
+    ok = expect(ringNode->style().fill == rgbHex(0xff0000), "ring fill set") && ok;
+    ok = expect(ringNode->style().track == rgbHex(0x00ff00), "ring track set") && ok;
+
+    tree.props["progress"] = 1.7;
+    ok = expect(!reconciler.reconcile(host, tree, renderer), "out-of-range ring progress requests no redraw") && ok;
+    ok = expect(host.children().front().get() == ring, "ring retained on update") && ok;
+    ok = expect(ringNode->style().progress == 1.0F, "ring progress clamps high") && ok;
+
+    tree.props["progress"] = -0.2;
+    reconciler.reconcile(host, tree, renderer);
+    ok = expect(ringNode->style().progress == 0.0F, "ring progress clamps low") && ok;
+
+    tree.props["progress"] = std::numeric_limits<double>::quiet_NaN();
+    reconciler.reconcile(host, tree, renderer);
+    ok = expect(ringNode->style().progress == 0.0F, "NaN ring progress clamps to zero") && ok;
+
+    tree.props["progress"] = 1.0;
+    tree.props.erase("fill");
+    tree.props.erase("track");
+    tree.props.erase("thickness");
+    reconciler.reconcile(host, tree, renderer);
+    ok = expect(host.children().front().get() == ring, "ring retained after props dropped") && ok;
+    ok = expect(ringNode->style().progress == 1.0F, "ring progress preserved") && ok;
+    ok = expect(ringNode->style().fill == resolveColorSpec(Ring::kDefaultFill), "ring fill reset to default") && ok;
+    ok = expect(ringNode->style().track == resolveColorSpec(Ring::kDefaultTrack), "ring track reset to default") && ok;
+    ok = expect(ringNode->style().thickness == Ring::kDefaultThickness * 1.5F, "ring thickness reset to default")
+        && ok;
+
+    tree.props.erase("progress");
+    reconciler.reconcile(host, tree, renderer);
+    ok = expect(ringNode->style().progress == 0.0F, "ring progress reset to default") && ok;
   }
 
   return ok ? 0 : 1;
