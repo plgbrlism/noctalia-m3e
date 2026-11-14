@@ -279,7 +279,9 @@ namespace settings {
           continue;
         }
         std::string label = shortcut.literalLabel ? std::move(shortcut.labelKey) : i18n::tr(shortcut.labelKey);
-        opts.push_back(SelectOption{std::move(shortcut.type), std::move(label)});
+        opts.push_back(
+            SelectOption{.value = std::move(shortcut.type), .label = std::move(label), .icon = std::move(shortcut.icon)}
+        );
       }
       return opts;
     }
@@ -1561,7 +1563,10 @@ namespace settings {
         const auto knownPanelIds = panel_catalog::allKnownIds();
         ignoredPanels.suggestedOptions.reserve(knownPanelIds.size());
         for (const auto& panelId : knownPanelIds) {
-          ignoredPanels.suggestedOptions.push_back(SelectOption{panelId, panel_catalog::describe(panelId).title});
+          auto desc = panel_catalog::describe(panelId);
+          ignoredPanels.suggestedOptions.push_back(
+              SelectOption{.value = panelId, .label = std::move(desc.title), .icon = std::move(desc.glyph)}
+          );
         }
         entries.push_back(makeEntry(
             SettingsSection::Launcher, "providers", tr("settings.schema.panels.launcher-ignored-panels.label"),
