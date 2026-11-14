@@ -22,8 +22,6 @@ public:
 
   void setMotionConfig(const MotionConfig& config);
   const MotionConfig& motionConfig() const;
-  void setReduceMotion(bool reduce);
-  bool reduceMotion() const;
   SpringSpec resolve(SpringToken token) const;
 
   bool enabled() const noexcept { return m_enabled; }
@@ -33,7 +31,6 @@ private:
   MotionService() = default;
 
   bool m_enabled = true;
-  bool m_reduceMotion = false;
   float m_speed = 1.0F;
   MotionConfig m_motionConfig;
   std::unordered_set<AnimationManager*> m_managers;
