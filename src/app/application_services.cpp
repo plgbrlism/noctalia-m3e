@@ -557,13 +557,12 @@ void Application::initStyleThemeAndWayland() {
   auto applyMotionConfig = [this] {
     auto& motion = MotionService::instance();
     auto& cfg = m_configService.config();
-    Style::setMotionPreset(cfg.motionPreset.preset);
     motion.setSpeed(cfg.shell.animation.speed);
     motion.setEnabled(cfg.shell.animation.enabled);
-    motion.setReduceMotion(cfg.motionPreset.reduce);
     motion.setMotionConfig(cfg.motion);
   };
-  auto applyStyleConfig = [this, lastCornerShape = std::optional<Style::CornerShapePreset>{}] mutable {
+  auto applyStyleConfig = [this, lastCornerShape = std::optional<Style::CornerShapePreset>{},
+                           lastDensity = std::optional<Style::Density>{}] mutable {
     auto& cfg = m_configService.config();
     Style::setDesignSystem(cfg.theme.expressive
         ? Style::DesignSystem::Expressive
@@ -572,6 +571,12 @@ void Application::initStyleThemeAndWayland() {
     const Style::CornerShapePreset cornerShape = cfg.theme.cornerShape;
     const bool cornerChanged = lastCornerShape.has_value() && *lastCornerShape != cornerShape;
     Style::setCornerShape(cornerShape);
+    const Style::Density density = cfg.theme.density;
+    const bool densityChanged = lastDensity.has_value() && *lastDensity != density;
+    const float densityScale = density == Style::Density::Standard ? 0.85F
+        : density == Style::Density::Compact                        ? 0.75F
+                                                                    : 1.0F;
+    Style::setDensityScale(densityScale);
     Style::setButtonBordersEnabled(m_configService.config().shell.buttonBorders);
     Style::setInputBordersEnabled(m_configService.config().shell.inputBorders);
     Style::setPopupBordersEnabled(m_configService.config().shell.popupBorders);
@@ -579,7 +584,8 @@ void Application::initStyleThemeAndWayland() {
     Style::setCardBordersEnabled(m_configService.config().shell.cardBorders);
     Style::setCloseButtonsEnabled(m_configService.config().shell.showCloseButtons);
     lastCornerShape = cornerShape;
-    if (cornerChanged) {
+    lastDensity = density;
+    if (cornerChanged || densityChanged) {
       m_notificationToast.requestLayout();
       m_panelManager.requestLayout();
     }

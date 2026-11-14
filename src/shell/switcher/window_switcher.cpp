@@ -136,9 +136,7 @@ namespace {
     return appId;
   }
 
-  float shellUiScale(const ConfigService* config) noexcept {
-    return config != nullptr ? config->config().accessibility.uiScale : 1.0F;
-  }
+  float shellUiScale() noexcept { return Style::densityScale(); }
 
   const WaylandOutput* findOutput(const WaylandConnection& wayland, wl_output* output) {
     for (const auto& entry : wayland.outputs()) {
@@ -910,7 +908,7 @@ void WindowSwitcher::refreshWindows() {
     }
   }
 
-  const int iconSize = static_cast<int>(std::round((Style::controlHeightLg + Style::spaceLg) * shellUiScale(m_config)));
+  const int iconSize = static_cast<int>(std::round((Style::controlHeightLg + Style::spaceLg) * shellUiScale()));
   bool allOutputs = m_config == nullptr || m_config->config().shell.windowSwitcher.showAllOutputs;
   bool currentWorkspaceOnly = m_config != nullptr && m_config->config().shell.windowSwitcher.currentWorkspaceOnly;
   switch (m_scopeOverride) {
@@ -972,7 +970,7 @@ std::optional<ThumbnailTarget> WindowSwitcher::currentThumbnailTarget() const {
 
   const ShellConfig::WindowSwitcherConfig switcherConfig =
       m_config != nullptr ? m_config->config().shell.windowSwitcher : ShellConfig::WindowSwitcherConfig{};
-  const float uiScale = m_instance != nullptr ? m_instance->uiLayoutScale : shellUiScale(m_config);
+  const float uiScale = m_instance != nullptr ? m_instance->uiLayoutScale : shellUiScale();
   return thumbnailTargetFor(*output, uiScale, switcherConfig);
 }
 
@@ -1694,7 +1692,7 @@ void WindowSwitcher::ensureSurface() {
 
   auto inst = std::make_unique<Instance>();
   inst->output = m_output;
-  inst->uiLayoutScale = shellUiScale(m_config);
+  inst->uiLayoutScale = shellUiScale();
 
   auto config = LayerSurfaceConfig{
       .nameSpace = "noctalia-window-switcher",

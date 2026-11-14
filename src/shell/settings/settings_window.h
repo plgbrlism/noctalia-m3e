@@ -251,7 +251,8 @@ private:
   void createDockMonitorOverride(std::string match);
   void renameDockMonitorOverride(std::string oldTableName, std::string newMatch);
   void deleteDockMonitorOverride(std::string tableName);
-  float uiScale() const;
+  float contentScale() const;
+  float windowScale() const;
 
   std::optional<LayerPopupParentContext> topmostPopupParentContext() const;
   void dismissOpenSelectDropdown();

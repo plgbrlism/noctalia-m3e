@@ -235,7 +235,7 @@ void SettingsWindow::initializeDialogPresenter(
   m_dialogPresenter = std::make_unique<settings::SettingsDialogPresenter>();
   m_dialogPresenter->initialize(
       m_modalHost, m_animations, thumbnails, colorFallback, glyphFallback, fileFallback,
-      [this] { return shouldUseModalDialogs(); }, [this] { return uiScale(); }, [this] { dismissOpenSelectDropdown(); }
+      [this] { return shouldUseModalDialogs(); }, [this] { return contentScale(); }, [this] { dismissOpenSelectDropdown(); }
   );
 }
 
@@ -261,11 +261,12 @@ bool SettingsWindow::shouldUseModalDialogs() const noexcept {
   return source != nullptr && ownsKeyboardSurface(source);
 }
 
-float SettingsWindow::uiScale() const {
-  if (m_config == nullptr) {
-    return 1.0F;
-  }
-  return std::max(0.1F, m_config->config().accessibility.uiScale);
+float SettingsWindow::contentScale() const {
+  return Style::densityScale();
+}
+
+float SettingsWindow::windowScale() const {
+  return 1.0F;
 }
 
 bool SettingsWindow::headerDragRegionContains(float sceneX, float sceneY) const {
@@ -485,7 +486,7 @@ void SettingsWindow::open(std::string context) {
 
   m_surface->setUpdateCallback([] {});
 
-  const float scale = uiScale();
+  const float scale = windowScale();
   float desiredWidth = kWindowWidth * scale;
   float desiredHeight = kWindowHeight * scale;
   float minWidthF = kWindowMinWidth * scale;
@@ -722,7 +723,7 @@ void SettingsWindow::prepareFrame(bool needsUpdate, bool needsLayout) {
   const bool sizeChanged = !firstBuild && (m_lastSceneWidth != width || m_lastSceneHeight != height);
   const bool needRebuild = firstBuild || m_rebuildRequested;
 
-  const float scale = uiScale();
+  const float scale = windowScale();
   float minWidthF = kWindowMinWidth * scale;
   float minHeightF = kWindowMinHeight * scale;
   wl_output* currentOutput = nullptr;
@@ -789,7 +790,7 @@ void SettingsWindow::prepareFrame(bool needsUpdate, bool needsLayout) {
         m_settingsRegistryRefreshRequested = false;
       }
       if (m_filterRowRefreshRequested) {
-        rebuildFilterRow(uiScale());
+        rebuildFilterRow(contentScale());
         m_filterRowRefreshRequested = false;
       }
       rebuildSettingsContent();
@@ -803,7 +804,7 @@ void SettingsWindow::prepareFrame(bool needsUpdate, bool needsLayout) {
     m_sceneRoot->layout(renderer);
     logSettingsProfile("prepareFrame layout", phaseProfileWatch);
     phaseProfileWatch.reset();
-    applyPendingContentScrollTarget(Style::spaceMd * uiScale());
+    applyPendingContentScrollTarget(Style::spaceMd * contentScale());
     logSettingsProfile("prepareFrame scrollTarget", phaseProfileWatch);
     m_lastSceneWidth = width;
     m_lastSceneHeight = height;

@@ -13,6 +13,7 @@
 #include "shell/wayland/layer_surface.h"
 #include "time/time_format.h"
 #include "ui/builders.h"
+#include "ui/style.h"
 #include "wayland/wayland_connection.h"
 #include "wayland/wayland_seat.h"
 
@@ -314,7 +315,7 @@ void DesktopWidgetsHost::createInstance(const DesktopWidgetState& state, const W
     return;
   }
 
-  const float baseUiScale = m_config != nullptr ? m_config->config().accessibility.uiScale : 1.0F;
+  const float baseUiScale = Style::densityScale();
   auto widget = m_factory->create(state.type, state.settings, desktop_widgets::widgetContentScale(baseUiScale));
   if (widget == nullptr) {
     return;
@@ -510,7 +511,7 @@ void DesktopWidgetsHost::prepareFrame(DesktopWidgetInstance& instance, bool need
 
   buildScene(instance);
 
-  const float baseUiScale = m_config != nullptr ? m_config->config().accessibility.uiScale : 1.0F;
+  const float baseUiScale = Style::densityScale();
   instance.widget->setContentScale(desktop_widgets::widgetContentScale(baseUiScale));
   instance.widget->setBox(instance.state.boxWidth, instance.state.boxHeight);
 

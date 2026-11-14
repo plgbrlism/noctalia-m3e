@@ -142,7 +142,8 @@ void PersistentPanelHost::open(const std::string& id, wl_output* output, std::st
   }
 
   Panel* panel = panelIt->second.get();
-  panel->setContentScale(shell::panel_surface::contentScale(m_config));
+  panel->setContentScale(1.0F);
+  panel->setDensityScale(Style::densityScale());
   panel->setPendingOpenContext(context);
 
   const auto& shadowConfig = m_config->config().shell.shadow;
@@ -630,7 +631,8 @@ void PersistentPanelHost::onConfigReloaded() {
       continue;
     }
     const float backgroundOpacity = shell::panel_surface::backgroundOpacity(m_config);
-    instance->panel->setContentScale(shell::panel_surface::contentScale(m_config));
+    instance->panel->setContentScale(1.0F);
+    instance->panel->setDensityScale(Style::densityScale());
     instance->panel->setPanelCardOpacity(shell::panel_surface::cardOpacity(m_config, backgroundOpacity));
     if (instance->bgNode != nullptr) {
       instance->bgNode->setPanelStyle(m_config->config().shell.panel.borders);

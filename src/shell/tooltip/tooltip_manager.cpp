@@ -650,7 +650,7 @@ TooltipManager::Size TooltipManager::measureContent(Renderer& renderer, const To
 
   const float bw = tooltipBorderWidth();
   const auto roles = resolveTooltipRoles(bw > 0.0F);
-  const float scale = (m_config != nullptr) ? std::max(0.1F, m_config->config().accessibility.uiScale) : 1.0F;
+  const float scale = Style::densityScale();
   const float maxContentWidth = kMaxContentWidth * scale;
   const float fontSize = Style::fontSizeCaption * scale;
   const float padH = kPadH * scale;
@@ -721,7 +721,7 @@ void TooltipManager::buildScene(const TooltipContent& content, float w, float h,
       })
   );
 
-  const float scale = (m_config != nullptr) ? std::max(0.1F, m_config->config().accessibility.uiScale) : 1.0F;
+  const float scale = Style::densityScale();
   const float maxContentWidth = kMaxContentWidth * scale;
   const float fontSize = Style::fontSizeCaption * scale;
   const float padH = kPadH * scale;

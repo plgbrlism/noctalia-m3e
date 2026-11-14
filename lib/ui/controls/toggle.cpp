@@ -176,7 +176,8 @@ void Toggle::applyState() { applyAnimatedState(m_checked ? 1.0F : 0.0F); }
 void Toggle::applyAnimatedState(float t) {
   m_animationProgress = t;
   const Color trackColor = lerpColor(colorForRole(ColorRole::OutlineVariant), colorForRole(ColorRole::Primary), t);
-  const Color thumbColor = lerpColor(colorForRole(ColorRole::OnPrimary), colorForRole(ColorRole::OnPrimary), t);
+  const Color thumbColor =
+      lerpColor(colorForRole(ColorRole::SurfaceContainerHighest), colorForRole(ColorRole::OnPrimary), t);
   const float thumbX = m_inset + m_travel * (Style::rtl() ? 1.0F - t : t);
   ColorSpec borderColor = colorSpecFromRole(ColorRole::OutlineVariant);
 

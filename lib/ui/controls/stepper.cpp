@@ -9,7 +9,6 @@
 #include "ui/controls/button.h"
 #include "ui/controls/flex.h"
 #include "ui/controls/input.h"
-#include "ui/controls/separator.h"
 #include "ui/palette.h"
 #include "ui/style.h"
 
@@ -32,15 +31,6 @@ namespace {
 
   float valueInputHorizontalPadding(float scale) { return Style::spaceSm * scale; }
 
-  std::unique_ptr<Separator> makeStepperSeparator(float scale) {
-    auto sep = std::make_unique<Separator>();
-    sep->setOrientation(SeparatorOrientation::VerticalRule);
-    sep->setThickness(std::max(1.0F, Style::borderWidth * scale));
-    sep->setColor(colorSpecFromRole(ColorRole::OutlineVariant));
-    sep->setFlexGrow(0.0F);
-    return sep;
-  }
-
   std::string trimAscii(std::string_view s) {
     std::size_t a = 0;
     std::size_t b = s.size();
@@ -59,12 +49,12 @@ Stepper::Stepper() {
   setDirection(FlexDirection::Horizontal);
   setAlign(FlexAlign::Stretch);
   setJustify(FlexJustify::Start);
-  setGap(0.0F);
+  setGap(6.0F * m_scale);
   setPadding(0.0F);
   setMinWidth(kDefaultMinWidth);
-  setFill(colorSpecFromRole(ColorRole::SurfaceContainer, m_surfaceOpacity));
+  clearFill();
   clearBorder();
-  setRadius(Style::scaledRadiusMd());
+  setRadius(0.0F);
 
   auto makeStepButton = [this](bool increment) -> std::unique_ptr<Button> {
     auto btn = std::make_unique<Button>();
@@ -95,12 +85,6 @@ Stepper::Stepper() {
   }
 
   {
-    auto sep = makeStepperSeparator(m_scale);
-    m_separatorBeforeValue = sep.get();
-    addChild(std::move(sep));
-  }
-
-  {
     auto track = std::make_unique<Flex>();
     track->setDirection(FlexDirection::Horizontal);
     track->setAlign(FlexAlign::Stretch);
@@ -109,9 +93,9 @@ Stepper::Stepper() {
     track->setPadding(0.0F);
     track->setFlexGrow(1.0F);
     track->setMinHeight(Style::controlHeight);
-    track->clearFill();
+    track->setFill(colorSpecFromRole(ColorRole::SurfaceContainer, m_surfaceOpacity));
     track->clearBorder();
-    track->setRadii(Radii{});
+    track->setRadius(Style::scaledRadiusMd(m_scale));
     m_valueTrack = track.get();
 
     auto field = std::make_unique<Input>();
@@ -127,12 +111,6 @@ Stepper::Stepper() {
     m_valueInput = field.get();
     track->addChild(std::move(field));
     addChild(std::move(track));
-  }
-
-  {
-    auto sep = makeStepperSeparator(m_scale);
-    m_separatorAfterValue = sep.get();
-    addChild(std::move(sep));
   }
 
   {
@@ -224,7 +202,7 @@ void Stepper::setValueSuffix(std::string suffix) {
 
 void Stepper::setScale(float scale) {
   m_scale = std::max(0.1F, scale);
-  setGap(0.0F);
+  setGap(6.0F * m_scale);
   setPadding(0.0F);
   setMinWidth(kDefaultMinWidth * m_scale);
   clearBorder();
@@ -423,26 +401,19 @@ void Stepper::refreshButtons() {
 
 void Stepper::refreshSegmentStyle() {
   const float r = Style::scaledRadiusMd(m_scale);
-  setFill(colorSpecFromRole(ColorRole::SurfaceContainer, m_surfaceOpacity));
+  clearFill();
   clearBorder();
-  setRadius(r);
+  setRadius(0.0F);
   if (m_decrement != nullptr) {
     m_decrement->setVariant(ButtonVariant::Tab);
-    m_decrement->setRadii({r, 0.0F, 0.0F, r});
+    m_decrement->setRadii({r, r, r, r});
   }
   if (m_increment != nullptr) {
     m_increment->setVariant(ButtonVariant::Tab);
-    m_increment->setRadii({0.0F, r, r, 0.0F});
+    m_increment->setRadii({r, r, r, r});
   }
   if (m_valueTrack != nullptr) {
-    m_valueTrack->setRadii(Radii{});
-    m_valueTrack->clearFill();
-  }
-  const float ruleW = std::max(1.0F, Style::borderWidth * m_scale);
-  if (m_separatorBeforeValue != nullptr) {
-    m_separatorBeforeValue->setThickness(ruleW);
-  }
-  if (m_separatorAfterValue != nullptr) {
-    m_separatorAfterValue->setThickness(ruleW);
+    m_valueTrack->setFill(colorSpecFromRole(ColorRole::SurfaceContainer, m_surfaceOpacity));
+    m_valueTrack->setRadius(r);
   }
 }

@@ -34,10 +34,8 @@ namespace shell::panel_surface {
   }
 
   inline float contentScale(const ConfigService* configService) noexcept {
-    if (configService == nullptr) {
-      return 1.0F;
-    }
-    return std::max(0.1F, configService->config().accessibility.uiScale);
+    (void)configService;
+    return 1.0F;
   }
 
   inline float backgroundOpacity(const ConfigService* configService) noexcept {

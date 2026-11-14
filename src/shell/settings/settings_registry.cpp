@@ -618,6 +618,14 @@ namespace settings {
         asSegmented(enumSelect(kCornerShapePresets, cfg.theme.cornerShape)),
         "rounded corners radius shape"
     ));
+    entries.push_back(makeEntry(
+        SettingsSection::Appearance, "interface",
+        tr("settings.schema.appearance.theme-density.label"),
+        tr("settings.schema.appearance.theme-density.description"),
+        {"theme", "density"},
+        asSegmented(enumSelect(kDensities, cfg.theme.density)),
+        "density spacing compact standard comfortable"
+    ));
     {
       const ColorSpec pickerColor = *effectiveShellAppIconColorizationTint(cfg.shell, true);
       entries.push_back(makeEntry(
@@ -633,11 +641,6 @@ namespace settings {
         "close button cross dismiss hide panel notification toast popup dialog sheet settings window"
     ));
     entries.push_back(makeEntry(
-        SettingsSection::Appearance, "accessibility", tr("settings.schema.appearance.ui-scale.label"),
-        tr("settings.schema.appearance.ui-scale.description"), {"accessibility", "ui_scale"},
-        sliderFor(cfg.accessibility.uiScale, noctalia::config::schema::kScaleRange, false), "size scale text panels"
-    ));
-    entries.push_back(makeEntry(
         SettingsSection::Appearance, "accessibility", tr("settings.schema.accessibility.high-contrast.label"),
         tr("settings.schema.accessibility.high-contrast.description"), {"accessibility", "high_contrast"},
         ToggleSetting{cfg.accessibility.highContrast}, "accessibility high contrast visually impaired"
@@ -649,9 +652,11 @@ namespace settings {
     ));
     entries.push_back(makeEntry(
         SettingsSection::Appearance, "motion",
-        tr("settings.schema.appearance.theme-motion-preset.label"),
-        tr("settings.schema.appearance.theme-motion-preset.description"), {"motion_preset", "preset"},
-        asSegmented(enumSelect(kMotionPresets, cfg.motionPreset.preset)), "motion preset smooth balanced playful"
+        tr("settings.schema.appearance.motion-panel.label"),
+        tr("settings.schema.appearance.motion-panel.description"),
+        {"motion_preset", "panel"},
+        asSegmented(enumSelect(kPanelMotions, cfg.motionPreset.panel)),
+        "panel motion reveal fade directional depth fluid"
     ));
     entries.push_back(makeEntry(
         SettingsSection::Appearance, "motion",
@@ -659,31 +664,7 @@ namespace settings {
         tr("settings.schema.appearance.expressive.description"),
         {"theme", "expressive"},
         ToggleSetting{cfg.theme.expressive},
-        "expressive classic morph animation material"
-    ));
-    entries.push_back(makeEntry(
-        SettingsSection::Appearance, "motion",
-        tr("settings.schema.appearance.motion-ripple.label"),
-        tr("settings.schema.appearance.motion-ripple.description"),
-        {"motion_preset", "ripple"},
-        ToggleSetting{cfg.motionPreset.ripple},
-        "ripple effect click feedback"
-    ));
-    entries.push_back(makeEntry(
-        SettingsSection::Appearance, "motion",
-        tr("settings.schema.appearance.motion-reduce.label"),
-        tr("settings.schema.appearance.motion-reduce.description"),
-        {"motion_preset", "reduce"},
-        ToggleSetting{cfg.motionPreset.reduce},
-        "reduce motion accessibility"
-    ));
-    entries.push_back(makeEntry(
-        SettingsSection::Appearance, "motion",
-        tr("settings.schema.appearance.motion-panel.label"),
-        tr("settings.schema.appearance.motion-panel.description"),
-        {"motion_preset", "panel"},
-        asSegmented(enumSelect(kPanelMotions, cfg.motionPreset.panel)),
-        "panel motion reveal standard directional depth fluid"
+        "button morphing expressive classic morph material"
     ));
     entries.push_back(makeEntry(
         SettingsSection::Appearance, "motion", tr("settings.schema.appearance.animation-speed.label"),

@@ -361,7 +361,7 @@ void SettingsWindow::openActionsMenu() {
   float anchorAbsY = 0.0F;
   Node::absolutePosition(m_actionsMenuButton, anchorAbsX, anchorAbsY);
 
-  const float scale = uiScale();
+  const float scale = contentScale();
   wl_output* output = m_wayland->lastPointerOutput();
   if (output == nullptr) {
     output = m_output;
@@ -403,7 +403,7 @@ void SettingsWindow::openConfigExportDialog() {
 
   m_configExportDialogModal->open(
       settings::ConfigExportDialogRequest{
-          .scale = uiScale(),
+          .scale = contentScale(),
           .callback = [this](settings::ConfigExportMode mode, noctalia::config::CredentialExportMode credentials) {
             saveConfigExport(mode, credentials);
           },
@@ -475,7 +475,7 @@ void SettingsWindow::openBarWidgetAddPopup(const std::vector<std::string>& laneP
           .parent = popupParentFor(*m_surface, output, m_wayland->lastInputSerial()),
           .lanePath = lanePath,
           .config = m_config->config(),
-          .scale = uiScale(),
+          .scale = contentScale(),
       }
   );
 }
@@ -547,7 +547,7 @@ void SettingsWindow::openSearchPickerPopup(settings::SearchPickerOpenRequest req
           .selectedValue = std::move(request.selectedValue),
           .placeholder = std::move(request.placeholder),
           .emptyText = std::move(request.emptyText),
-          .scale = uiScale(),
+          .scale = contentScale(),
           .keepOpenOnSelect = request.keepOpenOnSelect,
       }
   );
@@ -583,7 +583,7 @@ void SettingsWindow::openMonitorOverrideCreateDialog(std::optional<std::string> 
     m_editorSheetModal->initialize(m_modalHost, [this] { dismissOpenSelectDropdown(); });
   }
 
-  const float scale = uiScale();
+  const float scale = contentScale();
   const std::vector<settings::SelectOption> outputs = availableOutputs();
 
   std::vector<std::string> existingMatches;
@@ -794,7 +794,7 @@ void SettingsWindow::openSessionActionEntryEditor(std::size_t index) {
     m_editorSheetModal = std::make_unique<settings::SettingsSheetModal>();
     m_editorSheetModal->initialize(m_modalHost, [this] { dismissOpenSelectDropdown(); });
   }
-  const float scale = uiScale();
+  const float scale = contentScale();
   const BarConfig* selectedBar = settings::findBar(cfg, m_selectedBarName);
   const BarMonitorOverride* selectedMonitorOverride = nullptr;
   if (selectedBar != nullptr && !m_selectedMonitorOverride.empty()) {
@@ -894,7 +894,7 @@ void SettingsWindow::openIdleBehaviorEntryEditor(std::size_t index) {
     m_editorSheetModal = std::make_unique<settings::SettingsSheetModal>();
     m_editorSheetModal->initialize(m_modalHost, [this] { dismissOpenSelectDropdown(); });
   }
-  const float scale = uiScale();
+  const float scale = contentScale();
   const BarConfig* selectedBar = settings::findBar(cfg, m_selectedBarName);
   const BarMonitorOverride* selectedMonitorOverride = nullptr;
   if (selectedBar != nullptr && !m_selectedMonitorOverride.empty()) {
@@ -994,7 +994,7 @@ void SettingsWindow::openIdleBehaviorCreateEditor() {
   }
 
   const Config& cfg = m_config->config();
-  const float scale = uiScale();
+  const float scale = contentScale();
   const BarConfig* selectedBar = settings::findBar(cfg, m_selectedBarName);
   const BarMonitorOverride* selectedMonitorOverride = nullptr;
   if (selectedBar != nullptr && !m_selectedMonitorOverride.empty()) {
@@ -1078,7 +1078,7 @@ void SettingsWindow::openNotificationFilterEntryEditor(std::size_t index) {
     m_editorSheetModal = std::make_unique<settings::SettingsSheetModal>();
     m_editorSheetModal->initialize(m_modalHost, [this] { dismissOpenSelectDropdown(); });
   }
-  const float scale = uiScale();
+  const float scale = contentScale();
   const BarConfig* selectedBar = settings::findBar(cfg, m_selectedBarName);
   const BarMonitorOverride* selectedMonitorOverride = nullptr;
   if (selectedBar != nullptr && !m_selectedMonitorOverride.empty()) {
@@ -1176,7 +1176,7 @@ void SettingsWindow::openNotificationFilterCreateEditor() {
   }
 
   const Config& cfg = m_config->config();
-  const float scale = uiScale();
+  const float scale = contentScale();
   const BarConfig* selectedBar = settings::findBar(cfg, m_selectedBarName);
   const BarMonitorOverride* selectedMonitorOverride = nullptr;
   if (selectedBar != nullptr && !m_selectedMonitorOverride.empty()) {
@@ -1300,7 +1300,7 @@ void SettingsWindow::openCalendarAccountEditor(std::optional<std::string> accoun
     m_editorSheetModal->initialize(m_modalHost, [this] { dismissOpenSelectDropdown(); });
   }
 
-  const float scale = uiScale();
+  const float scale = contentScale();
   const std::string title = draft->creating ? i18n::tr("settings.calendar-accounts.add-title")
                                             : i18n::tr("settings.calendar-accounts.edit-title");
 
@@ -2007,7 +2007,7 @@ void SettingsWindow::openBarWidgetEditorSheet(
   }
 
   const Config& cfg = m_config->config();
-  const float scale = uiScale();
+  const float scale = contentScale();
   const BarConfig* selectedBar = settings::findBar(cfg, m_selectedBarName);
   const BarMonitorOverride* selectedMonitorOverride = nullptr;
   if (selectedBar != nullptr && !m_selectedMonitorOverride.empty()) {
@@ -2137,7 +2137,7 @@ void SettingsWindow::openPluginSourceCreateEditor(std::optional<PluginSourceConf
     openBarWidgetEditorSheet(
         title,
         [this, draft, nameLocked, fieldsLocked](Flex& body) {
-          const float scale = uiScale();
+          const float scale = contentScale();
           auto addField = [scale](Flex& parent, const std::string& label, std::unique_ptr<Node> control) {
             auto field = ui::column({
                 .align = FlexAlign::Stretch,
@@ -2340,7 +2340,7 @@ void SettingsWindow::openPluginSettingsEditor(std::string pluginId) {
         return;
       }
       settings::buildPluginSettingsEditor(
-          body, m_config->config(), *m_editorSheetFactory, pluginId, *currentManifest, m_showAdvanced, uiScale()
+          body, m_config->config(), *m_editorSheetFactory, pluginId, *currentManifest, m_showAdvanced, contentScale()
       );
     });
   });
@@ -2401,7 +2401,7 @@ void SettingsWindow::openPluginStore() {
         m_editorSheetModal->close();
       }
 
-      const float scale = uiScale();
+      const float scale = contentScale();
       auto catalogOwners = std::make_shared<std::unordered_map<std::string, std::string>>(std::move(owners));
 
       auto catalogLookup = std::make_shared<std::unordered_map<std::string, settings::StoreCatalogEntry>>();
@@ -2615,7 +2615,7 @@ void SettingsWindow::openCommunityTemplateStore() {
     m_editorSheetModal->initialize(m_modalHost, [this] { dismissOpenSelectDropdown(); });
   }
 
-  const float scale = uiScale();
+  const float scale = contentScale();
   auto catalog = noctalia::theme::CommunityTemplateService::availableTemplates();
   std::unordered_set<std::string> selectedIds(
       m_config->config().theme.templates.communityIds.begin(), m_config->config().theme.templates.communityIds.end()

@@ -18,11 +18,14 @@ namespace noctalia::shell::panel::reveal {
   inline constexpr float kFluidTravel = 24.0F;   // logical px
   inline constexpr float kFluidSquash = 0.02F;   // perpendicular swell
 
+  inline bool isDirectional(PanelMotion variant) noexcept { return variant == PanelMotion::Directional; }
+
   inline RevealTransform chromeTransform(float progress, PanelMotion variant,
-                                          RevealDirection dir, bool attached) noexcept {
+                                          RevealDirection dir, bool /*attached*/) noexcept {
     const float p = std::clamp(progress, 0.0F, 1.0F);
     switch (variant) {
     case PanelMotion::Standard:
+    case PanelMotion::Directional:
       return {};
     case PanelMotion::Depth:
       return {0.92F + 0.08F * p, 0.92F + 0.08F * p, 0.0F, 0.0F};
@@ -39,19 +42,19 @@ namespace noctalia::shell::panel::reveal {
     switch (dir) {
     case RevealDirection::Down:
       t.scaleX = swell;
-      if (!attached) t.offsetY = -kFluidTravel * s;
+      t.offsetY = -kFluidTravel * s;
       break;
     case RevealDirection::Up:
       t.scaleX = swell;
-      if (!attached) t.offsetY = +kFluidTravel * s;
+      t.offsetY = +kFluidTravel * s;
       break;
     case RevealDirection::Right:
       t.scaleY = swell;
-      if (!attached) t.offsetX = -kFluidTravel * s;
+      t.offsetX = -kFluidTravel * s;
       break;
     case RevealDirection::Left:
       t.scaleY = swell;
-      if (!attached) t.offsetX = +kFluidTravel * s;
+      t.offsetX = +kFluidTravel * s;
       break;
     }
     return t;

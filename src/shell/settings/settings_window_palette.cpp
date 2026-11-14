@@ -341,7 +341,7 @@ void SettingsWindow::openPaletteInspector() {
     m_editorSheetModal = std::make_unique<settings::SettingsSheetModal>();
     m_editorSheetModal->initialize(m_modalHost, [this] { dismissOpenSelectDropdown(); });
   }
-  const float scale = uiScale();
+  const float scale = contentScale();
   auto content = std::make_shared<settings::PaletteInspectorContent>(scale, [this](const std::string& value) {
     if (m_clipboardService != nullptr && m_clipboardService->copyText(value)) {
       m_editorSheetModal->setStatusMessage(i18n::tr("settings.palette-inspector.copied", "value", value), false);

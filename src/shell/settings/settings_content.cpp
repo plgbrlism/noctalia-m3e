@@ -1351,6 +1351,9 @@ namespace settings {
                 .text = groupLabel(group),
                 .fontSize = Style::fontSizeCaption * scale,
                 .variant = expandedGroups->contains(group) ? ButtonVariant::Primary : ButtonVariant::Default,
+                .minHeight = Style::controlHeightLg * scale,
+                .paddingV = Style::spaceLg * scale,
+                .paddingH = Style::spaceLg * scale,
                 .radius = Style::scaledRadiusMd(scale),
             })
         );

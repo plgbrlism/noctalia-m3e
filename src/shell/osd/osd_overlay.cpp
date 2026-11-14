@@ -41,9 +41,8 @@ namespace {
     if (config == nullptr) {
       return 1.0F;
     }
-    const auto& accessibility = config->config().accessibility;
     const auto& osd = config->config().osd;
-    return std::max(0.1F, accessibility.uiScale * osd.scale);
+    return std::max(0.1F, Style::densityScale() * osd.scale);
   }
 
   bool isOsdKindEnabled(const OsdKindsConfig& kinds, OsdKind kind) {

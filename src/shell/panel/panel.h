@@ -118,10 +118,13 @@ public:
   virtual bool isPersistent() const noexcept { return false; }
 
   Node* root() const noexcept { return m_root ? m_root.get() : m_rootPtr; }
-  float contentScale() const noexcept { return m_contentScale; }
+  float contentScale() const noexcept { return m_contentScale * m_densityScale; }
+  float densityScale() const noexcept { return m_densityScale; }
+  float layoutScale() const noexcept { return m_contentScale; }
   float panelCardOpacity() const noexcept { return m_panelCardOpacity; }
 
   void setContentScale(float scale) noexcept { m_contentScale = scale; }
+  void setDensityScale(float scale) noexcept { m_densityScale = scale; }
   void setPendingOpenContext(std::string_view context) { m_pendingOpenContext = std::string(context); }
   std::string_view pendingOpenContext() const noexcept { return m_pendingOpenContext; }
   void setPanelCardOpacity(float opacity) noexcept {
@@ -149,6 +152,7 @@ protected:
   virtual void doUpdate(Renderer& renderer) { (void)renderer; }
 
   float m_contentScale = 1.0F;
+  float m_densityScale = 1.0F;
   float m_panelCardOpacity = 1.0F;
   std::string m_pendingOpenContext;
   AnimationManager* m_animations = nullptr;

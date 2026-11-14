@@ -121,9 +121,8 @@ namespace {
     if (config == nullptr) {
       return 1.0F;
     }
-    const auto& accessibility = config->config().accessibility;
     const auto& notification = config->config().notification;
-    return std::max(0.1F, accessibility.uiScale * notification.scale);
+    return std::max(0.1F, Style::densityScale() * notification.scale);
   }
 
   ColorSpec toastBorderColor(const ConfigService* config, Urgency urgency) {

@@ -5,6 +5,7 @@
 #include "net/http_client.h"
 #include "system/distro_info.h"
 #include "system/hardware_info.h"
+#include "ui/style.h"
 #include "util/file_utils.h"
 #include "util/string_utils.h"
 #include "wayland/wayland_connection.h"
@@ -121,7 +122,7 @@ void TelemetryService::maybeSend(
       {"os", distroLabel()},
       {"ramGb", memoryTotalGb()},
       {"monitors", monitors},
-      {"ui", {{"scaleRatio", config.config().accessibility.uiScale}}},
+      {"ui", {{"scaleRatio", Style::densityScale()}}},
   };
 
   kLog.info("sending anonymous ping");

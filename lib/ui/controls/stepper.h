@@ -9,7 +9,6 @@
 
 class Button;
 class Input;
-class Separator;
 class Renderer;
 
 // Horizontal numeric stepper styled like Segmented (shared SurfaceContainer track, Tab-style ends + center).
@@ -54,9 +53,7 @@ private:
   void refreshSegmentStyle();
 
   Button* m_decrement = nullptr;
-  Separator* m_separatorBeforeValue = nullptr;
   Flex* m_valueTrack = nullptr;
-  Separator* m_separatorAfterValue = nullptr;
   Button* m_increment = nullptr;
   Input* m_valueInput = nullptr;
 

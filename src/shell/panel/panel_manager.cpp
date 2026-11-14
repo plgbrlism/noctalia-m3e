@@ -639,7 +639,8 @@ void PanelManager::openPanel(const std::string& panelId, PanelOpenRequest reques
 
   m_activePanel = it->second.get();
   m_activePanelId = panelId;
-  m_activePanel->setContentScale(shell::panel_surface::contentScale(m_config));
+  m_activePanel->setContentScale(1.0F);
+  m_activePanel->setDensityScale(Style::densityScale());
   m_pendingOpenContext = std::string(request.context);
   m_activePanel->setPendingOpenContext(request.context);
 
@@ -2242,9 +2243,6 @@ bool PanelManager::onKeyboardEvent(const KeyboardEvent& event) {
 
 void PanelManager::applyAttachedReveal(float progress) {
   m_attachedRevealProgress = std::clamp(progress, 0.0F, 1.0F);
-  // Reduce motion: force identity transform, no offset/scale flash. The spring still
-  // snaps progress to 1 via MotionService; this guard prevents a mid-frame non-identity paint.
-  const bool reduceMotion = MotionService::instance().reduceMotion();
   if (!m_attachedToBar || m_attachedRevealClipNode == nullptr || m_sceneRoot == nullptr) {
     if (m_attachedToBar && m_surface != nullptr) {
       m_layerSurface->clearBlurRegion();
@@ -2256,6 +2254,9 @@ void PanelManager::applyAttachedReveal(float progress) {
   const float h = m_sceneRoot->height();
   const float panelW = m_panelVisualWidth > 0 ? static_cast<float>(m_panelVisualWidth) : w;
   const float panelH = m_panelVisualHeight > 0 ? static_cast<float>(m_panelVisualHeight) : h;
+  const auto variant = m_config
+      ? m_config->config().motionPreset.panel
+      : PanelMotion::Standard;
   const float travelX = (m_attachedRevealDirection == AttachedRevealDirection::Left
                          || m_attachedRevealDirection == AttachedRevealDirection::Right)
       ? panelW * (1.0F - m_attachedRevealProgress)
@@ -2287,18 +2288,14 @@ void PanelManager::applyAttachedReveal(float progress) {
 
   if (m_attachedRevealContentNode != nullptr) {
     m_attachedRevealContentNode->setFrameSize(w, h);
-    const auto variant = m_config
-        ? m_config->config().motionPreset.panel
-        : PanelMotion::Standard;
     const auto dir = static_cast<reveal::RevealDirection>(m_attachedRevealDirection);
-    const auto t = reduceMotion
-        ? reveal::RevealTransform{}
-        : reveal::chromeTransform(progress, variant, dir, /*attached=*/true);
+    const auto t = reveal::chromeTransform(progress, variant, dir, /*attached=*/true);
     m_attachedRevealContentNode->setTransformOrigin(
         static_cast<float>(m_panelInsetX) + panelW / 2.0F,
         static_cast<float>(m_panelInsetY) + panelH / 2.0F);
     m_attachedRevealContentNode->setScale(t.scaleX, t.scaleY);
     m_attachedRevealContentNode->setPosition(contentX + t.offsetX, contentY + t.offsetY);
+    m_attachedRevealContentNode->setOpacity(1.0F);
   }
   if (m_panelShadowNode != nullptr) {
     m_panelShadowNode->setOpacity(m_attachedRevealProgress);
@@ -2318,9 +2315,6 @@ void PanelManager::applyAttachedReveal(float progress) {
 
 void PanelManager::applyDetachedReveal(float progress) {
   m_detachedRevealProgress = std::clamp(progress, 0.0F, 1.0F);
-  // Reduce motion: force identity transform, no offset/scale flash. The spring still
-  // snaps progress to 1 via MotionService; this guard prevents a mid-frame non-identity paint.
-  const bool reduceMotion = MotionService::instance().reduceMotion();
   if (m_attachedToBar || m_sceneRoot == nullptr) {
     if (!m_attachedToBar && m_surface != nullptr) {
       m_layerSurface->clearBlurRegion();
@@ -2343,34 +2337,35 @@ void PanelManager::applyDetachedReveal(float progress) {
   float clipW = surfaceW;
   float clipH = spanH;
 
-  switch (m_detachedRevealDirection) {
-  case AttachedRevealDirection::Down:
-    clipH = std::round(spanH * m_detachedRevealProgress);
-    break;
-  case AttachedRevealDirection::Up:
-    clipH = std::round(spanH * m_detachedRevealProgress);
-    clipY = spanY + spanH - clipH;
-    break;
-  case AttachedRevealDirection::Right:
-    clipW = std::round(surfaceW * m_detachedRevealProgress);
-    break;
-  case AttachedRevealDirection::Left:
-    clipW = std::round(surfaceW * m_detachedRevealProgress);
-    clipX = surfaceW - clipW;
-    break;
+  const auto variant = m_config
+      ? m_config->config().motionPreset.panel
+      : PanelMotion::Standard;
+  const bool directional = reveal::isDirectional(variant);
+  if (directional) {
+    switch (m_detachedRevealDirection) {
+    case AttachedRevealDirection::Down:
+      clipH = std::round(spanH * m_detachedRevealProgress);
+      break;
+    case AttachedRevealDirection::Up:
+      clipH = std::round(spanH * m_detachedRevealProgress);
+      clipY = spanY + spanH - clipH;
+      break;
+    case AttachedRevealDirection::Right:
+      clipW = std::round(surfaceW * m_detachedRevealProgress);
+      break;
+    case AttachedRevealDirection::Left:
+      clipW = std::round(surfaceW * m_detachedRevealProgress);
+      clipX = surfaceW - clipW;
+      break;
+    }
   }
 
   if (m_detachedRevealClipNode != nullptr && m_detachedRevealContentNode != nullptr) {
     m_detachedRevealClipNode->setPosition(clipX, clipY);
     m_detachedRevealClipNode->setFrameSize(clipW, clipH);
     m_detachedRevealContentNode->setFrameSize(surfaceW, surfaceH);
-    const auto variant = m_config
-        ? m_config->config().motionPreset.panel
-        : PanelMotion::Standard;
     const auto dir = static_cast<reveal::RevealDirection>(m_detachedRevealDirection);
-    const auto t = reduceMotion
-        ? reveal::RevealTransform{}
-        : reveal::chromeTransform(progress, variant, dir, /*attached=*/false);
+    const auto t = reveal::chromeTransform(progress, variant, dir, /*attached=*/false);
     m_detachedRevealContentNode->setTransformOrigin(
         static_cast<float>(m_panelInsetX) + static_cast<float>(m_panelVisualWidth) / 2.0F,
         static_cast<float>(m_panelInsetY) + static_cast<float>(m_panelVisualHeight) / 2.0F);

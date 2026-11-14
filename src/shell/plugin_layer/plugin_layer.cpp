@@ -12,6 +12,7 @@
 #include "scripting/plugin_runtime_context.h"
 #include "ui/builders.h"
 #include "ui/controls/flex.h"
+#include "ui/style.h"
 #include "wayland/wayland_connection.h"
 #include "wayland/wayland_seat.h"
 
@@ -225,7 +226,7 @@ std::uint32_t PluginLayer::requestedExtent(std::uint32_t configured, bool stretc
 }
 
 float PluginLayer::contentScale() const {
-  return m_services.config != nullptr ? std::max(0.01F, m_services.config->config().accessibility.uiScale) : 1.0F;
+  return std::max(0.01F, Style::densityScale());
 }
 
 void PluginLayer::buildScene() {
