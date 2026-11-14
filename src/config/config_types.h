@@ -1807,28 +1807,21 @@ constexpr EnumOption<ControlCenterSidebarMode> kControlCenterSidebarModes[] = {
 
 
 
-  constexpr EnumOption<Style::MotionPreset> kMotionPresets[] = {
-      {Style::MotionPreset::Smooth, "smooth", "motion.preset.smooth"},
-      {Style::MotionPreset::Balanced, "balanced", "motion.preset.balanced"},
-      {Style::MotionPreset::Playful, "playful", "motion.preset.playful"},
-  };
-
   enum class PanelMotion : std::uint8_t {
     Standard = 0,
-    Depth = 1,
-    Fluid = 2,
+    Directional = 1,
+    Depth = 2,
+    Fluid = 3,
   };
 
   constexpr EnumOption<PanelMotion> kPanelMotions[] = {
       {PanelMotion::Standard, "standard", "motion.panel.standard"},
+      {PanelMotion::Directional, "directional", "motion.panel.directional"},
       {PanelMotion::Depth, "depth", "motion.panel.depth"},
       {PanelMotion::Fluid, "fluid", "motion.panel.fluid"},
   };
 
   struct MotionPresetConfig {
-    Style::MotionPreset preset = Style::MotionPreset::Balanced;
-    bool ripple = true;
-    bool reduce = false;
     PanelMotion panel = PanelMotion::Standard;
     bool operator==(const MotionPresetConfig&) const = default;
   };
@@ -1842,6 +1835,12 @@ constexpr EnumOption<ControlCenterSidebarMode> kControlCenterSidebarModes[] = {
       {Style::CornerShapePreset::Sharp, "sharp", "theme.corner-shape.sharp"},
       {Style::CornerShapePreset::Standard, "standard", "theme.corner-shape.standard"},
       {Style::CornerShapePreset::Round, "round", "theme.corner-shape.round"},
+  };
+
+  constexpr EnumOption<Style::Density> kDensities[] = {
+      {Style::Density::Comfortable, "comfortable", "theme.density.comfortable"},
+      {Style::Density::Standard, "standard", "theme.density.standard"},
+      {Style::Density::Compact, "compact", "theme.density.compact"},
   };
 
   struct ThemeConfig {
@@ -1907,6 +1906,7 @@ constexpr EnumOption<ControlCenterSidebarMode> kControlCenterSidebarModes[] = {
   bool expressive = true;
   Style::CornerStyle cornerStyle = Style::CornerStyle::Material;
   Style::CornerShapePreset cornerShape = Style::CornerShapePreset::Standard;
+  Style::Density density = Style::Density::Comfortable;
   ThemeMode mode = ThemeMode::Dark;
   ShellThemeMode shellMode = ShellThemeMode::Follow;
   bool pureBlackDark = false;
@@ -2028,7 +2028,6 @@ bool sourceInAutoUpdateScope(const PluginSourceConfig& source, PluginAutoUpdateM
 bool isValidPluginSourceName(std::string_view name);
 
 struct AccessibilityConfig {
-  float uiScale = 1.0F;
   bool highContrast = false;
   bool operator==(const AccessibilityConfig&) const = default;
 };

@@ -36,6 +36,7 @@ namespace noctalia::config {
     constexpr int kWorkspacesMonitorsMigrationVersion = 18;
     constexpr int kAppIconColorizationMigrationVersion = 19;
     constexpr int kCornerShapePresetMigrationVersion = 20;
+    constexpr int kDensityMigrationVersion = 22;
     constexpr std::int64_t kMaxBarRadius = 500;
     constexpr std::array<std::string_view, 5> kBarRadiusKeys = {
         "radius", "radius_top_left", "radius_top_right", "radius_bottom_left", "radius_bottom_right",
@@ -1033,6 +1034,83 @@ namespace noctalia::config {
       });
     }
 
+    template <typename OnChanged> void migrateRemovedMotionSettings(toml::table& root, OnChanged&& onChanged) {
+      auto* motion = root["motion_preset"].as_table();
+      if (motion == nullptr) {
+        return;
+      }
+      for (const std::string_view key : {"preset", "ripple", "reduce"}) {
+        if (motion->erase(key) > 0) {
+          onChanged("motion_preset." + std::string(key));
+        }
+      }
+    }
+
+    template <typename OnChanged>
+    void migrateDensity(toml::table& root, OnChanged&& onChanged, bool renameLegacyCompact = false) {
+      auto* accessibility = root["accessibility"].as_table();
+      const bool hadUiScale = accessibility != nullptr && accessibility->contains("ui_scale");
+      if (hadUiScale) {
+        const auto& node = (*accessibility)["ui_scale"];
+        double scale = 0.0;
+        if (const auto value = node.value<double>()) {
+          scale = *value;
+        } else if (const auto intValue = node.value<std::int64_t>()) {
+          scale = static_cast<double>(*intValue);
+        } else {
+          return;
+        }
+
+        const std::string_view density = scale < 0.8 ? "compact" : scale < 0.95 ? "standard" : "comfortable";
+        accessibility->erase("ui_scale");
+
+        toml::table theme;
+        if (auto* existing = root["theme"].as_table()) {
+          theme = *existing;
+        }
+        if (!theme.contains("density")) {
+          theme.insert_or_assign("density", std::string(density));
+        }
+        root.insert_or_assign("theme", std::move(theme));
+        onChanged("accessibility.ui_scale");
+        return;
+      }
+
+      auto* theme = root["theme"].as_table();
+      if (theme == nullptr) {
+        return;
+      }
+      const auto density = (*theme)["density"].value<std::string>();
+      if (!density.has_value()) {
+        return;
+      }
+
+      std::string_view renamed;
+      if (*density == "spacious") {
+        renamed = "comfortable";
+      } else if (*density == "compact" && renameLegacyCompact) {
+        renamed = "standard";
+      } else if (*density == "default") {
+        renamed = "standard";
+      } else if (*density == "dense") {
+        renamed = "compact";
+      } else {
+        return;
+      }
+      theme->insert_or_assign("density", std::string(renamed));
+      onChanged("theme.density");
+    }
+
+    void migrateDensitySidecar(toml::table& root, const toml::table& /*base*/, schema::Diagnostics& diag) {
+      migrateDensity(
+          root,
+          [&diag](const std::string& path) {
+            diag.warn(path, "migrated legacy accessibility.ui_scale to theme.density");
+          },
+          true
+      );
+    }
+
     std::uint64_t stableIssueHash(int migrationVersion, std::string_view path) {
       constexpr std::uint64_t kOffset = 14695981039346656037ULL;
       constexpr std::uint64_t kPrime = 1099511628211ULL;
@@ -1169,6 +1247,11 @@ namespace noctalia::config {
             .toVersion = kCornerShapePresetMigrationVersion,
             .summary = "theme: replace shell corner_radius_scale with theme corner_shape",
             .apply = migrateCornerRadiusScaleSidecar,
+        },
+        {
+            .toVersion = kDensityMigrationVersion,
+            .summary = "theme: replace accessibility ui_scale with theme density",
+            .apply = migrateDensitySidecar,
         },
     };
     return migrations;
@@ -1366,6 +1449,20 @@ namespace noctalia::config {
           .migrationVersion = kCornerShapePresetMigrationVersion,
           .path = path,
           .message = "corner_radius_scale is now theme.corner_shape",
+      });
+    });
+    migrateDensity(root, [&issues](const std::string& path) {
+      issues.push_back({
+          .migrationVersion = kDensityMigrationVersion,
+          .path = path,
+          .message = "accessibility.ui_scale is now theme.density",
+      });
+    });
+    migrateRemovedMotionSettings(root, [&issues](const std::string& path) {
+      issues.push_back({
+          .migrationVersion = kDensityMigrationVersion,
+          .path = path,
+          .message = "spring, ripple and reduce motion settings were removed",
       });
     });
   }

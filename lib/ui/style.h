@@ -21,10 +21,10 @@ namespace Style {
     Round = 2,
   };
 
-  enum class MotionPreset : std::uint8_t {
-    Smooth = 0,
-    Balanced = 1,
-    Playful = 2,
+  enum class Density : std::uint8_t {
+    Comfortable = 0,
+    Standard = 1,
+    Compact = 2,
   };
 
   inline constexpr int barThicknessDefault = 34;
@@ -62,8 +62,8 @@ namespace Style {
   inline constexpr float fontSizeTitle = 16.0F;
   inline constexpr float fontSizeHeader = 20.0F;
 
-  inline constexpr float controlHeightSm = 32.0F;
-  inline constexpr float controlHeight = 38.0F;
+  inline constexpr float controlHeightSm = 36.0F;
+  inline constexpr float controlHeight = 42.0F;
   inline constexpr float controlHeightLg = 44.0F;
   inline constexpr float scrollWheelStep = 56.0F;
   // Pointer distance in logical px before an armed drag becomes active.
@@ -124,6 +124,11 @@ namespace Style {
   void setCornerShape(CornerShapePreset shape) noexcept;
   Signal<>& cornerShapeChanged();
 
+  Density density() noexcept;
+  void setDensityScale(float scale) noexcept;
+  float densityScale() noexcept;
+  Signal<>& densityChanged();
+
   bool buttonBordersEnabled() noexcept;
   void setButtonBordersEnabled(bool enabled);
   Signal<>& buttonBordersChanged();
@@ -161,7 +166,5 @@ namespace Style {
   void setCornerStyle(CornerStyle cs) noexcept;
   Signal<>& cornerStyleChanged();
 
-  MotionPreset motionPreset() noexcept;
-  void setMotionPreset(MotionPreset p) noexcept;
 
 } // namespace Style

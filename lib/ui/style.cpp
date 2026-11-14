@@ -14,7 +14,37 @@ namespace {
   bool g_closeButtonsEnabled = true;
   Style::DesignSystem g_designSystem = Style::DesignSystem::Expressive;
   Style::CornerStyle g_cornerStyle = Style::CornerStyle::Material;
-  Style::MotionPreset g_motionPreset = Style::MotionPreset::Balanced;
+  Style::Density g_density = Style::Density::Comfortable;
+  float g_densityScale = 1.0F;
+
+  float densityScaleFor(Style::Density density) {
+    switch (density) {
+    case Style::Density::Comfortable:
+      return 1.0F;
+    case Style::Density::Standard:
+      return 0.85F;
+    case Style::Density::Compact:
+      return 0.75F;
+    }
+    return 1.0F;
+  }
+
+  Style::Density densityForScale(float scale) {
+    Style::Density best = Style::Density::Comfortable;
+    float bestDistance = std::abs(scale - densityScaleFor(best));
+    for (const Style::Density candidate : {
+             Style::Density::Comfortable,
+             Style::Density::Standard,
+             Style::Density::Compact,
+         }) {
+      const float distance = std::abs(scale - densityScaleFor(candidate));
+      if (distance < bestDistance) {
+        best = candidate;
+        bestDistance = distance;
+      }
+    }
+    return best;
+  }
 
 } // namespace
 
@@ -30,6 +60,24 @@ namespace Style {
   }
 
   Signal<>& cornerShapeChanged() {
+    static Signal<> s;
+    return s;
+  }
+
+  Density density() noexcept { return g_density; }
+
+  float densityScale() noexcept { return g_densityScale; }
+
+  void setDensityScale(float scale) noexcept {
+    if (g_densityScale == scale) {
+      return;
+    }
+    g_densityScale = scale;
+    g_density = densityForScale(scale);
+    densityChanged().emit();
+  }
+
+  Signal<>& densityChanged() {
     static Signal<> s;
     return s;
   }
@@ -120,9 +168,5 @@ namespace Style {
     static Signal<> s;
     return s;
   }
-
-  MotionPreset motionPreset() noexcept { return g_motionPreset; }
-
-  void setMotionPreset(MotionPreset p) noexcept { g_motionPreset = p; }
 
 } // namespace Style

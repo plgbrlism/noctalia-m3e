@@ -1412,6 +1412,7 @@ namespace noctalia::config::schema {
          field(&ThemeConfig::expressive, "expressive"),
          enumField(&ThemeConfig::cornerStyle, "corner_style", kCornerStyles),
          enumField(&ThemeConfig::cornerShape, "corner_shape", kCornerShapePresets),
+         enumField(&ThemeConfig::density, "density", kDensities),
          enumField(&ThemeConfig::mode, "mode", kThemeModes),
         enumField(&ThemeConfig::shellMode, "shell_mode", kShellThemeModes),
         field(&ThemeConfig::pureBlackDark, "pure_black_dark"),
@@ -1439,9 +1440,6 @@ namespace noctalia::config::schema {
   } // namespace
   const Schema<MotionPresetConfig>& motionPresetSchema() {
     static const Schema<MotionPresetConfig> s = {
-        enumField(&MotionPresetConfig::preset, "preset", kMotionPresets),
-        field(&MotionPresetConfig::ripple, "ripple"),
-        field(&MotionPresetConfig::reduce, "reduce"),
         enumField(&MotionPresetConfig::panel, "panel", kPanelMotions),
     };
     return s;
@@ -2927,7 +2925,6 @@ namespace noctalia::config::schema {
 
   const Schema<AccessibilityConfig>& accessibilitySchema() {
     static const Schema<AccessibilityConfig> s = {
-        field(&AccessibilityConfig::uiScale, "ui_scale", kScaleRange),
         field(&AccessibilityConfig::highContrast, "high_contrast"),
     };
     return s;
