@@ -39,7 +39,7 @@ namespace {
   // Style::controlHeightLg which is a control-row height — bumping that token to
   // a roomier value would otherwise inflate the artwork, card, and menu widths
   // and overflow the panel content area.
-  constexpr float kMediaUnit = 36.0F;
+  constexpr float kMediaUnit = 35.0F;
 
   constexpr float kArtworkSize = kMediaUnit * 6;
   constexpr float kMediaNowCardMinHeight = kMediaUnit * 11 + Style::spaceSm * 2;
@@ -522,7 +522,7 @@ std::unique_ptr<Flex> MediaTab::createHeaderActions() {
           .selected = m_showVisualizer,
           .tooltip = i18n::tr("control-center.media.toggle-visualizer"),
           .onClick = [this] { toggleVisualizer(); },
-          .configure = [scale](Button& button) { panel_button_style::configureHeaderIconButton(button, scale); },
+          .configure = [this, scale](Button& button) { panel_button_style::configureHeaderIconButton(button, scale, panelCardOpacity()); },
       })
   );
 }

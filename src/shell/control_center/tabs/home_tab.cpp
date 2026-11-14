@@ -608,7 +608,7 @@ std::unique_ptr<Flex> HomeTab::create() {
     auto btn = ui::button({
         .text = showLabels ? std::optional<std::string>{label} : std::nullopt,
         .glyph = shortcut->displayIcon(),
-        .glyphSize = Style::fontSizeTitle * 1.35F * scale,
+        .glyphSize = panel_button_style::kIconButtonGlyphSize * scale,
         .contentAlign = showLabels ? ButtonContentAlign::Start : ButtonContentAlign::Center,
         .minHeight = 0.0F,
         .padding = Style::spaceSm * scale,
@@ -693,16 +693,15 @@ std::unique_ptr<Flex> HomeTab::createHeaderActions() {
           .out = &m_settingsButton,
           .glyph = "settings",
           .onClick = [] { PanelManager::instance().openSettingsWindow(); },
-          .configure = [scale](Button& button) { panel_button_style::configureHeaderIconButton(button, scale); },
+          .configure = [this, scale](Button& button) { panel_button_style::configureHeaderIconButton(button, scale, panelCardOpacity()); },
       }),
       ui::button({
           .out = &m_sessionButton,
           .glyph = "shutdown",
           .onClick = [] { PanelManager::instance().togglePanel("session"); },
-          .configure = [scale](Button& button) { panel_button_style::configureHeaderIconButton(button, scale); },
+          .configure = [this, scale](Button& button) { panel_button_style::configureHeaderIconButton(button, scale, panelCardOpacity()); },
       })
   );
-  row->setRowGrouping(true);
   syncHeaderActions();
   return row;
 }

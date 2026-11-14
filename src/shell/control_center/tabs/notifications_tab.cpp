@@ -937,8 +937,8 @@ std::unique_ptr<Flex> NotificationsTab::createHeaderActions() {
           .tooltip = i18n::tr("control-center.notifications.clear-all"),
           .onClick = [this] { clearAllNotifications(); },
           .configure =
-              [scale](Button& button) {
-                panel_button_style::configureHeaderIconButton(button, scale);
+              [this, scale](Button& button) {
+                panel_button_style::configureHeaderIconButton(button, scale, panelCardOpacity());
                 button.setVariant(ButtonVariant::Destructive);
               },
       }),
@@ -949,7 +949,7 @@ std::unique_ptr<Flex> NotificationsTab::createHeaderActions() {
           .tooltip =
               i18n::tr(dndEnabled ? "control-center.notifications.dnd-off" : "control-center.notifications.dnd-on"),
           .onClick = [this] { toggleDoNotDisturb(); },
-          .configure = [scale](Button& button) { panel_button_style::configureHeaderIconButton(button, scale); },
+          .configure = [this, scale](Button& button) { panel_button_style::configureHeaderIconButton(button, scale, panelCardOpacity()); },
       })
   );
 }

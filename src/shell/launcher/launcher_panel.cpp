@@ -17,6 +17,8 @@
 #include "render/scene/node.h"
 #include "shell/app_icon_colorization_settings.h"
 #include "shell/dock/pinned_apps.h"
+#include "shell/panel/panel_button_style.h"
+#include "shell/panel/panel_header_style.h"
 #include "shell/panel/panel_manager.h"
 #include "shell/profile/avatar_path.h"
 #include "system/desktop_entry.h"
@@ -1628,7 +1630,7 @@ void LauncherPanel::create() {
             .out = &m_launcherNavigation,
             .scale = scale,
             .compact = true,
-            .surfaceOpacity = panelCardOpacity(),
+            .surfaceOpacity = 0.0F,
             .equalSegmentWidths = false,
         })
     );
@@ -1641,16 +1643,11 @@ void LauncherPanel::create() {
             .out = &m_launcherUsageButton,
             .glyph = m_config != nullptr && m_config->config().shell.launcher.sortByUsage ? "sort-ascending-letters"
                                                                                           : "sort-descending-small-big",
-            .glyphSize = Style::fontSizeBody * scale,
-            .variant = ButtonVariant::Ghost,
-            .surfaceOpacity = panelCardOpacity(),
             .tooltip = i18n::tr(
                 m_config != nullptr && m_config->config().shell.launcher.sortByUsage
                     ? "launcher.browser.options.use-default-order"
                     : "launcher.browser.options.sort-by-frequency"
             ),
-            .radius = Style::scaledRadiusMd(scale),
-            .width = Style::controlHeightSm * scale,
             .onClick =
                 [this] {
                   if (m_config == nullptr) {
@@ -1660,23 +1657,18 @@ void LauncherPanel::create() {
                   m_config->setOverride({"shell", "launcher", "sort_by_usage"}, enabled);
                 },
             .configure =
-                [scale](Button& button) {
-                  button.setControlHeight(Style::controlHeightSm * scale);
+                [this, scale](Button& button) {
+                  panel_button_style::configureHeaderIconButton(button, scale, panelCardOpacity());
                   button.inputArea()->setTabFocusKey("launcher.sort-by-usage");
                 },
         }),
         ui::button({
             .out = &m_launcherGridButton,
             .glyph = m_config != nullptr && m_config->config().shell.launcher.appGrid ? "list" : "layout-grid",
-            .glyphSize = Style::fontSizeBody * scale,
-            .variant = ButtonVariant::Ghost,
-            .surfaceOpacity = panelCardOpacity(),
             .tooltip = i18n::tr(
                 m_config != nullptr && m_config->config().shell.launcher.appGrid ? "launcher.browser.options.show-list"
                                                                                  : "launcher.browser.options.show-grid"
             ),
-            .radius = Style::scaledRadiusMd(scale),
-            .width = Style::controlHeightSm * scale,
             .onClick =
                 [this] {
                   if (m_config == nullptr || !supportsResultGrid()) {
@@ -1686,8 +1678,8 @@ void LauncherPanel::create() {
                   m_config->setOverride({"shell", "launcher", "app_grid"}, enabled);
                 },
             .configure =
-                [scale](Button& button) {
-                  button.setControlHeight(Style::controlHeightSm * scale);
+                [this, scale](Button& button) {
+                  panel_button_style::configureHeaderIconButton(button, scale, panelCardOpacity());
                   button.inputArea()->setTabFocusKey("launcher.grid-view");
                 },
         })
@@ -1697,27 +1689,43 @@ void LauncherPanel::create() {
           ui::button({
               .out = &m_launcherSettingsButton,
               .glyph = "settings",
-              .glyphSize = Style::fontSizeBody * scale,
-              .variant = ButtonVariant::Ghost,
-              .surfaceOpacity = panelCardOpacity(),
               .tooltip = i18n::tr("launcher.browser.actions.settings"),
-              .radius = Style::scaledRadiusMd(scale),
-              .width = Style::controlHeightSm * scale,
               .onClick = [] { PanelManager::instance().openSettingsWindow(); },
               .configure =
-                  [scale](Button& button) {
-                    button.setControlHeight(Style::controlHeightSm * scale);
+                  [this, scale](Button& button) {
+                    panel_button_style::configureHeaderIconButton(button, scale, panelCardOpacity());
                     button.inputArea()->setTabFocusKey("launcher.settings");
                   },
           })
       );
     }
     navigationRow->addChild(std::move(navigationActions));
+    panel_header_style::applyHeaderSurface(*navigationRow, panelCardOpacity());
     if (m_launcherNavigation != nullptr && m_launcherNavigation->focusArea() != nullptr) {
       m_launcherNavigation->focusArea()->setTabFocusKey("launcher.navigation");
     }
     body->addChild(std::move(navigationRow));
-    body->addChild(std::move(categoryFilter));
+    categoryFilter->setSurfaceOpacity(0.0F);
+    categoryFilter->setEqualSegmentWidths(false);
+    auto categoryScroll = ui::scrollView({
+        .orientation = ScrollOrientation::Horizontal,
+        .scrollbarVisible = false,
+        .viewportPaddingH = 0.0F,
+        .viewportPaddingV = 0.0F,
+        .fill = clearColorSpec(),
+        .radius = 0.0F,
+        .fillWidth = true,
+        .flexGrow = 1.0F,
+        .configure = [](ScrollView& scroll) {
+          scroll.clearFill();
+          scroll.clearBorder();
+        },
+    });
+    categoryScroll->content()->setAlign(FlexAlign::Center);
+    categoryScroll->content()->addChild(std::move(categoryFilter));
+    auto categoryRow = ui::row({.align = FlexAlign::Center, .fillWidth = true}, std::move(categoryScroll));
+    panel_header_style::applyHeaderSurface(*categoryRow, panelCardOpacity());
+    body->addChild(std::move(categoryRow));
   }
 
   auto resultsViewport = ui::column({
@@ -1862,8 +1870,8 @@ void LauncherPanel::create() {
         .align = FlexAlign::Center,
         .gap = std::round(Style::spaceSm * scale),
         .fillWidth = true,
-        .configure = [scale, opacity = panelCardOpacity()](Flex& flex) {
-          applyLauncherToolbarStyle(flex, scale, opacity);
+        .configure = [opacity = panelCardOpacity()](Flex& flex) {
+          panel_header_style::applyHeaderSurface(flex, opacity);
         },
     });
     const float toolbarSideWidth = std::round(kLauncherAvatarSize * scale);
@@ -1930,16 +1938,11 @@ void LauncherPanel::create() {
           ui::button({
               .out = &m_launcherPowerButton,
               .glyph = "shutdown",
-              .glyphSize = Style::fontSizeTitle * scale,
-              .variant = ButtonVariant::Ghost,
-              .surfaceOpacity = panelCardOpacity(),
               .tooltip = i18n::tr("launcher.browser.actions.power"),
-              .radius = Style::scaledRadiusMd(scale),
-              .width = toolbarSideWidth,
               .onClick = [this] { showSessionActions(); },
               .configure =
-                  [toolbarSideWidth](Button& button) {
-                    button.setControlHeight(toolbarSideWidth);
+                  [this, scale](Button& button) {
+                    panel_button_style::configureHeaderIconButton(button, scale, panelCardOpacity());
                     button.inputArea()->setTabFocusKey("launcher.power");
                   },
           })

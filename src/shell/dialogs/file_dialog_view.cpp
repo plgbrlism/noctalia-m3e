@@ -11,6 +11,8 @@
 #include "render/scene/input_area.h"
 #include "shell/dialogs/file_entry_row.h"
 #include "shell/dialogs/file_entry_tile.h"
+#include "shell/panel/panel_button_style.h"
+#include "shell/panel/panel_header_style.h"
 #include "ui/builders.h"
 #include "ui/controls/button.h"
 #include "ui/controls/flex.h"
@@ -157,12 +159,6 @@ void FileDialogView::create() {
     headerRow->addChild(
         ui::button({
             .glyph = "close",
-            .glyphSize = Style::fontSizeBody * scale,
-            .variant = ButtonVariant::Default,
-            .minWidth = Style::controlHeightSm * scale,
-            .minHeight = Style::controlHeightSm * scale,
-            .padding = Style::spaceXs * scale,
-            .radius = Style::scaledRadiusMd(scale),
             .onClick = [this] {
               const std::weak_ptr<void> aliveGuard = m_aliveGuard;
               DeferredCall::callLater([this, aliveGuard] {
@@ -172,9 +168,13 @@ void FileDialogView::create() {
                 cancelDialog();
               });
             },
+            .configure = [scale](Button& button) {
+              panel_button_style::configureHeaderIconButton(button, scale, 1.0F);
+            },
         })
     );
   }
+  panel_header_style::applyHeaderSurface(*headerRow, 1.0F);
   root->addChild(std::move(headerRow));
 
   root->addChild(

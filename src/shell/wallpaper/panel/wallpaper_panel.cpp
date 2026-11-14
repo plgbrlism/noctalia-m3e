@@ -13,6 +13,8 @@
 #include "shell/dialogs/color_picker_dialog.h"
 #include "shell/dialogs/search_picker_popup.h"
 #include "shell/palette_swatch_preview.h"
+#include "shell/panel/panel_header_style.h"
+#include "shell/panel/panel_button_style.h"
 #include "shell/panel/panel_manager.h"
 #include "shell/tooltip/tooltip_manager.h"
 #include "shell/wallpaper/panel/wallpaper_tile.h"
@@ -448,6 +450,8 @@ void WallpaperPanel::create() {
       .fillWidth = true,
   });
 
+  panel_header_style::applyHeaderSurface(*toolbar, panelCardOpacity());
+
   toolbar->addChild(
       ui::label({
           .out = &m_title,
@@ -495,14 +499,11 @@ void WallpaperPanel::create() {
       ui::button({
           .out = &m_backButton,
           .glyph = "arrow-big-up",
-          .glyphSize = Style::fontSizeBody * scale,
-          .variant = ButtonVariant::Secondary,
           .tooltip = i18n::tr("wallpaper.panel.navigate-up"),
-          .minWidth = Style::controlHeightSm * scale,
-          .minHeight = Style::controlHeightSm * scale,
-          .padding = Style::spaceXs * scale,
-          .radius = Style::scaledRadiusMd(scale),
           .onClick = [this] { navigateUp(); },
+          .configure = [this, scale](Button& button) {
+            panel_button_style::configureHeaderIconButton(button, scale, panelCardOpacity());
+          },
       })
   );
 
@@ -562,14 +563,11 @@ void WallpaperPanel::create() {
       ui::button({
           .out = &m_colorButton,
           .glyph = "color-picker",
-          .glyphSize = Style::fontSizeBody * scale,
-          .variant = ButtonVariant::Default,
           .tooltip = i18n::tr("wallpaper.panel.choose-color"),
-          .minWidth = Style::controlHeightSm * scale,
-          .minHeight = Style::controlHeightSm * scale,
-          .padding = Style::spaceXs * scale,
-          .radius = Style::scaledRadiusMd(scale),
           .onClick = [this] { applyColorWallpaper(); },
+          .configure = [this, scale](Button& button) {
+            panel_button_style::configureHeaderIconButton(button, scale, panelCardOpacity());
+          },
       })
   );
 
@@ -577,14 +575,11 @@ void WallpaperPanel::create() {
       ui::button({
           .out = &m_sortButton,
           .glyph = std::string(sortModeGlyph(m_sortMode)),
-          .glyphSize = Style::fontSizeBody * scale,
-          .variant = ButtonVariant::Default,
           .tooltip = i18n::tr(sortModeTooltipKey(m_sortMode)),
-          .minWidth = Style::controlHeightSm * scale,
-          .minHeight = Style::controlHeightSm * scale,
-          .padding = Style::spaceXs * scale,
-          .radius = Style::scaledRadiusMd(scale),
           .onClick = [this] { cycleSortMode(); },
+          .configure = [this, scale](Button& button) {
+            panel_button_style::configureHeaderIconButton(button, scale, panelCardOpacity());
+          },
       })
   );
 
@@ -592,13 +587,7 @@ void WallpaperPanel::create() {
       ui::button({
           .out = &m_refreshButton,
           .glyph = "refresh",
-          .glyphSize = Style::fontSizeBody * scale,
-          .variant = ButtonVariant::Default,
           .tooltip = i18n::tr("wallpaper.panel.refresh"),
-          .minWidth = Style::controlHeightSm * scale,
-          .minHeight = Style::controlHeightSm * scale,
-          .padding = Style::spaceXs * scale,
-          .radius = Style::scaledRadiusMd(scale),
           .onClick = [this] {
             if (m_scanner != nullptr) {
               m_scanner->invalidate();
@@ -610,6 +599,9 @@ void WallpaperPanel::create() {
             m_dirty = true;
             PanelManager::instance().refresh();
           },
+          .configure = [this, scale](Button& button) {
+            panel_button_style::configureHeaderIconButton(button, scale, panelCardOpacity());
+          },
       })
   );
 
@@ -618,13 +610,11 @@ void WallpaperPanel::create() {
         ui::button({
             .out = &m_closeButton,
             .glyph = "close",
-            .glyphSize = Style::fontSizeBody * scale,
             .tooltip = i18n::tr("wallpaper.panel.close"),
-            .minWidth = Style::controlHeightSm * scale,
-            .minHeight = Style::controlHeightSm * scale,
-            .padding = Style::spaceXs * scale,
-            .radius = Style::scaledRadiusMd(scale),
             .onClick = [] { PanelManager::instance().close(); },
+            .configure = [this, scale](Button& button) {
+              panel_button_style::configureHeaderIconButton(button, scale, panelCardOpacity());
+            },
         })
     );
   }

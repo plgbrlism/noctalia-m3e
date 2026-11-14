@@ -3,6 +3,8 @@
 #include "core/deferred_call.h"
 #include "render/core/renderer.h"
 #include "render/scene/node.h"
+#include "shell/panel/panel_button_style.h"
+#include "shell/panel/panel_header_style.h"
 #include "shell/settings/settings_content_common.h"
 #include "ui/builders.h"
 #include "ui/controls/label.h"
@@ -88,16 +90,17 @@ namespace settings {
       header->addChild(
           ui::button({
               .glyph = "trash",
-              .glyphSize = Style::fontSizeBody * m_scale,
-              .variant = ButtonVariant::Destructive,
-              .minWidth = Style::controlHeightSm * m_scale,
-              .minHeight = Style::controlHeightSm * m_scale,
-              .padding = Style::spaceXs * m_scale,
-              .radius = Style::scaledRadiusMd(m_scale),
               .onClick = [removeAction = m_removeAction] {
                 if (removeAction) {
                   DeferredCall::callLater(removeAction);
                 }
+              },
+              .configure = [scale = m_scale](Button& button) {
+                panel_button_style::configureHeaderIconButton(button, scale, 1.0F);
+                auto palette = Button::defaultPalette(ButtonVariant::Destructive);
+                palette.normal.bg = clearColorSpec();
+                palette.normal.border = clearColorSpec();
+                button.setCustomPalette(palette);
               },
           })
       );
@@ -106,12 +109,6 @@ namespace settings {
       header->addChild(
           ui::button({
               .glyph = "close",
-              .glyphSize = Style::fontSizeBody * m_scale,
-              .variant = ButtonVariant::Default,
-              .minWidth = Style::controlHeightSm * m_scale,
-              .minHeight = Style::controlHeightSm * m_scale,
-              .padding = Style::spaceXs * m_scale,
-              .radius = Style::scaledRadiusMd(m_scale),
               .onClick = [onCloseRequested = m_onCloseRequested, closeAction = m_closeAction] {
                 // Snapshot the callbacks so the deferred close never depends on
                 // the SettingsSheet still being alive.
@@ -119,9 +116,13 @@ namespace settings {
                   performCloseRequest(onCloseRequested, closeAction);
                 });
               },
+              .configure = [scale = m_scale](Button& button) {
+                panel_button_style::configureHeaderIconButton(button, scale, 1.0F);
+              },
           })
       );
     }
+    panel_header_style::applyHeaderSurface(*header, 1.0F);
     root->addChild(std::move(header));
     root->addChild(makeSettingsStatusBanner({
         .message = m_statusMessage,

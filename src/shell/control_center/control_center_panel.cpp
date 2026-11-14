@@ -11,6 +11,7 @@
 #include "render/scene/node.h"
 #include "shell/control_center/tabs/screen_time_tab.h"
 #include "shell/panel/panel_button_style.h"
+#include "shell/panel/panel_header_style.h"
 #include "shell/panel/panel_manager.h"
 #include "system/dependency_service.h"
 #include "system/easyeffects_service.h"
@@ -120,7 +121,7 @@ void ControlCenterPanel::create() {
 
   if (m_showSidebar) {
     const std::optional<float> sidebarScrollWidth =
-        m_compact ? std::optional<float>{48.0F * scale} : std::nullopt;
+        m_compact ? std::optional<float>{panel_button_style::kIconButtonSize * scale} : std::nullopt;
 
     auto sidebar = ui::column({
         .out = &m_sidebar,
@@ -186,16 +187,18 @@ void ControlCenterPanel::create() {
               .out = &m_tabButtons[idx],
               .text = m_compact ? std::optional<std::string>{} : std::optional<std::string>{i18n::tr(tab.titleKey)},
               .glyph = tab.glyph,
-              .glyphSize = 21.0F * scale,
+              .glyphSize = panel_button_style::kIconButtonGlyphSize * scale,
+              .selected = (tab.id == m_activeTab),
               .contentAlign = m_compact ? ButtonContentAlign::Center : ButtonContentAlign::Start,
-              .variant = (tab.id == m_activeTab) ? ButtonVariant::TabActive : ButtonVariant::Ghost,
+              .variant = ButtonVariant::Default,
+              .surfaceOpacity = (tab.id == m_activeTab) ? 1.0F : panelCardOpacity(),
               .tooltip = m_compact ? i18n::tr(tab.titleKey) : std::string{},
-              .minHeight = m_compact ? (48.0F * scale) : (Style::controlHeight * scale),
+              .minHeight = m_compact ? (panel_button_style::kIconButtonSize * scale) : (Style::controlHeight * scale),
               .paddingV = m_compact ? (Style::spaceSm * scale) : (Style::spaceLg * scale),
               .paddingH = m_compact ? 0.0F : (Style::spaceSm * scale),
               .gap = Style::spaceSm * scale,
               .radius = Style::scaledRadiusLg(scale),
-              .width = m_compact ? std::optional<float>{48.0F * scale} : std::nullopt,
+              .width = m_compact ? std::optional<float>{panel_button_style::kIconButtonSize * scale} : std::nullopt,
               .onClick = onClick,
               .configure = [this, scale](Button& button) {
                 if (button.label() != nullptr) {
@@ -248,11 +251,13 @@ void ControlCenterPanel::create() {
       .gap = Style::spaceSm * scale,
   });
 
+  panel_header_style::applyHeaderSurface(*m_contentHeader, panelCardOpacity());
+
   header->addChild(
       ui::label({
           .out = &m_contentTitle,
           .text = i18n::tr("control-center.tabs.home"),
-          .fontSize = Style::fontSizeTitle * scale,
+          .fontSize = Style::fontSizeHeader * scale,
           .fontWeight = FontWeight::Bold,
           .color = colorSpecFromRole(ColorRole::Primary),
           .flexGrow = 1.0F,
@@ -280,7 +285,7 @@ void ControlCenterPanel::create() {
             .out = &m_closeButton,
             .glyph = "close",
             .onClick = [] { PanelManager::instance().close(); },
-            .configure = [scale](Button& button) { panel_button_style::configureHeaderIconButton(button, scale); },
+            .configure = [this, scale](Button& button) { panel_button_style::configureHeaderIconButton(button, scale, panelCardOpacity()); },
         })
     );
   }
@@ -353,7 +358,7 @@ void ControlCenterPanel::doLayout(Renderer& renderer, float width, float height)
   }
 
   if (m_contentHeader != nullptr) {
-    m_contentHeader->setSize(contentInnerWidth, 0.0F);
+    m_contentHeader->setSize(contentInnerWidth, m_contentHeader->height());
   }
 
   if (m_contentTitle != nullptr) {
@@ -590,7 +595,9 @@ void ControlCenterPanel::updateTabChrome(TabId tab) {
     }
     if (m_tabButtons[idx] != nullptr) {
       m_tabButtons[idx]->setVisible(tabEnabled);
-      m_tabButtons[idx]->setVariant(meta.id == tab ? ButtonVariant::TabActive : ButtonVariant::Ghost);
+      m_tabButtons[idx]->setVariant(ButtonVariant::Default);
+      m_tabButtons[idx]->setSelected(meta.id == tab);
+      m_tabButtons[idx]->setSurfaceOpacity(meta.id == tab ? 1.0F : panelCardOpacity());
     }
     if (meta.id == tab && m_contentTitle != nullptr) {
       m_contentTitle->setText(i18n::tr(meta.titleKey));

@@ -13,6 +13,8 @@
 #include "render/core/renderer.h"
 #include "render/scene/input_area.h"
 #include "shell/control_center/tab.h"
+#include "shell/panel/panel_button_style.h"
+#include "shell/panel/panel_header_style.h"
 #include "shell/panel/panel_manager.h"
 #include "shell/wayland/clipboard_service.h"
 #include "system/process.h"
@@ -184,7 +186,7 @@ namespace {
 
   std::unique_ptr<Button> makeCompactIconButton(
       Button** out, std::string glyph, ButtonVariant variant, float scale, std::function<void()> onClick,
-      bool visible = true, bool participatesInLayout = true
+      bool visible = true, bool participatesInLayout = true, bool headerStyle = false, float surfaceOpacity = 1.0F
   ) {
     return ui::button({
         .out = out,
@@ -198,6 +200,16 @@ namespace {
         .visible = visible,
         .participatesInLayout = participatesInLayout,
         .onClick = std::move(onClick),
+        .configure =
+            [scale, variant, headerStyle, surfaceOpacity](Button& button) {
+              if (!headerStyle) {
+                return;
+              }
+              panel_button_style::configureHeaderIconButton(button, scale, surfaceOpacity);
+              if (variant != ButtonVariant::Default) {
+                button.setVariant(variant);
+              }
+            },
     });
   }
 
@@ -722,19 +734,28 @@ void ClipboardPanel::create() {
 
   auto previewActions = ui::row(
       {.align = FlexAlign::Center, .gap = Style::spaceSm * scale},
-      makeCompactIconButton(&m_copyButton, "copy", ButtonVariant::Default, scale, [this] { activateSelected(); }),
       makeCompactIconButton(
-          &m_imageActionButton, "photo-edit", ButtonVariant::Default, scale, [this] { runImageAction(); }, false, false
+          &m_copyButton, "copy", ButtonVariant::Default, scale, [this] { activateSelected(); }, true, true, true,
+          panelCardOpacity()
       ),
-      makeCompactIconButton(&m_pinButton, "pin", ButtonVariant::Default, scale, [this] { togglePinSelected(); }),
-      makeCompactIconButton(&m_deleteEntryButton, "trash", ButtonVariant::Destructive, scale, [this] {
-        requestDeleteSelectedEntry();
-      })
+      makeCompactIconButton(
+          &m_imageActionButton, "photo-edit", ButtonVariant::Default, scale, [this] { runImageAction(); }, false,
+          false, true, panelCardOpacity()
+      ),
+      makeCompactIconButton(
+          &m_pinButton, "pin", ButtonVariant::Default, scale, [this] { togglePinSelected(); }, true, true, true,
+          panelCardOpacity()
+      ),
+      makeCompactIconButton(
+          &m_deleteEntryButton, "trash", ButtonVariant::Destructive, scale, [this] { requestDeleteSelectedEntry(); },
+          true, true, true, panelCardOpacity()
+      )
   );
   if (Style::closeButtonsEnabled()) {
-    previewActions->addChild(makeCompactIconButton(&m_closeButton, "close", ButtonVariant::Default, scale, [] {
-      PanelManager::instance().close();
-    }));
+    previewActions->addChild(makeCompactIconButton(
+        &m_closeButton, "close", ButtonVariant::Default, scale, [] { PanelManager::instance().close(); }, true, true,
+        true, panelCardOpacity()
+    ));
   }
 
   auto previewHeader = ui::row(
@@ -754,6 +775,7 @@ void ClipboardPanel::create() {
       }),
       std::move(previewActions)
   );
+  panel_header_style::applyHeaderSurface(*previewHeader, panelCardOpacity());
   preview->addChild(std::move(previewHeader));
 
   preview->addChild(

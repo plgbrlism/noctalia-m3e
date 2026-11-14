@@ -55,8 +55,8 @@ public:
   void onClose() override;
   bool handleGlobalKey(std::uint32_t sym, std::uint32_t modifiers, bool pressed, bool preedit) override;
 
-  float preferredWidth() const override { return scaled(980.0F); }
-  float preferredHeight() const override { return scaled(700.0F); }
+  float preferredWidth() const override { return scaled(880.0F); }
+  float preferredHeight() const override { return scaled(520.0F); }
   PanelPlacement panelPlacement() const noexcept override;
   LayerShellKeyboard keyboardMode() const override { return LayerShellKeyboard::Exclusive; }
   InputArea* initialFocusArea() const override;

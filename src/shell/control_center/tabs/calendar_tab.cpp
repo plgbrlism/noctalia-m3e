@@ -233,7 +233,7 @@ std::unique_ptr<Flex> CalendarTab::createHeaderActions() {
           .selected = m_showEventsCard,
           .tooltip = i18n::tr("control-center.calendar.toggle-events-card"),
           .onClick = [this] { toggleEventsCard(); },
-          .configure = [scale](Button& button) { panel_button_style::configureHeaderIconButton(button, scale); },
+          .configure = [this, scale](Button& button) { panel_button_style::configureHeaderIconButton(button, scale, panelCardOpacity()); },
       })
   );
 }

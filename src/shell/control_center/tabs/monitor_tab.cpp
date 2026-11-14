@@ -128,7 +128,7 @@ std::unique_ptr<Flex> MonitorTab::createHeaderActions() {
                   m_brightness->requestDdcRescan();
                 }
               },
-          .configure = [scale](Button& button) { panel_button_style::configureHeaderIconButton(button, scale); },
+          .configure = [this, scale](Button& button) { panel_button_style::configureHeaderIconButton(button, scale, panelCardOpacity()); },
       })
   );
   syncHeaderActions();

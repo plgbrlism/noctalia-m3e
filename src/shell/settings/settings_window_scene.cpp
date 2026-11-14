@@ -18,6 +18,8 @@
 #include "shell/bar/widget_action.h"
 #include "shell/greeter/greeter_appearance_sync.h"
 #include "shell/palette_swatch_preview.h"
+#include "shell/panel/panel_header_style.h"
+#include "shell/panel/panel_button_style.h"
 #include "shell/profile/avatar_path.h"
 #include "shell/settings/font_family_catalog.h"
 #include "shell/settings/settings_bar_management.h"
@@ -713,7 +715,7 @@ void SettingsWindow::scrollSidebarNodeIntoView(const Node* node) {
   if (node == nullptr || m_sidebarScrollView == nullptr) {
     return;
   }
-  scrollNodeIntoScrollView(*m_sidebarScrollView, &m_sidebarScrollState, *node, Style::spaceXs * uiScale());
+  scrollNodeIntoScrollView(*m_sidebarScrollView, &m_sidebarScrollState, *node, Style::spaceXs * contentScale());
 }
 
 void SettingsWindow::scrollFocusedAreaIntoView(InputArea* area) {
@@ -727,7 +729,7 @@ void SettingsWindow::scrollFocusedAreaIntoView(InputArea* area) {
         m_pendingContentScrollTarget = area;
         m_scrollToPendingContentTarget = true;
         if (!m_deferFocusScrollToLayout) {
-          applyPendingContentScrollTarget(Style::spaceMd * uiScale());
+          applyPendingContentScrollTarget(Style::spaceMd * contentScale());
         }
         return;
       }
@@ -920,7 +922,7 @@ settings::SettingsContentContext SettingsWindow::makeContentContext(
   return settings::SettingsContentContext{
       .config = cfg,
       .configService = m_config,
-      .scale = uiScale(),
+      .scale = contentScale(),
       .searchQuery = m_searchQuery,
       .selectedSection = m_selectedSection,
       .selectedBar = selectedBar,
@@ -951,7 +953,7 @@ settings::SettingsContentContext SettingsWindow::makeContentContext(
       .scrollContentToTop =
           [this](const Node& target) {
             if (m_contentScrollView != nullptr) {
-              scrollNodeToScrollViewTop(*m_contentScrollView, target, Style::spaceMd * uiScale());
+              scrollNodeToScrollViewTop(*m_contentScrollView, target, Style::spaceMd * contentScale());
             }
           },
       .focusArea = [this](InputArea* area) { m_inputDispatcher.setFocus(area); },
@@ -1046,7 +1048,7 @@ void SettingsWindow::rebuildSettingsContent() {
   logSettingsProfile("rebuildContent clear", phaseProfileWatch);
   phaseProfileWatch.reset();
 
-  const float scale = uiScale();
+  const float scale = contentScale();
   const Config fallbackCfg{};
   const Config& cfg = m_config != nullptr ? m_config->config() : fallbackCfg;
   const BarConfig* selectedBar = settings::findBar(cfg, m_selectedBarName);
@@ -1140,7 +1142,7 @@ void SettingsWindow::rebuildSettingsContent() {
             .scrollContentToTop =
                 [this](const Node& target) {
                   if (m_contentScrollView != nullptr) {
-                    scrollNodeToScrollViewTop(*m_contentScrollView, target, Style::spaceMd * uiScale());
+                    scrollNodeToScrollViewTop(*m_contentScrollView, target, Style::spaceMd * contentScale());
                   }
                 },
             .expandedGroupsByPage = m_expandedSettingGroups,
@@ -1229,6 +1231,8 @@ void SettingsWindow::rebuildSettingsContent() {
 }
 
 std::unique_ptr<Flex> SettingsWindow::buildHeaderRow(float scale) {
+  const float headerOpacity =
+      m_config != nullptr && m_config->config().shell.settingsWindowTranslucent ? 0.8F : 1.0F;
   auto row = ui::row(
       {
           .align = FlexAlign::Center,
@@ -1237,7 +1241,7 @@ std::unique_ptr<Flex> SettingsWindow::buildHeaderRow(float scale) {
       },
       ui::label({
           .text = i18n::tr("settings.window.title"),
-          .fontSize = Style::fontSizeTitle * scale,
+          .fontSize = Style::fontSizeHeader * scale,
           .fontWeight = FontWeight::Bold,
           .color = colorSpecFromRole(ColorRole::OnSurface),
           .flexGrow = 1.0F,
@@ -1245,28 +1249,25 @@ std::unique_ptr<Flex> SettingsWindow::buildHeaderRow(float scale) {
       ui::button({
           .out = &m_actionsMenuButton,
           .glyph = "more-vertical",
-          .glyphSize = Style::fontSizeBody * scale,
-          .variant = ButtonVariant::Ghost,
-          .minWidth = Style::controlHeightSm * scale,
-          .minHeight = Style::controlHeightSm * scale,
-          .padding = Style::spaceXs * scale,
-          .radius = Style::scaledRadiusMd(scale),
           .onClick = [this] { openActionsMenu(); },
-          .configure = [](Button& button) { button.setTabStop(false); },
+          .configure =
+              [scale, headerOpacity](Button& button) {
+                panel_button_style::configureHeaderIconButton(button, scale, headerOpacity);
+                button.setTabStop(false);
+              },
       })
   );
+  panel_header_style::applyHeaderSurface(*row, headerOpacity);
   if (Style::closeButtonsEnabled()) {
     row->addChild(
         ui::button({
             .glyph = "close",
-            .glyphSize = Style::fontSizeBody * scale,
-            .variant = ButtonVariant::Default,
-            .minWidth = Style::controlHeightSm * scale,
-            .minHeight = Style::controlHeightSm * scale,
-            .padding = Style::spaceXs * scale,
-            .radius = Style::scaledRadiusMd(scale),
             .onClick = [this] { close(); },
-            .configure = [](Button& button) { button.setTabStop(false); },
+            .configure =
+                [scale, headerOpacity](Button& button) {
+                  panel_button_style::configureHeaderIconButton(button, scale, headerOpacity);
+                  button.setTabStop(false);
+                },
         })
     );
   }
@@ -2195,7 +2196,7 @@ void SettingsWindow::buildScene(std::uint32_t width, std::uint32_t height) {
 
   const auto w = static_cast<float>(width);
   const auto h = static_cast<float>(height);
-  const float scale = uiScale();
+  const float scale = contentScale();
   m_actionsMenuButton = nullptr;
   m_pageTitleRow = nullptr;
   m_groupJumpRow = nullptr;
