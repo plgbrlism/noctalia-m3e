@@ -3,6 +3,7 @@
 #include <array>
 #include <cmath>
 #include <print>
+#include <string>
 #include <string_view>
 
 namespace {
@@ -86,6 +87,44 @@ namespace {
     return 0;
   }
 
+  int middleEllipsisSpacingCase(CairoTextRenderer& renderer) {
+    const TextFont font{.family = "monospace"};
+    for (const float scale : {1.0F, 1.25F, 1.5F, 2.0F}) {
+      const auto retained = renderer.measure(scale, "MMM…MMM", 14.0F, font);
+      const auto glyph = renderer.measure(scale, "M", 14.0F, font);
+      const float budget = retained.width + glyph.width * 0.5F;
+      const auto text = std::string(40, 'M');
+      const auto compact =
+          renderer.measure(scale, text, 14.0F, font, budget, 1, TextAlign::Start, TextEllipsize::Middle);
+      if (std::abs(compact.width - retained.width) >= 0.01F || compact.lineCount != 1) {
+        std::println(stderr, "cairo_text_renderer_test: FAIL: middle ellipsis spacing at scale {}", scale);
+        return 1;
+      }
+      const auto again =
+          renderer.measure(scale, text, 14.0F, font, budget, 1, TextAlign::Start, TextEllipsize::Middle);
+      if (!sameMetrics(compact, again)) {
+        std::println(stderr, "cairo_text_renderer_test: FAIL: middle ellipsis measurement not repeatable");
+        return 1;
+      }
+      for (const auto mode : {TextEllipsize::Start, TextEllipsize::End}) {
+        const auto normal = renderer.measure(scale, text, 14.0F, font, budget, 1, TextAlign::Start, mode);
+        if (std::abs(normal.width - budget) >= 0.01F) {
+          std::println(stderr, "cairo_text_renderer_test: FAIL: start/end ellipsis width at scale {}", scale);
+          return 1;
+        }
+      }
+      const auto spaces = renderer.measure(scale, "MMM MMM", 14.0F, font);
+      const auto unchanged = renderer.measure(
+          scale, "MMM MMM", 14.0F, font, spaces.width + 20.0F, 1, TextAlign::Start, TextEllipsize::Middle
+      );
+      if (!sameMetrics(spaces, unchanged)) {
+        std::println(stderr, "cairo_text_renderer_test: FAIL: middle ellipsis changed untruncated text");
+        return 1;
+      }
+    }
+    return 0;
+  }
+
 } // namespace
 
 int main() {
@@ -95,5 +134,8 @@ int main() {
   if (const int rc = scaleKeyedCacheCase(renderer); rc != 0) {
     return rc;
   }
-  return wrappingBoundaryCase(renderer);
+  if (const int rc = wrappingBoundaryCase(renderer); rc != 0) {
+    return rc;
+  }
+  return middleEllipsisSpacingCase(renderer);
 }
