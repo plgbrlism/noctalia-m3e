@@ -644,7 +644,6 @@ struct WindowSwitcher::Instance {
   InputArea* input = nullptr;
   InputArea* panel = nullptr;
   Box* panelBackground = nullptr;
-  Box* dimmer = nullptr;
   InputArea* strip = nullptr;
   Node* gridContent = nullptr;
   std::vector<WindowSwitcherTile*> tiles;
@@ -1745,6 +1744,7 @@ void WindowSwitcher::ensureSurface() {
       .keyboard = LayerShellKeyboard::Exclusive,
       .defaultWidth = static_cast<std::uint32_t>(output->effectiveLogicalWidth()),
       .defaultHeight = static_cast<std::uint32_t>(output->effectiveLogicalHeight()),
+      .prewarmBlur = true,
   };
 
   inst->surface = std::make_unique<LayerSurface>(*m_wayland, std::move(config));
@@ -2030,7 +2030,6 @@ void WindowSwitcher::buildScene(Instance& instance, std::uint32_t width, std::ui
 
   input->addChild(
       ui::box({
-          .out = &instance.dimmer,
           .fill = colorSpecFromRole(ColorRole::Shadow),
           .width = w,
           .height = h,
@@ -2172,7 +2171,6 @@ void WindowSwitcher::buildScene(Instance& instance, std::uint32_t width, std::ui
   instance.sceneRoot->addChild(std::move(input));
   syncSelection(false);
   instance.sceneRoot->layout(renderer);
-  positionPanel(instance, w, h);
 
   instance.surface->setSceneRoot(instance.sceneRoot.get());
   instance.inputDispatcher.setSceneRoot(instance.sceneRoot.get());
@@ -2185,19 +2183,13 @@ void WindowSwitcher::buildScene(Instance& instance, std::uint32_t width, std::ui
     instance.inputDispatcher.setFocus(instance.input);
   }
 
-  if (!instance.revealStarted && instance.panel != nullptr && instance.dimmer != nullptr) {
+  if (!instance.revealStarted && instance.panel != nullptr) {
     instance.revealStarted = true;
-    instance.panel->setOpacity(0.0F);
     instance.panel->setScale(Style::windowSwitcherRevealScale);
-    instance.dimmer->setOpacity(0.0F);
     instance.animations.animate(
-        0.0F, 1.0F, Style::animNormal, Easing::EaseOutCubic,
-        [panelNode = instance.panel, dimmer = instance.dimmer](float value) {
-          panelNode->setOpacity(value);
-          panelNode->setScale(Style::windowSwitcherRevealScale + (1.0F - Style::windowSwitcherRevealScale) * value);
-          dimmer->setOpacity(Style::windowSwitcherDimOpacity * value);
-        },
-        {}, instance.panel
+        Style::windowSwitcherRevealScale, 1.0F, Style::animNormal, Easing::EaseOutCubic,
+        [panelNode = instance.panel](float value) { panelNode->setScale(value); }, {}, instance.panel
     );
   }
+  positionPanel(instance, w, h);
 }
