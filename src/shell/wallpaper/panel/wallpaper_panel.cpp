@@ -450,7 +450,7 @@ void WallpaperPanel::create() {
       .fillWidth = true,
   });
 
-  panel_header_style::applyHeaderSurface(*toolbar, panelCardOpacity());
+  panel_header_style::applyHeaderSurface(*toolbar, panelCardOpacity(), scale);
 
   toolbar->addChild(
       ui::label({

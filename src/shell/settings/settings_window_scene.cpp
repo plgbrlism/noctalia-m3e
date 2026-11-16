@@ -986,6 +986,7 @@ settings::SettingsContentContext SettingsWindow::makeContentContext(
       .openCapsuleGroupEditor = [this](
                                     std::vector<std::string> laneListPath, std::string groupId
                                 ) { openCapsuleGroupEditor(std::move(laneListPath), std::move(groupId)); },
+      .openBuiltinTemplateStore = [this] { openBuiltinTemplateStore(); },
       .registerIdleLiveStatusLabel =
           [this](Label* label) {
             m_idleLiveStatusLabel = label;
@@ -1174,7 +1175,8 @@ void SettingsWindow::rebuildSettingsContent() {
                   markPluginListDirty();
                   requestSceneRebuild();
                 },
-            .openBrowserUrl = [this](const std::string& url) { openBrowserUrl(url); },
+      .openBrowserUrl = [this](const std::string& url) { openBrowserUrl(url); },
+            .openBuiltinTemplateStore = [this] { openBuiltinTemplateStore(); },
             .autoUpdateMode = cfg.plugins.autoUpdate,
             .setAutoUpdate =
                 [this](PluginAutoUpdateMode mode) {
@@ -1257,7 +1259,7 @@ std::unique_ptr<Flex> SettingsWindow::buildHeaderRow(float scale) {
               },
       })
   );
-  panel_header_style::applyHeaderSurface(*row, headerOpacity);
+  panel_header_style::applyHeaderSurface(*row, headerOpacity, scale);
   if (Style::closeButtonsEnabled()) {
     row->addChild(
         ui::button({
@@ -1585,6 +1587,7 @@ void SettingsWindow::refreshSettingsRegistry(const Config& cfg) {
     if (auto* button = std::get_if<settings::ButtonSetting>(&entry.control)) {
       button->action = [this] { openCommunityTemplateStore(); };
     }
+
   }
 
   if (m_calendarService != nullptr

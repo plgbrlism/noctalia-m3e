@@ -251,7 +251,7 @@ void ControlCenterPanel::create() {
       .gap = Style::spaceSm * scale,
   });
 
-  panel_header_style::applyHeaderSurface(*m_contentHeader, panelCardOpacity());
+  panel_header_style::applyHeaderSurface(*m_contentHeader, panelCardOpacity(), scale);
 
   header->addChild(
       ui::label({

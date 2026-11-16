@@ -1700,7 +1700,7 @@ void LauncherPanel::create() {
       );
     }
     navigationRow->addChild(std::move(navigationActions));
-    panel_header_style::applyHeaderSurface(*navigationRow, panelCardOpacity());
+    panel_header_style::applyHeaderSurface(*navigationRow, panelCardOpacity(), scale);
     if (m_launcherNavigation != nullptr && m_launcherNavigation->focusArea() != nullptr) {
       m_launcherNavigation->focusArea()->setTabFocusKey("launcher.navigation");
     }
@@ -1724,7 +1724,7 @@ void LauncherPanel::create() {
     categoryScroll->content()->setAlign(FlexAlign::Center);
     categoryScroll->content()->addChild(std::move(categoryFilter));
     auto categoryRow = ui::row({.align = FlexAlign::Center, .fillWidth = true}, std::move(categoryScroll));
-    panel_header_style::applyHeaderSurface(*categoryRow, panelCardOpacity());
+    panel_header_style::applyHeaderSurface(*categoryRow, panelCardOpacity(), scale);
     body->addChild(std::move(categoryRow));
   }
 
@@ -1870,8 +1870,8 @@ void LauncherPanel::create() {
         .align = FlexAlign::Center,
         .gap = std::round(Style::spaceSm * scale),
         .fillWidth = true,
-        .configure = [opacity = panelCardOpacity()](Flex& flex) {
-          panel_header_style::applyHeaderSurface(flex, opacity);
+        .configure = [opacity = panelCardOpacity(), scale](Flex& flex) {
+          panel_header_style::applyHeaderSurface(flex, opacity, scale);
         },
     });
     const float toolbarSideWidth = std::round(kLauncherAvatarSize * scale);

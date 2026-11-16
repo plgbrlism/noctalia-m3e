@@ -122,7 +122,7 @@ namespace settings {
           })
       );
     }
-    panel_header_style::applyHeaderSurface(*header, 1.0F);
+    panel_header_style::applyHeaderSurface(*header, 1.0F, scale());
     root->addChild(std::move(header));
     root->addChild(makeSettingsStatusBanner({
         .message = m_statusMessage,

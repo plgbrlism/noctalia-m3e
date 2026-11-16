@@ -174,7 +174,7 @@ void FileDialogView::create() {
         })
     );
   }
-  panel_header_style::applyHeaderSurface(*headerRow, 1.0F);
+  panel_header_style::applyHeaderSurface(*headerRow, 1.0F, scale);
   root->addChild(std::move(headerRow));
 
   root->addChild(

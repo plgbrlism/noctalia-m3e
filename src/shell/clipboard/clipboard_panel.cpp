@@ -775,7 +775,7 @@ void ClipboardPanel::create() {
       }),
       std::move(previewActions)
   );
-  panel_header_style::applyHeaderSurface(*previewHeader, panelCardOpacity());
+  panel_header_style::applyHeaderSurface(*previewHeader, panelCardOpacity(), scale);
   preview->addChild(std::move(previewHeader));
 
   preview->addChild(
