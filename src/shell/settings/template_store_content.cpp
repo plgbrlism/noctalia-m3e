@@ -1,23 +1,24 @@
 #include "shell/settings/template_store_content.h"
 
 #include "config/config_service.h"
-#include "core/input/key_symbols.h"
-#include "core/input/keybind_matcher.h"
-#include "cursor-shape-v1-client-protocol.h"
 #include "i18n/i18n.h"
 #include "shell/settings/template_store_tile.h"
 #include "ui/builders.h"
 #include "ui/controls/button.h"
 #include "ui/controls/input.h"
 #include "ui/controls/label.h"
-#include "ui/controls/virtual_grid_view.h"
+#include "ui/controls/scroll_view.h"
+#include "ui/controls/segmented.h"
 #include "ui/palette.h"
 #include "ui/style.h"
 #include "util/string_utils.h"
 
 #include <algorithm>
 #include <cctype>
+#include <memory>
+#include <numeric>
 #include <set>
+#include <unordered_map>
 
 namespace settings {
 
@@ -35,88 +36,6 @@ namespace settings {
               }).empty();
     }
 
-    class TemplateStoreAdapter final : public VirtualGridAdapter {
-    public:
-      explicit TemplateStoreAdapter(float scale) : m_scale(scale) {}
-
-      void setContent(TemplateStoreContent* content) { m_content = content; }
-      void setFilteredIndices(const std::vector<std::size_t>* indices) { m_indices = indices; }
-      void setCatalog(const std::vector<noctalia::theme::AvailableTemplate>* catalog) { m_catalog = catalog; }
-      void setSelectedIds(const std::unordered_set<std::string>* ids) { m_selectedIds = ids; }
-
-      std::size_t itemCount() const override { return m_indices != nullptr ? m_indices->size() : 0; }
-
-      [[nodiscard]] std::unique_ptr<Node> createTile() override { return std::make_unique<TemplateStoreTile>(m_scale); }
-
-      void bindTile(Node& tile, std::size_t index, bool selected, bool hovered) override {
-        if (m_indices == nullptr || m_catalog == nullptr || index >= m_indices->size()) {
-          return;
-        }
-        auto* t = static_cast<TemplateStoreTile*>(&tile);
-        const auto& entry = (*m_catalog)[(*m_indices)[index]];
-        const bool enabled = m_selectedIds != nullptr && m_selectedIds->contains(entry.id);
-        t->bind(
-            entry.displayName, entry.category, enabled, selected, hovered, !entry.documentationUrl.empty(),
-            [this, index](bool nextEnabled) {
-              if (m_content != nullptr) {
-                m_content->setEnabledAtFilteredIndex(index, nextEnabled);
-              }
-            }
-        );
-      }
-
-      std::string itemTooltip(std::size_t index) const override {
-        if (m_indices == nullptr || m_catalog == nullptr || index >= m_indices->size()) {
-          return {};
-        }
-        return noctalia::theme::formatTemplateTooltip((*m_catalog)[(*m_indices)[index]]);
-      }
-
-      void onActivate(std::size_t index) override {
-        if (m_content != nullptr) {
-          m_content->toggleAtFilteredIndex(index);
-        }
-      }
-
-      bool onPointerPress(std::size_t index, float localX, float localY, float cellWidth, float cellHeight) override {
-        if (m_content == nullptr || !overlayHitTest(index, localX, localY, cellWidth, cellHeight)) {
-          return false;
-        }
-        return m_content->openDocumentationAtFilteredIndex(index);
-      }
-
-      bool
-      overlayHitTest(std::size_t index, float localX, float localY, float cellWidth, float cellHeight) const override {
-        return m_indices != nullptr
-            && m_catalog != nullptr
-            && index < m_indices->size()
-            && !(*m_catalog)[(*m_indices)[index]].documentationUrl.empty()
-            && TemplateStoreTile::hitTestReadme(cellWidth, cellHeight, m_scale, localX, localY);
-      }
-
-      void applyOverlayHover(Node& tile, bool hovered) override {
-        static_cast<TemplateStoreTile&>(tile).setReadmeHovered(hovered);
-      }
-
-      std::string overlayTooltip(std::size_t /*index*/) const override { return i18n::tr("settings.templates.readme"); }
-
-      std::optional<TooltipAnchorInsets> itemTooltipAnchorInsets(
-          std::size_t /*index*/, float cellWidth, float cellHeight, bool overlayHovered
-      ) const override {
-        if (!overlayHovered) {
-          return std::nullopt;
-        }
-        return TemplateStoreTile::readmeTooltipAnchorInsets(cellWidth, cellHeight, m_scale);
-      }
-
-    private:
-      float m_scale;
-      TemplateStoreContent* m_content = nullptr;
-      const std::vector<std::size_t>* m_indices = nullptr;
-      const std::vector<noctalia::theme::AvailableTemplate>* m_catalog = nullptr;
-      const std::unordered_set<std::string>* m_selectedIds = nullptr;
-    };
-
   } // namespace
 
   TemplateStoreContent::TemplateStoreContent(
@@ -131,12 +50,11 @@ namespace settings {
       }
     }
     collectCategories();
+    sortFiltered();
     applyFilter();
   }
 
   TemplateStoreContent::~TemplateStoreContent() = default;
-
-  void TemplateStoreContent::setOnRebuildNeeded(std::function<void()> cb) { m_onRebuildNeeded = std::move(cb); }
 
   void TemplateStoreContent::collectCategories() {
     std::set<std::string> categories;
@@ -149,7 +67,9 @@ namespace settings {
   }
 
   void TemplateStoreContent::sortFiltered() {
-    std::ranges::sort(m_filteredIndices, [this](std::size_t a, std::size_t b) {
+    m_sortedIndices.resize(m_catalog.size());
+    std::iota(m_sortedIndices.begin(), m_sortedIndices.end(), std::size_t{0});
+    std::ranges::sort(m_sortedIndices, [this](std::size_t a, std::size_t b) {
       const auto& left = m_catalog[a];
       const auto& right = m_catalog[b];
       const int nameOrder = StringUtils::naturalCaseInsensitiveCompare(left.displayName, right.displayName);
@@ -196,11 +116,34 @@ namespace settings {
       m_config->setStateString("template_store", "sort", sortModeStateValue(mode));
     }
     syncSortButtonGlyph();
-    sortFiltered();
-    syncGridSelection();
-    if (m_grid != nullptr) {
-      m_grid->notifyDataChanged();
+
+    if (m_listContent == nullptr || m_rows.empty()) {
+      sortFiltered();
+      applyFilter();
+      return;
     }
+
+    const std::vector<std::size_t> oldSorted = m_sortedIndices;
+    std::unordered_map<std::size_t, std::unique_ptr<Node>> owned;
+    owned.reserve(m_rows.size());
+    for (std::size_t i = 0; i < m_rows.size() && i < oldSorted.size(); ++i) {
+      if (m_rows[i] != nullptr) {
+        owned[oldSorted[i]] = m_listContent->removeChild(static_cast<Node*>(m_rows[i]));
+      }
+    }
+
+    sortFiltered();
+    m_rows.clear();
+    m_rows.reserve(m_sortedIndices.size());
+    for (const std::size_t catalogIndex : m_sortedIndices) {
+      auto it = owned.find(catalogIndex);
+      if (it == owned.end()) {
+        continue;
+      }
+      m_rows.push_back(static_cast<TemplateStoreTile*>(it->second.get()));
+      m_listContent->addChild(std::move(it->second));
+    }
+    applyFilter();
   }
 
   TemplateSortMode TemplateStoreContent::sortModeFromState(std::string_view value) {
@@ -267,29 +210,52 @@ namespace settings {
   }
 
   void TemplateStoreContent::applyFilter() {
+    m_visible.assign(m_rows.size(), false);
     m_filteredIndices.clear();
-    m_filteredIndices.reserve(m_catalog.size());
+    std::size_t visibleCount = 0;
+
     const bool enabledOnly = m_selectedCategory == kEnabledFilter;
-    for (std::size_t i = 0; i < m_catalog.size(); ++i) {
-      const auto& entry = m_catalog[i];
+    for (std::size_t i = 0; i < m_rows.size(); ++i) {
+      const std::size_t catalogIndex = m_sortedIndices[i];
+      const auto& entry = m_catalog[catalogIndex];
+
+      bool visible = true;
       if (enabledOnly) {
-        if (!m_selectedIds.contains(entry.id)) {
-          continue;
-        }
-      } else if (!m_selectedCategory.empty() && entry.category != m_selectedCategory) {
-        continue;
+        visible = m_selectedIds.contains(entry.id);
+      } else if (!m_selectedCategory.empty()) {
+        visible = entry.category == m_selectedCategory;
       }
-      if (!m_searchQuery.empty()) {
-        const bool match = containsInsensitive(entry.displayName, m_searchQuery)
+      if (visible && !m_searchQuery.empty()) {
+        visible = containsInsensitive(entry.displayName, m_searchQuery)
             || containsInsensitive(entry.id, m_searchQuery)
             || containsInsensitive(entry.category, m_searchQuery);
-        if (!match) {
-          continue;
-        }
       }
-      m_filteredIndices.push_back(i);
+
+      m_visible[i] = visible;
+      if (m_rows[i] != nullptr) {
+        m_rows[i]->setVisible(visible);
+        m_rows[i]->setParticipatesInLayout(visible);
+      }
+      if (visible) {
+        ++visibleCount;
+        m_filteredIndices.push_back(catalogIndex);
+      }
     }
-    sortFiltered();
+
+    if (m_countLabel != nullptr) {
+      m_countLabel->setText(
+          i18n::tr("settings.templates.store.results-count", "count", std::to_string(visibleCount))
+      );
+    }
+
+    if (m_emptyLabel != nullptr) {
+      m_emptyLabel->setText(
+          m_catalog.empty() ? i18n::tr("settings.schema.templates.community-ids.empty")
+                            : i18n::tr("settings.templates.store.empty")
+      );
+      m_emptyLabel->setVisible(visibleCount == 0);
+      m_emptyLabel->setParticipatesInLayout(visibleCount == 0);
+    }
   }
 
   void TemplateStoreContent::commitSelection() {
@@ -306,58 +272,16 @@ namespace settings {
     m_callbacks.setSelected(std::move(ordered));
   }
 
-  void TemplateStoreContent::toggleAtFilteredIndex(std::size_t filteredIndex) {
-    if (filteredIndex >= m_filteredIndices.size()) {
-      return;
-    }
-    const auto& entry = m_catalog[m_filteredIndices[filteredIndex]];
-    setEnabledAtFilteredIndex(filteredIndex, !m_selectedIds.contains(entry.id));
-  }
-
-  void TemplateStoreContent::setEnabledAtFilteredIndex(std::size_t filteredIndex, bool enabled) {
-    if (filteredIndex >= m_filteredIndices.size()) {
-      return;
-    }
-    const auto& entry = m_catalog[m_filteredIndices[filteredIndex]];
-    if (enabled == m_selectedIds.contains(entry.id)) {
-      return;
-    }
-    if (enabled) {
-      m_selectedIds.insert(entry.id);
-    } else {
-      m_selectedIds.erase(entry.id);
-    }
-    m_selectedTemplateId = entry.id;
-    commitSelection();
-
-    if (m_selectedCategory == kEnabledFilter) {
-      applyFilter();
-      if (m_onRebuildNeeded) {
-        m_onRebuildNeeded();
-      } else if (m_grid != nullptr) {
-        m_grid->notifyDataChanged();
-        syncGridSelection();
-      }
-      return;
-    }
-
-    if (m_grid != nullptr) {
-      m_grid->notifyItemChanged(filteredIndex);
-      m_grid->setSelectedIndex(filteredIndex);
-    }
-    if (m_countLabel != nullptr) {
-      m_countLabel->setText(
-          i18n::tr("settings.templates.store.results-count", "count", std::to_string(m_filteredIndices.size()))
-      );
-    }
-  }
-
-  void TemplateStoreContent::populateBody(Flex& body, Renderer& renderer) {
+  void TemplateStoreContent::populateBody(Flex& body, Renderer* /*renderer*/) {
     const float scale = m_callbacks.scale;
     m_countLabel = nullptr;
     m_sortButton = nullptr;
-    m_grid = nullptr;
-    m_adapter.reset();
+    m_searchInput = nullptr;
+    m_categoryFilter = nullptr;
+    m_listScroll = nullptr;
+    m_listContent = nullptr;
+    m_emptyLabel = nullptr;
+    m_rows.clear();
 
     body.setDirection(FlexDirection::Vertical);
     body.setAlign(FlexAlign::Stretch);
@@ -366,98 +290,92 @@ namespace settings {
 
     body.addChild(
         ui::input({
+            .out = &m_searchInput,
             .value = m_searchQuery,
             .placeholder = i18n::tr("settings.templates.store.search-placeholder"),
             .fontSize = Style::fontSizeBody * scale,
-            .onChange = [this](const std::string& text) {
-              m_searchQuery = text;
-              applyFilter();
-              syncGridSelection();
-              if (m_countLabel != nullptr) {
-                m_countLabel->setText(
-                    i18n::tr(
-                        "settings.templates.store.results-count", "count", std::to_string(m_filteredIndices.size())
-                    )
-                );
-              }
-              if (m_grid != nullptr) {
-                m_grid->notifyDataChanged();
-              }
-            },
-        })
-    );
-
-    auto toolbar = ui::row({
-        .align = FlexAlign::Center,
-        .gap = Style::spaceSm * scale,
-        .fillWidth = true,
-    });
-    // Holds the count and sort button when the category chips are expanded, so the chips
-    // sit between the filters and the row that summarizes them.
-    auto toolbarBottom = ui::row({
-        .align = FlexAlign::Center,
-        .gap = Style::spaceSm * scale,
-        .fillWidth = true,
-    });
-
-    std::vector<std::unique_ptr<Button>> filterButtons;
-    toolbar->addChild(
-        ui::button({
-            .text = i18n::tr("settings.templates.store.categories"),
-            .glyph = m_categoryFiltersCollapsed ? std::string(Style::rtl() ? "chevron-left" : "chevron-right")
-                                                : std::string("chevron-down"),
-            .fontSize = Style::fontSizeCaption * scale,
-            .glyphSize = Style::fontSizeCaption * scale,
-            .contentAlign = ButtonContentAlign::Start,
-            .variant = ButtonVariant::Ghost,
-            .onClick = [this] {
-              m_categoryFiltersCollapsed = !m_categoryFiltersCollapsed;
-              if (m_onRebuildNeeded) {
-                m_onRebuildNeeded();
-              }
-            },
-        })
-    );
-
-    if (!m_categoryFiltersCollapsed) {
-      const auto makeFilterChip = [&](const std::string& label, std::string filterKey) {
-        const bool selected = m_selectedCategory == filterKey;
-        filterButtons.push_back(
-            ui::button({
-                .text = label,
-                .fontSize = Style::fontSizeCaption * scale,
-                .variant = selected ? ButtonVariant::Primary : ButtonVariant::Default,
-                .radius = Style::scaledRadiusMd(scale),
-                .onClick = [this, filterKey = std::move(filterKey)] {
-                  m_selectedCategory = filterKey;
+            .controlHeight = Style::controlHeight * scale,
+            .horizontalPadding = Style::spaceMd * scale,
+            .clearButtonEnabled = true,
+            .onChange =
+                [this](const std::string& text) {
+                  m_searchQuery = text;
                   applyFilter();
-                  if (m_onRebuildNeeded) {
-                    m_onRebuildNeeded();
-                  }
                 },
-            })
-        );
-      };
+        })
+    );
 
-      makeFilterChip(i18n::tr("settings.templates.store.category-all"), {});
-      makeFilterChip(i18n::tr("settings.templates.store.filter-enabled"), std::string(kEnabledFilter));
-      for (const auto& category : m_allCategories) {
-        makeFilterChip(category, category);
+    auto categoryScroll = ui::scrollView({
+        .orientation = ScrollOrientation::Horizontal,
+        .scrollbarVisible = false,
+        .viewportPaddingH = 0.0F,
+        .viewportPaddingV = 0.0F,
+        .fill = clearColorSpec(),
+        .radius = 0.0F,
+        .fillWidth = true,
+        .configure = [](ScrollView& scroll) {
+          scroll.clearFill();
+          scroll.clearBorder();
+        },
+    });
+    categoryScroll->content()->setAlign(FlexAlign::Center);
+    auto categoryFilter = ui::segmented({
+        .out = &m_categoryFilter,
+        .scale = scale,
+        .compact = true,
+        .surfaceOpacity = 0.0F,
+        .equalSegmentWidths = false,
+        .configure = [](Segmented& segmented) { segmented.setAlign(FlexAlign::Center); },
+    });
+
+    std::vector<std::string> filterKeys;
+    filterKeys.reserve(m_allCategories.size() + 2);
+    filterKeys.emplace_back();
+    filterKeys.emplace_back(kEnabledFilter);
+    for (const auto& category : m_allCategories) {
+      filterKeys.push_back(category);
+    }
+
+    std::size_t selectedIndex = 0;
+    for (std::size_t i = 0; i < filterKeys.size(); ++i) {
+      if (filterKeys[i] == m_selectedCategory) {
+        selectedIndex = i;
+        break;
       }
     }
 
-    Flex& summaryRow = m_categoryFiltersCollapsed ? *toolbar : *toolbarBottom;
-    summaryRow.addChild(ui::spacer());
-    summaryRow.addChild(
+    categoryFilter->addOption(i18n::tr("settings.templates.store.category-all"));
+    categoryFilter->addOption(i18n::tr("settings.templates.store.filter-enabled"));
+    for (const auto& category : m_allCategories) {
+      categoryFilter->addOption(category);
+    }
+    categoryFilter->setSelectedIndex(selectedIndex);
+    categoryFilter->setOnChange(
+        [this, filterKeys = std::move(filterKeys)](std::size_t index) {
+          if (index >= filterKeys.size()) {
+            return;
+          }
+          m_selectedCategory = filterKeys[index];
+          applyFilter();
+        }
+    );
+    categoryScroll->content()->addChild(std::move(categoryFilter));
+    body.addChild(std::move(categoryScroll));
+
+    auto summaryRow = ui::row({
+        .align = FlexAlign::Center,
+        .gap = Style::spaceSm * scale,
+        .fillWidth = true,
+    });
+    summaryRow->addChild(
         ui::label({
             .out = &m_countLabel,
-            .text =
-                i18n::tr("settings.templates.store.results-count", "count", std::to_string(m_filteredIndices.size())),
             .fontSize = Style::fontSizeCaption * scale,
             .color = colorSpecFromRole(ColorRole::OnSurfaceVariant),
         })
     );
-    summaryRow.addChild(
+    summaryRow->addChild(ui::spacer());
+    summaryRow->addChild(
         ui::button({
             .out = &m_sortButton,
             .glyph = std::string(sortModeGlyph(m_sortMode)),
@@ -471,117 +389,90 @@ namespace settings {
             .onClick = [this] { cycleSortMode(); },
         })
     );
+    body.addChild(std::move(summaryRow));
 
-    body.addChild(std::move(toolbar));
-
-    if (!m_categoryFiltersCollapsed) {
-      auto chipRow = ui::row({
-          .align = FlexAlign::Center,
-          .justify = FlexJustify::Center,
-          .wrap = true,
-          .gap = Style::spaceXs * scale,
-          .fillWidth = true,
-      });
-      for (auto& btn : filterButtons) {
-        chipRow->addChild(std::move(btn));
-      }
-      body.addChild(std::move(chipRow));
-      body.addChild(std::move(toolbarBottom));
-    }
-
-    auto adapter = std::make_unique<TemplateStoreAdapter>(scale);
-    auto* adapterPtr = adapter.get();
-    adapterPtr->setContent(this);
-    adapterPtr->setFilteredIndices(&m_filteredIndices);
-    adapterPtr->setCatalog(&m_catalog);
-    adapterPtr->setSelectedIds(&m_selectedIds);
-    m_adapter = std::move(adapter);
-
-    // Intrinsic height of the same card layout as built-in templates (padding + checkbox/text).
-    auto probe = std::make_unique<TemplateStoreTile>(scale);
-    probe->bind("Mg", "category", false, false, false, true, {});
-    const float cardHeight = std::ceil(probe->measure(renderer, LayoutConstraints{}).height);
-    // Floor above checkbox+tight padding — two caption lines need more than controlHeightSm alone.
-    const float minCardHeight = (Style::controlHeightSm + Style::spaceSm * 2.0F) * scale;
-    auto grid = ui::virtualGridView({
-        .out = &m_grid,
+    auto listScroll = ui::scrollView({
+        .out = &m_listScroll,
         .contentScale = scale,
-        .minCellWidth = 152.0F * scale,
-        .cellHeight = std::max(cardHeight, minCardHeight),
-        .squareCells = false,
-        .columnGap = Style::spaceSm * scale,
-        .rowGap = Style::spaceSm * scale,
-        .itemCursorShape = WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_POINTER,
-        .adapter = adapterPtr,
+        .scrollbarVisible = true,
+        .viewportPaddingH = 0.0F,
+        .viewportPaddingV = 0.0F,
+        .fill = clearColorSpec(),
+        .radius = 0.0F,
+        .fillWidth = true,
         .flexGrow = 1.0F,
-        .onSelectionChanged =
-            [this](std::optional<std::size_t> index) {
-              m_selectedTemplateId = index.has_value() && *index < m_filteredIndices.size()
-                  ? std::optional{m_catalog[m_filteredIndices[*index]].id}
-                  : std::nullopt;
-            },
-        .configure = [](VirtualGridView& view) { view.setFillWidth(true); },
+        .configure = [](ScrollView& scroll) {
+          scroll.clearFill();
+          scroll.clearBorder();
+        },
     });
-    if (const auto index = indexOfTemplateId(m_selectedTemplateId.value_or("")); index.has_value()) {
-      m_grid->setSelectedIndex(index);
-    }
-    body.addChild(std::move(grid));
+    m_listContent = listScroll->content();
+    m_listContent->setDirection(FlexDirection::Vertical);
+    m_listContent->setAlign(FlexAlign::Stretch);
+    m_listContent->setGap(Style::spaceXs * scale);
+    m_listContent->addChild(ui::box({.fill = clearColorSpec(), .height = Style::spaceMd * scale}));
+    body.addChild(std::move(listScroll));
 
-    if (m_filteredIndices.empty()) {
-      body.addChild(
-          ui::label({
-              .text = m_catalog.empty() ? i18n::tr("settings.schema.templates.community-ids.empty")
-                                        : i18n::tr("settings.templates.store.empty"),
-              .fontSize = Style::fontSizeCaption * scale,
-              .color = colorSpecFromRole(ColorRole::OnSurfaceVariant),
-          })
+    body.addChild(
+        ui::label({
+            .out = &m_emptyLabel,
+            .fontSize = Style::fontSizeCaption * scale,
+            .color = colorSpecFromRole(ColorRole::OnSurfaceVariant),
+            .visible = false,
+            .participatesInLayout = false,
+        })
+    );
+
+    sortFiltered();
+    m_rows.reserve(m_sortedIndices.size());
+    auto refreshCount = [this] {
+      std::size_t visibleCount = 0;
+      for (const bool visible : m_visible) {
+        if (visible) {
+          ++visibleCount;
+        }
+      }
+      if (m_countLabel != nullptr) {
+        m_countLabel->setText(
+            i18n::tr("settings.templates.store.results-count", "count", std::to_string(visibleCount))
+        );
+      }
+    };
+
+    for (const std::size_t catalogIndex : m_sortedIndices) {
+      const auto& entry = m_catalog[catalogIndex];
+      auto tile = std::make_unique<TemplateStoreTile>(scale);
+      auto* row = tile.get();
+      m_listContent->addChild(std::move(tile));
+      m_rows.push_back(row);
+
+      const std::string id = entry.id;
+      row->bind(
+          entry.displayName, entry.category, m_selectedIds.contains(entry.id), !entry.documentationUrl.empty(),
+          noctalia::theme::formatTemplateTooltip(entry),
+          [this, id, refreshCount](bool next) {
+            if (next) {
+              m_selectedIds.insert(id);
+            } else {
+              m_selectedIds.erase(id);
+            }
+            commitSelection();
+            refreshCount();
+          },
+          [this, catalogIndex] {
+            for (std::size_t fi = 0; fi < m_filteredIndices.size(); ++fi) {
+              if (m_filteredIndices[fi] == catalogIndex) {
+                (void)openDocumentationAtFilteredIndex(fi);
+                break;
+              }
+            }
+          }
       );
     }
-  }
 
-  std::optional<std::size_t> TemplateStoreContent::indexOfTemplateId(std::string_view id) const {
-    if (id.empty()) {
-      return std::nullopt;
-    }
-    for (std::size_t i = 0; i < m_filteredIndices.size(); ++i) {
-      if (m_catalog[m_filteredIndices[i]].id == id) {
-        return i;
-      }
-    }
-    return std::nullopt;
-  }
+    m_listContent->addChild(ui::box({.fill = clearColorSpec(), .height = Style::spaceMd * scale}));
 
-  void TemplateStoreContent::syncGridSelection() {
-    if (m_grid == nullptr) {
-      return;
-    }
-    if (const auto index = indexOfTemplateId(m_selectedTemplateId.value_or("")); index.has_value()) {
-      m_grid->setSelectedIndex(index);
-    } else {
-      m_grid->setSelectedIndex(std::nullopt);
-    }
-  }
-
-  void TemplateStoreContent::selectIndex(std::size_t index) {
-    if (index >= m_filteredIndices.size() || m_grid == nullptr) {
-      return;
-    }
-    m_selectedTemplateId = m_catalog[m_filteredIndices[index]].id;
-    m_grid->setSelectedIndex(index);
-    m_grid->scrollToIndex(index);
-  }
-
-  void TemplateStoreContent::moveSelection(int delta) {
-    if (m_filteredIndices.empty()) {
-      return;
-    }
-    const auto current = indexOfTemplateId(m_selectedTemplateId.value_or(""));
-    if (!current.has_value()) {
-      selectIndex(0);
-      return;
-    }
-    const int next = std::clamp(static_cast<int>(*current) + delta, 0, static_cast<int>(m_filteredIndices.size()) - 1);
-    selectIndex(static_cast<std::size_t>(next));
+    applyFilter();
   }
 
   bool TemplateStoreContent::openDocumentationAtFilteredIndex(std::size_t filteredIndex) {
@@ -594,70 +485,6 @@ namespace settings {
     }
     m_callbacks.openBrowserUrl(url);
     return true;
-  }
-
-  bool TemplateStoreContent::activateSelection() {
-    const auto index = indexOfTemplateId(m_selectedTemplateId.value_or(""));
-    if (!index.has_value()) {
-      return false;
-    }
-    toggleAtFilteredIndex(*index);
-    return true;
-  }
-
-  bool TemplateStoreContent::handleKeyEvent(
-      std::uint32_t sym, std::uint32_t modifiers, bool pressed, bool preedit, InputArea* focused
-  ) {
-    if (!pressed || preedit) {
-      return false;
-    }
-
-    const InputArea* gridFocus = m_grid != nullptr ? m_grid->focusArea() : nullptr;
-    if (focused != nullptr && focused != gridFocus) {
-      return false;
-    }
-
-    if (m_filteredIndices.empty()) {
-      return false;
-    }
-
-    if (sym == XKB_KEY_F1) {
-      const auto index = indexOfTemplateId(m_selectedTemplateId.value_or(""));
-      return index.has_value() && openDocumentationAtFilteredIndex(*index);
-    }
-
-    const int columns = m_grid != nullptr ? static_cast<int>(std::max<std::size_t>(1, m_grid->layoutColumnCount())) : 1;
-
-    if (KeySymbol::isPageUp(sym)) {
-      const int stride = m_grid != nullptr ? static_cast<int>(m_grid->pageItemStride()) : columns;
-      moveSelection(-stride);
-      return true;
-    }
-    if (KeySymbol::isPageDown(sym)) {
-      const int stride = m_grid != nullptr ? static_cast<int>(m_grid->pageItemStride()) : columns;
-      moveSelection(stride);
-      return true;
-    }
-    if (KeybindMatcher::matches(KeybindAction::Left, sym, modifiers)) {
-      moveSelection(-1);
-      return true;
-    }
-    if (KeybindMatcher::matches(KeybindAction::Right, sym, modifiers)) {
-      moveSelection(1);
-      return true;
-    }
-    if (KeybindMatcher::matches(KeybindAction::Up, sym, modifiers)) {
-      moveSelection(-columns);
-      return true;
-    }
-    if (KeybindMatcher::matches(KeybindAction::Down, sym, modifiers)) {
-      moveSelection(columns);
-      return true;
-    }
-    if (KeybindMatcher::matches(KeybindAction::Validate, sym, modifiers)) {
-      return activateSelection();
-    }
-    return false;
   }
 
 } // namespace settings

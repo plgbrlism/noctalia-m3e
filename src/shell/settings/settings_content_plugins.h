@@ -50,6 +50,7 @@ namespace settings {
     std::function<void(std::string source)> updateSource;
     std::function<void()> refresh;
     std::function<void(const std::string&)> openBrowserUrl;
+    std::function<void()> openBuiltinTemplateStore;
 
     // Background auto-update scope for git sources; drives the "auto-update plugins"
     // dropdown. setAutoUpdate persists the mode for all git sources.

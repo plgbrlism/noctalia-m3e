@@ -964,6 +964,7 @@ namespace settings {
       entries.push_back(std::move(e));
     }
 
+
     // Dock and per-monitor dock pages share the same controls. Override pages display effective values while
     // writing to their own table, so untouched fields continue to inherit from the global dock.
     const auto addDockSettings = [&](const DockConfig& dock, std::vector<std::string> root,

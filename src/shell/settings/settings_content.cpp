@@ -4,6 +4,7 @@
 #include "config/config_types.h"
 #include "i18n/i18n.h"
 #include "notification/notification_filter.h"
+#include "render/scene/input_area.h"
 #include "shell/dialogs/glyph_picker_dialog.h"
 #include "shell/settings/bar_widget_editor.h"
 #include "shell/settings/settings_content_common.h"
@@ -373,241 +374,42 @@ namespace settings {
     const auto makeTemplateGridBlock = [&](Flex& section, const SettingEntry& entry,
                                            const TemplateGridSetting& setting) {
       const bool overridden = (ctx.configService != nullptr && ctx.configService->hasEffectiveOverride(entry.path));
-
       auto block = makeCollectionBlock(entry, overridden, false, false, false, false, true);
 
-      if (setting.options.empty()) {
-        block->addChild(makeSettingSubtitleLabel(setting.emptyText, scale));
-        section.addChild(std::move(block));
-        return;
-      }
+      const std::size_t enabledCount = setting.selectedValues.size();
 
-      constexpr std::size_t kTemplateCardsPerRow = 5;
-      auto selected = std::make_shared<std::vector<std::string>>(setting.selectedValues);
-      const auto options = std::make_shared<std::vector<noctalia::theme::AvailableTemplate>>(setting.options);
-      const auto path = entry.path;
-
-      auto commit = [setOverride = ctx.setOverride, path, options, selected] {
-        std::vector<std::string> ordered;
-        ordered.reserve(selected->size());
-        for (const auto& opt : *options) {
-          if (std::ranges::contains(*selected, opt.id)) {
-            ordered.push_back(opt.id);
-          }
-        }
-        setOverride(path, std::move(ordered));
-      };
-
-      auto grid =
-          ui::column({.align = FlexAlign::Stretch, .gap = Style::spaceSm * scale, .configure = [scale](Flex& flex) {
-                        flex.setPadding(Style::spaceMd * scale, 0.0F, 0.0F, 0.0F);
-                      }});
-      std::unique_ptr<Flex> row;
-      std::size_t countInRow = 0;
-
-      auto flushRow = [&] {
-        if (row == nullptr) {
-          return;
-        }
-        while (countInRow > 0 && countInRow < kTemplateCardsPerRow) {
-          row->addChild(ui::row({.fillWidth = true, .flexGrow = 1.0F}));
-          ++countInRow;
-        }
-        grid->addChild(std::move(row));
-        countInRow = 0;
-      };
-
-      for (const auto& option : *options) {
-        if (row == nullptr || countInRow == kTemplateCardsPerRow) {
-          flushRow();
-          row = ui::row({.align = FlexAlign::Stretch, .gap = Style::spaceSm * scale, .fillWidth = true});
-        }
-
-        const bool checked = std::ranges::contains(*selected, option.id);
-        const std::string value = option.id;
-        Button* card = nullptr;
-        Label* titleLabel = nullptr;
-        Label* categoryLabel = nullptr;
-        Checkbox* checkbox = nullptr;
-        Button* documentationButton = nullptr;
-        auto checkedState = std::make_shared<bool>(checked);
-        const auto cardPaletteFor = [scale](bool active) {
-          return Button::ButtonPalette{
-              .borderWidth = 1.0F * scale,
-              .normal =
-                  Button::ButtonStateColors{
-                      .bg = colorSpecFromRole(active ? ColorRole::Primary : ColorRole::SurfaceContainerLow),
-                      .border = active ? colorSpecFromRole(ColorRole::Primary, 0.9F)
-                                       : colorSpecFromRole(ColorRole::OutlineVariant, Style::disabledOutlineAlpha),
-                      .label = colorSpecFromRole(active ? ColorRole::OnPrimary : ColorRole::OnSurface),
-                  },
-              .hover =
-                  Button::ButtonStateColors{
-                      .bg = colorSpecFromRole(active ? ColorRole::Primary : ColorRole::Hover),
-                      .border = colorSpecFromRole(active ? ColorRole::Primary : ColorRole::Hover),
-                      .label = colorSpecFromRole(active ? ColorRole::OnPrimary : ColorRole::OnHover),
-                  },
-              .pressed =
-                  Button::ButtonStateColors{
-                      .bg = colorSpecFromRole(ColorRole::Primary),
-                      .border = colorSpecFromRole(ColorRole::Primary),
-                      .label = colorSpecFromRole(ColorRole::OnPrimary),
-                  },
-              .disabled =
-                  Button::ButtonStateColors{
-                      .bg = colorSpecFromRole(ColorRole::SurfaceContainer, 0.35F),
-                      .border = colorSpecFromRole(ColorRole::OutlineVariant, Style::disabledOutlineAlpha),
-                      .label = colorSpecFromRole(ColorRole::OnSurfaceVariant),
-                  },
-              .selected = std::nullopt,
-          };
-        };
-        auto cardNode = ui::button({
-            .out = &card,
-            .contentAlign = ButtonContentAlign::Start,
-            .customPalette = cardPaletteFor(checked),
-            .minHeight = Style::controlHeightSm * scale,
-            .paddingV = Style::spaceXs * scale,
-            .paddingH = Style::spaceSm * scale,
-            .gap = Style::spaceXs * scale,
-            .radius = Style::scaledRadiusMd(scale),
-            .flexGrow = 1.0F,
-        });
-        card->addChild(
-            ui::checkbox({
-                .out = &checkbox,
-                .checked = checked,
-                .scale = scale,
-                .checkedFill = colorSpecFromRole(ColorRole::Surface),
-                .checkedBorder = colorSpecFromRole(ColorRole::OnPrimary),
-                .checkedGlyph = colorSpecFromRole(ColorRole::Primary),
-            })
-        );
-
-        auto text = ui::column({.align = FlexAlign::Start, .flexGrow = 1.0F});
-        text->addChild(
-            ui::label({
-                .out = &titleLabel,
-                .text = option.displayName,
-                .fontSize = Style::fontSizeBody * scale,
-                .fontWeight = FontWeight::Medium,
-                .color = colorSpecFromRole(checked ? ColorRole::OnPrimary : ColorRole::OnSurface),
-                .maxLines = 1,
-                .ellipsize = TextEllipsize::End,
-            })
-        );
-        if (!option.category.empty()) {
-          text->addChild(
-              ui::label({
-                  .out = &categoryLabel,
-                  .text = option.category,
-                  .fontSize = Style::fontSizeCaption * scale,
-                  .color = colorSpecFromRole(
-                      checked ? ColorRole::OnPrimary : ColorRole::OnSurfaceVariant, checked ? 0.75F : 1.0F
-                  ),
-                  .maxLines = 1,
-                  .ellipsize = TextEllipsize::End,
-              })
-          );
-        }
-        card->addChild(std::move(text));
-        if (!option.documentationUrl.empty()) {
-          card->addChild(
-              ui::button({
-                  .out = &documentationButton,
-                  .glyph = "external-link",
-                  .glyphSize = Style::fontSizeBody * scale,
-                  .controlHeight = Style::controlHeightSm * scale,
-                  .variant = ButtonVariant::Ghost,
-                  .tooltip = i18n::tr("settings.templates.documentation"),
-                  .width = Style::controlHeightSm * scale,
-                  .height = Style::controlHeightSm * scale,
-                  .onClick =
-                      [openBrowserUrl = ctx.openBrowserUrl, url = option.documentationUrl] {
-                        if (openBrowserUrl) {
-                          openBrowserUrl(url);
-                        }
-                      },
-                  .configure = [](Button& button) { button.setZIndex(2); },
-              })
-          );
-        }
-        const auto syncDocumentationColor = [documentationButton](ColorRole role) {
-          if (documentationButton == nullptr) {
-            return;
-          }
-          auto palette = Button::defaultPalette(ButtonVariant::Ghost);
-          palette.normal.label = colorSpecFromRole(role);
-          palette.hover.bg = colorSpecFromRole(ColorRole::Surface);
-          palette.hover.label = colorSpecFromRole(ColorRole::OnSurface);
-          documentationButton->setCustomPalette(palette);
-        };
-        const auto syncTileState = [checkedState, card, documentationButton, titleLabel, categoryLabel,
-                                    syncDocumentationColor] {
-          const bool linkHovered = documentationButton != nullptr && documentationButton->hovered();
-          card->setHoveredVisual(linkHovered);
-          const bool hovered = card->hovered() || linkHovered;
-          ColorRole foreground = ColorRole::OnSurface;
-          ColorRole detail = ColorRole::OnSurfaceVariant;
-          float detailOpacity = 1.0F;
-          if (*checkedState || card->pressed()) {
-            foreground = ColorRole::OnPrimary;
-            detail = ColorRole::OnPrimary;
-            detailOpacity = 0.75F;
-          } else if (hovered) {
-            foreground = ColorRole::OnHover;
-            detail = ColorRole::OnHover;
-            detailOpacity = 0.75F;
-          }
-          if (titleLabel != nullptr) {
-            titleLabel->setColor(colorSpecFromRole(foreground));
-          }
-          if (categoryLabel != nullptr) {
-            categoryLabel->setColor(colorSpecFromRole(detail, detailOpacity));
-          }
-          syncDocumentationColor(foreground);
-        };
-        auto setTileActive = [selected, value, commit, checkedState, card, checkbox, cardPaletteFor,
-                              syncTileState](bool nextChecked) mutable {
-          auto it = std::find(selected->begin(), selected->end(), value);
-          if (nextChecked) {
-            if (it == selected->end()) {
-              selected->push_back(value);
-            }
-          } else if (it != selected->end()) {
-            selected->erase(it);
-          }
-          *checkedState = nextChecked;
-          if (card != nullptr) {
-            card->setCustomPalette(cardPaletteFor(nextChecked));
-          }
-          if (checkbox != nullptr) {
-            checkbox->setChecked(nextChecked);
-          }
-          syncTileState();
-          commit();
-        };
-        checkbox->setOnChange(setTileActive);
-        syncTileState();
-        card->setOnEnter(syncTileState);
-        card->setOnLeave(syncTileState);
-        card->setOnPress([syncTileState](float /*localX*/, float /*localY*/, bool /*pressed*/) { syncTileState(); });
-        if (documentationButton != nullptr) {
-          documentationButton->setOnEnter(syncTileState);
-          documentationButton->setOnLeave(syncTileState);
-        }
-        card->setOnClick([checkedState, setTileActive] mutable { setTileActive(!*checkedState); });
-        const std::string tooltip = noctalia::theme::formatTemplateTooltip(option);
-        if (!tooltip.empty()) {
-          card->setTooltip(tooltip);
-        }
-
-        row->addChild(std::move(cardNode));
-        ++countInRow;
-      }
-      flushRow();
-
-      block->addChild(std::move(grid));
+      auto summaryRow = ui::row({
+          .align = FlexAlign::Center,
+          .gap = Style::spaceSm * scale,
+          .fillWidth = true,
+      });
+      summaryRow->addChild(
+          ui::label({
+              .text = i18n::tr("settings.templates.store.enabled-count", "count", std::to_string(enabledCount)),
+              .fontSize = Style::fontSizeCaption * scale,
+              .color = colorSpecFromRole(ColorRole::OnSurfaceVariant),
+          })
+      );
+      summaryRow->addChild(ui::spacer());
+      summaryRow->addChild(
+          ui::button({
+              .text = i18n::tr("settings.templates.store.browse"),
+              .glyph = "apps",
+              .fontSize = Style::fontSizeBody * scale,
+              .glyphSize = Style::fontSizeBody * scale,
+              .variant = ButtonVariant::Default,
+              .minHeight = Style::controlHeight * scale,
+              .paddingV = Style::spaceSm * scale,
+              .paddingH = Style::spaceMd * scale,
+              .radius = Style::scaledRadiusMd(scale),
+              .onClick = [openStore = ctx.openBuiltinTemplateStore] {
+                if (openStore) {
+                  openStore();
+                }
+              },
+          })
+      );
+      block->addChild(std::move(summaryRow));
       section.addChild(std::move(block));
     };
 

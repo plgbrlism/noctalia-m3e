@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ui/controls/grid_tile.h"
+#include "ui/controls/flex.h"
 
 #include <functional>
 #include <string>
@@ -8,22 +8,22 @@
 
 class Button;
 class Checkbox;
+class InputArea;
 class Label;
-struct TooltipAnchorInsets;
 
 namespace settings {
 
-  class TemplateStoreTile : public GridTile {
+  class TemplateStoreTile : public Flex {
   public:
     explicit TemplateStoreTile(float scale);
 
     void bind(
-        std::string_view name, std::string_view category, bool enabled, bool selected, bool hovered, bool hasReadme,
-        std::function<void(bool enabled)> onToggle
+        std::string_view name, std::string_view category, bool enabled, bool hasReadme,
+        std::string_view tooltip, std::function<void(bool enabled)> onToggle, std::function<void()> onReadme
     );
-    void setReadmeHovered(bool hovered);
-    static bool hitTestReadme(float cellWidth, float cellHeight, float scale, float localX, float localY);
-    static TooltipAnchorInsets readmeTooltipAnchorInsets(float cellWidth, float cellHeight, float scale);
+
+  protected:
+    void doLayout(Renderer& renderer) override;
 
   private:
     float m_scale;
@@ -31,6 +31,7 @@ namespace settings {
     Label* m_nameLabel = nullptr;
     Label* m_categoryLabel = nullptr;
     Button* m_readmeButton = nullptr;
+    InputArea* m_tooltipArea = nullptr;
   };
 
 } // namespace settings

@@ -201,7 +201,7 @@ private:
   void clearTransientSettingsState();
   void finishSettingsWrite(
       bool changed, bool forceSceneRebuild, bool pageResetPathsChanged, bool registryAlreadyCurrent,
-      bool rebuildWhenUnchanged = false
+      bool rebuildWhenUnchanged = false, bool rebuildEditorSheet = true
   );
   void openActionsMenu();
   void openConfigExportDialog();
@@ -222,6 +222,8 @@ private:
   void openPluginSettingsEditor(std::string pluginId);
   void openPluginStore();
   void openCommunityTemplateStore();
+  void openBuiltinTemplateStore();
+
   void openPaletteInspector();
   void openBarWidgetEditorSheet(
       std::string title, std::function<void(Flex&)> populate, std::function<void()> removeAction = nullptr

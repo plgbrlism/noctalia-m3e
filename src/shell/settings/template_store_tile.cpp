@@ -1,6 +1,7 @@
 #include "shell/settings/template_store_tile.h"
 
-#include "render/scene/tooltip_content.h"
+#include "i18n/i18n.h"
+#include "render/scene/input_area.h"
 #include "ui/builders.h"
 #include "ui/controls/checkbox.h"
 #include "ui/controls/label.h"
@@ -10,26 +11,19 @@
 namespace settings {
 
   TemplateStoreTile::TemplateStoreTile(float scale) : m_scale(scale) {
-    // Match built-in template cards in settings_content makeTemplateGridBlock.
+    const float actionSize = Style::checkboxTargetSize * scale;
+
     setDirection(FlexDirection::Horizontal);
     setAlign(FlexAlign::Center);
     setGap(Style::spaceXs * scale);
     setPadding(Style::spaceXs * scale, Style::spaceSm * scale);
+    setMinHeight((Style::checkboxTargetSize + Style::spaceXs * 2.0F) * scale);
     setFill(colorSpecFromRole(ColorRole::SurfaceContainerLow));
     setBorder(colorSpecFromRole(ColorRole::OutlineVariant, Style::disabledOutlineAlpha), Style::borderWidth * scale);
     setRadius(Style::scaledRadiusMd(scale));
 
-    addChild(
-        ui::checkbox({
-            .out = &m_checkbox,
-            .scale = scale,
-            .checkedFill = colorSpecFromRole(ColorRole::Surface),
-            .checkedBorder = colorSpecFromRole(ColorRole::OnPrimary),
-            .checkedGlyph = colorSpecFromRole(ColorRole::Primary),
-        })
-    );
-
-    auto text = ui::column({.align = FlexAlign::Start, .flexGrow = 1.0F});
+    auto text = ui::column({.align = FlexAlign::Start, .justify = FlexJustify::Center, .flexGrow = 1.0F});
+    text->setHitTestVisible(false);
     text->addChild(
         ui::label({
             .out = &m_nameLabel,
@@ -51,28 +45,79 @@ namespace settings {
         })
     );
     addChild(std::move(text));
-    addChild(
+
+    auto actionGroup = ui::row({.align = FlexAlign::Center, .gap = Style::spaceSm * scale});
+    actionGroup->setZIndex(10);
+    actionGroup->addChild(
         ui::button({
             .out = &m_readmeButton,
             .glyph = "external-link",
-            .glyphSize = Style::fontSizeBody * scale,
-            .controlHeight = Style::controlHeightSm * scale,
+            .glyphSize = 20.0F * scale,
             .variant = ButtonVariant::Ghost,
-            .width = Style::controlHeightSm * scale,
-            .height = Style::controlHeightSm * scale,
+            .tooltip = i18n::tr("settings.templates.documentation"),
+            .minWidth = 40.0F * scale,
+            .minHeight = 40.0F * scale,
+            .width = 40.0F * scale,
+            .height = 40.0F * scale,
             .visible = false,
             .participatesInLayout = false,
-            .configure = [](Button& button) {
-              button.setHitTestVisible(false);
-              button.setTabStop(false);
+            .configure = [scale](Button& button) {
+              button.setPadding(0.0F);
+              button.setRadius(20.0F * scale);
+              button.setZIndex(20);
+              auto palette = Button::defaultPalette(ButtonVariant::Ghost);
+              palette.hover.bg = colorSpecFromRole(ColorRole::SurfaceContainerHigh);
+              button.setCustomPalette(palette);
             },
         })
     );
+
+    auto checkboxHost = ui::button({
+        .variant = ButtonVariant::Ghost,
+        .minWidth = actionSize,
+        .minHeight = actionSize,
+        .width = actionSize,
+        .height = actionSize,
+        .configure = [scale](Button& button) {
+          button.setPadding(0.0F);
+          button.setRadius(Style::scaledRadiusLg(scale));
+          button.setZIndex(20);
+          if (auto* area = button.inputArea()) {
+            area->setHitTestVisible(false);
+            area->setAcceptedButtons(0);
+          }
+        },
+    });
+    checkboxHost->addChild(
+        ui::checkbox({
+            .out = &m_checkbox,
+            .scale = scale,
+            .checkedFill = colorSpecFromRole(ColorRole::Primary),
+            .checkedGlyph = colorSpecFromRole(ColorRole::OnPrimary),
+        })
+    );
+    actionGroup->addChild(std::move(checkboxHost));
+    addChild(std::move(actionGroup));
+
+    auto tooltipArea = std::make_unique<InputArea>();
+    tooltipArea->setParticipatesInLayout(false);
+    tooltipArea->setHitTestVisible(true);
+    tooltipArea->setFrameSize(0.0F, 0.0F);
+    tooltipArea->setZIndex(1);
+    m_tooltipArea = static_cast<InputArea*>(addChild(std::move(tooltipArea)));
+  }
+
+  void TemplateStoreTile::doLayout(Renderer& renderer) {
+    Flex::doLayout(renderer);
+    if (m_tooltipArea != nullptr) {
+      m_tooltipArea->setPosition(0.0F, 0.0F);
+      m_tooltipArea->setFrameSize(width(), height());
+    }
   }
 
   void TemplateStoreTile::bind(
-      std::string_view name, std::string_view category, bool enabled, bool selected, bool hovered, bool hasReadme,
-      std::function<void(bool enabled)> onToggle
+      std::string_view name, std::string_view category, bool enabled, bool hasReadme,
+      std::string_view tooltip, std::function<void(bool enabled)> onToggle, std::function<void()> onReadme
   ) {
     m_nameLabel->setText(name);
     m_categoryLabel->setText(category);
@@ -82,10 +127,27 @@ namespace settings {
     m_categoryLabel->setParticipatesInLayout(hasCategory);
     m_readmeButton->setVisible(hasReadme);
     m_readmeButton->setParticipatesInLayout(hasReadme);
+    if (m_tooltipArea != nullptr) {
+      if (tooltip.empty()) {
+        m_tooltipArea->clearTooltip();
+      } else {
+        m_tooltipArea->setTooltip(std::string(tooltip));
+      }
+    }
+    if (m_checkbox != nullptr) {
+      if (tooltip.empty()) {
+        m_checkbox->clearTooltip();
+      } else {
+        m_checkbox->setTooltip(tooltip);
+      }
+    }
+    m_readmeButton->setOnClick([onReadme = std::move(onReadme)] {
+      if (onReadme) {
+        onReadme();
+      }
+    });
     auto readmePalette = Button::defaultPalette(ButtonVariant::Ghost);
-    readmePalette.normal.label = colorSpecFromRole(
-        enabled ? ColorRole::OnPrimary : (hovered || selected ? ColorRole::OnHover : ColorRole::OnSurface)
-    );
+    readmePalette.normal.label = colorSpecFromRole(ColorRole::OnSurface);
     readmePalette.hover.bg = colorSpecFromRole(ColorRole::Surface);
     readmePalette.hover.label = colorSpecFromRole(ColorRole::OnSurface);
     m_readmeButton->setCustomPalette(readmePalette);
@@ -93,10 +155,6 @@ namespace settings {
     if (m_checkbox != nullptr) {
       m_checkbox->setOnChange(nullptr);
       m_checkbox->setChecked(enabled);
-      m_checkbox->setCheckedColors(
-          colorSpecFromRole(ColorRole::Surface), colorSpecFromRole(ColorRole::OnPrimary),
-          colorSpecFromRole(ColorRole::Primary)
-      );
       m_checkbox->setOnChange([onToggle = std::move(onToggle)](bool next) {
         if (onToggle) {
           onToggle(next);
@@ -104,42 +162,11 @@ namespace settings {
       });
     }
 
-    // Same palette as built-in template Button::ButtonPalette (normal / hover).
     const float borderWidth = Style::borderWidth * m_scale;
-    if (enabled) {
-      setFill(colorSpecFromRole(ColorRole::Primary));
-      setBorder(colorSpecFromRole(ColorRole::Primary, 0.9F), borderWidth);
-      m_nameLabel->setColor(colorSpecFromRole(ColorRole::OnPrimary));
-      m_categoryLabel->setColor(colorSpecFromRole(ColorRole::OnPrimary, 0.75F));
-    } else if (hovered || selected) {
-      setFill(colorSpecFromRole(ColorRole::Hover));
-      setBorder(colorSpecFromRole(ColorRole::Hover), borderWidth);
-      m_nameLabel->setColor(colorSpecFromRole(ColorRole::OnHover));
-      m_categoryLabel->setColor(colorSpecFromRole(ColorRole::OnHover, 0.75F));
-    } else {
-      setFill(colorSpecFromRole(ColorRole::SurfaceContainerLow));
-      setBorder(colorSpecFromRole(ColorRole::OutlineVariant, Style::disabledOutlineAlpha), borderWidth);
-      m_nameLabel->setColor(colorSpecFromRole(ColorRole::OnSurface));
-      m_categoryLabel->setColor(colorSpecFromRole(ColorRole::OnSurfaceVariant));
-    }
-  }
-
-  void TemplateStoreTile::setReadmeHovered(bool hovered) { m_readmeButton->setHoveredVisual(hovered); }
-
-  bool TemplateStoreTile::hitTestReadme(float cellWidth, float cellHeight, float scale, float localX, float localY) {
-    const auto insets = readmeTooltipAnchorInsets(cellWidth, cellHeight, scale);
-    return localX >= insets.left
-        && localX < cellWidth - insets.right
-        && localY >= insets.top
-        && localY < cellHeight - insets.bottom;
-  }
-
-  TooltipAnchorInsets TemplateStoreTile::readmeTooltipAnchorInsets(float cellWidth, float cellHeight, float scale) {
-    const float size = Style::controlHeightSm * scale;
-    const float inset = Style::spaceSm * scale;
-    const float left = Style::rtl() ? inset : cellWidth - inset - size;
-    const float top = (cellHeight - size) * 0.5F;
-    return TooltipAnchorInsets{.top = top, .right = cellWidth - left - size, .bottom = top, .left = left};
+    setFill(colorSpecFromRole(ColorRole::SurfaceContainerLow));
+    setBorder(colorSpecFromRole(ColorRole::OutlineVariant, Style::disabledOutlineAlpha), borderWidth);
+    m_nameLabel->setColor(colorSpecFromRole(ColorRole::OnSurface));
+    m_categoryLabel->setColor(colorSpecFromRole(ColorRole::OnSurfaceVariant));
   }
 
 } // namespace settings

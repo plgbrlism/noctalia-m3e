@@ -5,8 +5,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <functional>
-#include <memory>
-#include <optional>
 #include <string>
 #include <string_view>
 #include <unordered_set>
@@ -15,13 +13,15 @@
 class Button;
 class ConfigService;
 class Flex;
-class InputArea;
+class Input;
 class Label;
 class Renderer;
-class VirtualGridAdapter;
-class VirtualGridView;
+class ScrollView;
+class Segmented;
 
 namespace settings {
+
+  class TemplateStoreTile;
 
   enum class TemplateSortMode : std::uint8_t {
     NameAsc,
@@ -45,17 +45,8 @@ namespace settings {
     );
     ~TemplateStoreContent();
 
-    void populateBody(Flex& body, Renderer& renderer);
+    void populateBody(Flex& body, Renderer* renderer = nullptr);
 
-    void setOnRebuildNeeded(std::function<void()> cb);
-
-    // Arrow/page/validate navigation for the catalog grid.
-    // Returns true when the event was consumed. Pass the sheet's focused InputArea so
-    // chrome controls (search, category chips) keep their own Enter/arrow handling.
-    bool handleKeyEvent(std::uint32_t sym, std::uint32_t modifiers, bool pressed, bool preedit, InputArea* focused);
-
-    void toggleAtFilteredIndex(std::size_t filteredIndex);
-    void setEnabledAtFilteredIndex(std::size_t filteredIndex, bool enabled);
     [[nodiscard]] bool openDocumentationAtFilteredIndex(std::size_t filteredIndex);
 
   private:
@@ -70,17 +61,14 @@ namespace settings {
     static std::string_view sortModeGlyph(TemplateSortMode mode);
     static const char* sortModeTooltipKey(TemplateSortMode mode);
     void commitSelection();
-    void selectIndex(std::size_t index);
-    std::optional<std::size_t> indexOfTemplateId(std::string_view id) const;
-    void syncGridSelection();
-    void moveSelection(int delta);
-    [[nodiscard]] bool activateSelection();
 
     std::vector<noctalia::theme::AvailableTemplate> m_catalog;
     std::unordered_set<std::string> m_selectedIds;
     std::vector<std::size_t> m_filteredIndices;
+    std::vector<std::size_t> m_sortedIndices;
+    std::vector<bool> m_visible;
+    std::vector<TemplateStoreTile*> m_rows;
     std::vector<std::string> m_allCategories;
-    bool m_categoryFiltersCollapsed = true;
     TemplateSortMode m_sortMode = TemplateSortMode::NameAsc;
     std::string m_searchQuery;
     // Empty = all templates. `kEnabledFilter` shows only enabled. Otherwise a catalog category.
@@ -90,10 +78,11 @@ namespace settings {
 
     Label* m_countLabel = nullptr;
     Button* m_sortButton = nullptr;
-    VirtualGridView* m_grid = nullptr;
-    std::unique_ptr<VirtualGridAdapter> m_adapter;
-    std::optional<std::string> m_selectedTemplateId;
-    std::function<void()> m_onRebuildNeeded;
+    Input* m_searchInput = nullptr;
+    Segmented* m_categoryFilter = nullptr;
+    ScrollView* m_listScroll = nullptr;
+    Flex* m_listContent = nullptr;
+    Label* m_emptyLabel = nullptr;
   };
 
 } // namespace settings

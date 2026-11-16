@@ -24,7 +24,9 @@
 #include "shell/settings/settings_registry.h"
 #include "shell/settings/settings_window.h"
 #include "shell/settings/template_store_content.h"
+#include "shell/settings/template_store_tile.h"
 #include "shell/settings/widget_settings_registry.h"
+#include "theme/builtin_templates.h"
 #include "theme/community_templates.h"
 #include "ui/builders.h"
 #include "ui/controls/button.h"
@@ -2597,6 +2599,8 @@ void SettingsWindow::openPluginStore() {
   }).detach();
 }
 
+
+
 void SettingsWindow::openCommunityTemplateStore() {
   if (m_config == nullptr
       || m_wayland == nullptr
@@ -2632,12 +2636,6 @@ void SettingsWindow::openCommunityTemplateStore() {
       }
   );
 
-  storeContent->setOnRebuildNeeded([this] {
-    if (m_editorSheetModal != nullptr) {
-      m_editorSheetModal->rebuildBody();
-    }
-  });
-
   m_editorSheetModal->open(
       settings::SettingsSheetRequest{
           .sheetTitle = i18n::tr("settings.templates.store.title"),
@@ -2655,7 +2653,7 @@ void SettingsWindow::openCommunityTemplateStore() {
                       )
                   );
                 }
-                storeContent->populateBody(body, m_surface->renderTarget().renderer());
+                storeContent->populateBody(body, &m_surface->renderTarget().renderer());
               },
           .scale = scale,
           .minWidth = 720.0F,
@@ -2663,11 +2661,113 @@ void SettingsWindow::openCommunityTemplateStore() {
           .parentFraction = 0.85F,
           .fillParentHeight = true,
           .scrollableBody = false,
-          .preDispatchKeyboard =
-              [storeContent, this](const KeyboardEvent& event) {
-                InputArea* focused = m_editorSheetModal != nullptr ? m_editorSheetModal->focusedArea() : nullptr;
-                return storeContent->handleKeyEvent(event.sym, event.modifiers, event.pressed, event.preedit, focused);
-              },
+      }
+  );
+}
+
+void SettingsWindow::openBuiltinTemplateStore() {
+  if (m_config == nullptr
+      || m_wayland == nullptr
+      || m_renderContext == nullptr
+      || m_surface == nullptr
+      || m_surface->xdgSurface() == nullptr) {
+    return;
+  }
+
+  if (m_editorSheetModal != nullptr && m_editorSheetModal->isOpen()) {
+    m_editorSheetModal->close();
+  }
+
+  if (m_editorSheetModal == nullptr) {
+    m_editorSheetModal = std::make_unique<settings::SettingsSheetModal>();
+    m_editorSheetModal->initialize(m_modalHost, [this] { dismissOpenSelectDropdown(); });
+  }
+
+  const float scale = contentScale();
+  auto catalog = noctalia::theme::availableTemplates();
+  auto selectedIds = std::make_shared<std::unordered_set<std::string>>(
+      m_config->config().theme.templates.builtinIds.begin(),
+      m_config->config().theme.templates.builtinIds.end()
+  );
+
+  auto commitSelection = [this, selectedIds, catalog] {
+    std::vector<std::string> ordered;
+    ordered.reserve(selectedIds->size());
+    for (const auto& opt : catalog) {
+      if (selectedIds->contains(opt.id)) {
+        ordered.push_back(opt.id);
+      }
+    }
+    setSettingOverride({"theme", "templates", "builtin_ids"}, std::move(ordered));
+  };
+
+  auto populateModal = [catalog, selectedIds, commitSelection, scale, this](Flex& body) {
+    body.setDirection(FlexDirection::Vertical);
+    body.setAlign(FlexAlign::Stretch);
+    body.setGap(Style::spaceSm * scale);
+    body.setPadding(Style::spaceMd * scale);
+
+    auto listScroll = ui::scrollView({
+        .contentScale = scale,
+        .scrollbarVisible = true,
+        .viewportPaddingH = 0.0F,
+        .viewportPaddingV = 0.0F,
+        .fill = clearColorSpec(),
+        .radius = 0.0F,
+        .fillWidth = true,
+        .flexGrow = 1.0F,
+        .configure = [](ScrollView& scroll) {
+          scroll.clearFill();
+          scroll.clearBorder();
+        },
+    });
+    auto* listContent = listScroll->content();
+    listContent->setDirection(FlexDirection::Vertical);
+    listContent->setAlign(FlexAlign::Stretch);
+    listContent->setGap(Style::spaceXs * scale);
+    listContent->addChild(ui::box({.fill = clearColorSpec(), .height = Style::spaceMd * scale}));
+
+    for (const auto& entry : catalog) {
+      auto tile = std::make_unique<settings::TemplateStoreTile>(scale);
+      auto* row = tile.get();
+      listContent->addChild(std::move(tile));
+
+      const std::string id = entry.id;
+      const bool enabled = selectedIds->contains(id);
+      row->bind(
+          entry.displayName, entry.category, enabled, !entry.documentationUrl.empty(),
+          noctalia::theme::formatTemplateTooltip(entry),
+          [selectedIds, id, commitSelection](bool next) {
+            if (next) {
+              selectedIds->insert(id);
+            } else {
+              selectedIds->erase(id);
+            }
+            commitSelection();
+          },
+          [this, url = entry.documentationUrl] {
+            if (!url.empty()) {
+              openBrowserUrl(url);
+            }
+          }
+      );
+    }
+    listContent->addChild(ui::box({.fill = clearColorSpec(), .height = Style::spaceMd * scale}));
+    body.addChild(std::move(listScroll));
+  };
+
+  m_editorSheetModal->open(
+      settings::SettingsSheetRequest{
+          .sheetTitle = i18n::tr("settings.schema.templates.builtin-ids.label"),
+          .removeAction = nullptr,
+          .createHeaderAction = nullptr,
+          .populateSheetBody = populateModal,
+          .scale = scale,
+          .minWidth = 720.0F,
+          .maxWidth = 1000.0F,
+          .parentFraction = 0.85F,
+          .fillParentHeight = true,
+          .scrollableBody = false,
       }
   );
 }

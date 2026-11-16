@@ -31,6 +31,10 @@ namespace {
     return std::ranges::any_of(paths, [](const auto& path) { return settingPathNeedsSceneRebuild(path); });
   }
 
+  bool settingPathNeedsEditorSheetRebuild(const std::vector<std::string>& path) {
+    return !(path.size() == 3 && path[0] == "theme" && path[1] == "templates" && path[2] == "community_ids");
+  }
+
   std::string settingsMutationError(const ConfigService& config, const std::string& fallback) {
     return config.lastMutationError().empty() ? fallback : config.lastMutationError();
   }
@@ -80,7 +84,7 @@ void SettingsWindow::markSettingsWriteError(std::string message) {
 
 void SettingsWindow::finishSettingsWrite(
     bool changed, bool forceSceneRebuild, bool pageResetPathsChanged, bool registryAlreadyCurrent,
-    bool rebuildWhenUnchanged
+    bool rebuildWhenUnchanged, bool rebuildEditorSheet
 ) {
   const bool hadStatus = !m_statusMessage.empty();
   const bool hadPendingReset = !m_pendingResetPageScope.empty() || !m_pendingResetSettingPaths.empty();
@@ -89,7 +93,7 @@ void SettingsWindow::finishSettingsWrite(
     requestSceneRebuild();
   } else if (changed || rebuildWhenUnchanged) {
     requestContentRebuild(
-        changed ? !registryAlreadyCurrent : true, pageResetPathsChanged || rebuildWhenUnchanged, true
+        changed ? !registryAlreadyCurrent : true, pageResetPathsChanged || rebuildWhenUnchanged, rebuildEditorSheet
     );
   }
 }
@@ -129,7 +133,10 @@ void SettingsWindow::setSettingOverride(std::vector<std::string> path, ConfigOve
     const auto previousResetPaths = currentPageResetPaths();
     if (m_config->setOverride(path, std::move(value), &changed)) {
       const bool registryPatched = changed && !needsSceneRebuild && tryPatchSettingsRegistryValue(path, patchValue);
-      finishSettingsWrite(changed, needsSceneRebuild, previousResetPaths != currentPageResetPaths(), registryPatched);
+      finishSettingsWrite(
+          changed, needsSceneRebuild, previousResetPaths != currentPageResetPaths(), registryPatched, false,
+          settingPathNeedsEditorSheetRebuild(path)
+      );
       warnOnUnusableCustomSchedule(path);
       return;
     }
