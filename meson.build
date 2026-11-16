@@ -1191,6 +1191,7 @@ if build_tests
     'capsule_group_lane_override',
     'capsule_group_reconcile',
     'capsule_group_style_persist',
+    'checkbox',
     'cli_help',
     'cli_parse',
     'cli_schema',

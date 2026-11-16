@@ -903,6 +903,12 @@ namespace ui {
     if (props.checkedFill.has_value() || props.checkedBorder.has_value() || props.checkedGlyph.has_value()) {
       control->setCheckedColors(props.checkedFill, props.checkedBorder, props.checkedGlyph);
     }
+    if (props.indeterminate.has_value()) {
+      control->setIndeterminate(*props.indeterminate);
+    }
+    if (props.error.has_value()) {
+      control->setError(*props.error);
+    }
     if (props.onChange) {
       control->setOnChange(std::move(props.onChange));
     }

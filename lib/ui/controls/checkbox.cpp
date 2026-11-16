@@ -1,6 +1,7 @@
 #include "ui/controls/checkbox.h"
 
 #include "core/input/keybind_matcher.h"
+#include "render/animation/animation_manager.h"
 #include "render/scene/input_area.h"
 #include "ui/controls/box.h"
 #include "ui/controls/glyph.h"
@@ -12,6 +13,10 @@
 #include <memory>
 
 Checkbox::Checkbox() {
+  auto stateLayer = std::make_unique<Box>();
+  stateLayer->setFill(clearColorSpec());
+  m_stateLayer = static_cast<Box*>(addChild(std::move(stateLayer)));
+
   auto box = std::make_unique<Box>();
   m_box = static_cast<Box*>(addChild(std::move(box)));
 
@@ -21,8 +26,18 @@ Checkbox::Checkbox() {
 
   auto area = std::make_unique<InputArea>();
   area->setFocusable(true);
-  area->setOnEnter([this](const InputArea::PointerData& /*data*/) { applyState(); });
-  area->setOnLeave([this] { applyState(); });
+  area->setOnEnter([this](const InputArea::PointerData& /*data*/) {
+    if (!m_hovered) {
+      m_hovered = true;
+      applyState();
+    }
+  });
+  area->setOnLeave([this] {
+    if (m_hovered) {
+      m_hovered = false;
+      applyState();
+    }
+  });
   area->setOnPress([this](const InputArea::PointerData& /*data*/) { applyState(); });
   area->setOnFocusGain([this] { applyState(); });
   area->setOnFocusLoss([this] { applyState(); });
@@ -35,6 +50,8 @@ Checkbox::Checkbox() {
     }
     const bool next = !m_checked;
     m_checked = next;
+    m_indeterminate = false;
+    m_checkGlyph->setGlyph("check");
     applyState();
     if (m_onChange) {
       m_onChange(next);
@@ -46,6 +63,8 @@ Checkbox::Checkbox() {
     }
     const bool next = !m_checked;
     m_checked = next;
+    m_indeterminate = false;
+    m_checkGlyph->setGlyph("check");
     applyState();
     if (m_onChange) {
       m_onChange(next);
@@ -56,11 +75,37 @@ Checkbox::Checkbox() {
   applyState();
 }
 
+Checkbox::~Checkbox() {
+  if (m_animId != 0 && animationManager() != nullptr) {
+    animationManager()->cancel(m_animId);
+    m_animId = 0;
+  }
+}
+
 void Checkbox::setChecked(bool checked) {
   if (m_checked == checked) {
     return;
   }
   m_checked = checked;
+  m_indeterminate = false;
+  m_checkGlyph->setGlyph("check");
+  applyState();
+}
+
+void Checkbox::setIndeterminate(bool indeterminate) {
+  if (m_indeterminate == indeterminate) {
+    return;
+  }
+  m_indeterminate = indeterminate;
+  m_checkGlyph->setGlyph(indeterminate ? "minus" : "check");
+  applyState();
+}
+
+void Checkbox::setError(bool error) {
+  if (m_error == error) {
+    return;
+  }
+  m_error = error;
   applyState();
 }
 
@@ -92,35 +137,61 @@ void Checkbox::setCheckedColors(
   applyState();
 }
 
-bool Checkbox::hovered() const noexcept { return m_inputArea != nullptr && m_inputArea->hovered(); }
+void Checkbox::setTooltip(std::string_view text) {
+  if (m_inputArea == nullptr) {
+    return;
+  }
+  if (text.empty()) {
+    m_inputArea->clearTooltip();
+  } else {
+    m_inputArea->setTooltip(std::string(text));
+  }
+}
+
+void Checkbox::clearTooltip() {
+  if (m_inputArea != nullptr) {
+    m_inputArea->clearTooltip();
+  }
+}
+
+bool Checkbox::hovered() const noexcept { return m_hovered; }
 
 bool Checkbox::pressed() const noexcept { return m_inputArea != nullptr && m_inputArea->pressed(); }
 
 void Checkbox::doLayout(Renderer& renderer) {
-  const float touchSize = Style::controlHeightSm * m_scale;
-  const float boxSize = (Style::fontSizeTitle + Style::spaceXs) * m_scale;
-  const float boxInset = (touchSize - boxSize) * 0.5F;
+  const float targetSize = Style::checkboxTargetSize * m_scale;
+  const float stateSize = Style::checkboxStateLayerSize * m_scale;
+  const float containerSize = Style::checkboxContainerSize * m_scale;
+  const float radius = std::min(Style::checkboxCornerRadius * m_scale, containerSize * 0.5F);
+  const float stateInset = (targetSize - stateSize) * 0.5F;
+  const float containerInset = (targetSize - containerSize) * 0.5F;
 
-  setSize(touchSize, touchSize);
+  setSize(targetSize, targetSize);
+
+  if (m_stateLayer != nullptr) {
+    m_stateLayer->setPosition(stateInset, stateInset);
+    m_stateLayer->setFrameSize(stateSize, stateSize);
+    m_stateLayer->setRadius(stateSize * 0.5F);
+  }
 
   if (m_box != nullptr) {
-    m_box->setPosition(boxInset, boxInset);
-    m_box->setFrameSize(boxSize, boxSize);
-    m_box->setRadius(Style::scaledRadiusSm(m_scale));
+    m_box->setPosition(containerInset, containerInset);
+    m_box->setFrameSize(containerSize, containerSize);
+    m_box->setRadius(radius);
   }
 
   if (m_checkGlyph != nullptr) {
-    m_checkGlyph->setGlyphSize((Style::fontSizeBody + Style::spaceXs * 0.5F) * m_scale);
+    m_checkGlyph->setGlyphSize(Style::checkboxIconSize * m_scale);
     m_checkGlyph->measure(renderer);
     m_checkGlyph->setPosition(
-        std::round(boxInset + (boxSize - m_checkGlyph->width()) * 0.5F),
-        std::round(boxInset + (boxSize - m_checkGlyph->height()) * 0.5F)
+        std::round(containerInset + (containerSize - m_checkGlyph->width()) * 0.5F),
+        std::round(containerInset + (containerSize - m_checkGlyph->height()) * 0.5F)
     );
   }
 
   if (m_inputArea != nullptr) {
     m_inputArea->setPosition(0.0F, 0.0F);
-    m_inputArea->setFrameSize(width(), height());
+    m_inputArea->setFrameSize(targetSize, targetSize);
   }
 }
 
@@ -129,32 +200,98 @@ void Checkbox::applyState() {
     return;
   }
 
-  ColorSpec fill = colorSpecFromRole(ColorRole::Surface);
-  ColorSpec border = colorSpecFromRole(ColorRole::OutlineVariant);
+  const bool active = m_checked || m_indeterminate;
+
+  ColorSpec fill = clearColorSpec();
+  ColorSpec border = colorSpecFromRole(m_error ? ColorRole::Error : ColorRole::OnSurfaceVariant);
   ColorSpec glyph = colorSpecFromRole(ColorRole::OnPrimary);
-  float borderWidth = Style::borderWidth * m_scale;
-  const bool focused = (m_inputArea != nullptr && m_inputArea->focused());
-  if (m_checked) {
-    fill = m_checkedFill.value_or(colorSpecFromRole(ColorRole::Primary));
-    border = m_checkedBorder.value_or(colorSpecFromRole(ColorRole::Primary));
-    glyph = m_checkedGlyph.value_or(colorSpecFromRole(ColorRole::OnPrimary));
-    if (focused) {
-      border = colorSpecFromRole(ColorRole::Secondary);
-      borderWidth = Style::emphasizedBorderWidth * m_scale;
-    }
-  } else if (focused) {
-    fill = colorSpecFromRole(ColorRole::SecondaryContainer);
-    border = colorSpecFromRole(ColorRole::Secondary);
-    borderWidth = Style::emphasizedBorderWidth * m_scale;
-  } else if (hovered()) {
-    border = colorSpecFromRole(ColorRole::Hover);
+  float borderWidth = Style::checkboxOutlineWidth * m_scale;
+
+  if (active) {
+    fill = m_error ? colorSpecFromRole(ColorRole::Error)
+                   : m_checkedFill.value_or(colorSpecFromRole(ColorRole::Primary));
+    glyph = m_error ? colorSpecFromRole(ColorRole::OnError)
+                    : m_checkedGlyph.value_or(colorSpecFromRole(ColorRole::OnPrimary));
+    border = m_checkedBorder.value_or(clearColorSpec());
+    borderWidth = m_checkedBorder.has_value() ? Style::checkboxOutlineWidth * m_scale : 0.0F;
   }
 
   m_box->setFill(fill);
-  m_box->setBorder(border, borderWidth);
+  if (borderWidth > 0.0F) {
+    m_box->setBorder(border, borderWidth);
+  } else {
+    m_box->clearBorder();
+  }
 
   m_checkGlyph->setColor(glyph);
-  m_checkGlyph->setVisible(m_checked);
+  m_checkGlyph->setVisible(active);
 
   setOpacity(m_enabled ? 1.0F : 0.55F);
+
+  float targetAlpha = 0.0F;
+  if (m_enabled) {
+    if (pressed()) {
+      targetAlpha = Style::checkboxStateLayerPressedAlpha;
+    } else if (hovered()) {
+      targetAlpha = Style::checkboxStateLayerHoverAlpha;
+    }
+  }
+
+  animateStateLayer(targetAlpha);
+}
+
+ColorSpec Checkbox::stateLayerBase() const {
+  if (m_error) {
+    return colorSpecFromRole(ColorRole::Error);
+  }
+  if (m_checked || m_indeterminate) {
+    return colorSpecFromRole(ColorRole::Primary);
+  }
+  return colorSpecFromRole(ColorRole::OnSurface);
+}
+
+void Checkbox::applyStateLayer(float alpha) {
+  if (m_stateLayer == nullptr) {
+    return;
+  }
+  m_stateLayer->setFill(scaleAlpha(stateLayerBase(), alpha));
+  markPaintDirty();
+}
+
+void Checkbox::animateStateLayer(float targetAlpha) {
+  if (m_stateLayer == nullptr) {
+    return;
+  }
+  if (m_stateLayerAlpha == targetAlpha) {
+    applyStateLayer(targetAlpha);
+    return;
+  }
+  if (animationManager() == nullptr) {
+    m_stateLayerAlpha = targetAlpha;
+    applyStateLayer(targetAlpha);
+    return;
+  }
+
+  if (m_animId != 0) {
+    animationManager()->cancel(m_animId);
+    m_animId = 0;
+  }
+
+  const float from = m_stateLayerAlpha;
+  m_animId = animationManager()->animate(
+      from, targetAlpha, Style::animFast, Easing::EaseOutCubic,
+      [this](float alpha) {
+        m_stateLayerAlpha = alpha;
+        applyStateLayer(alpha);
+      },
+      [this] {
+        m_animId = 0;
+        if (m_stateLayerAlpha != 0.0F
+            && m_stateLayerAlpha != Style::checkboxStateLayerHoverAlpha
+            && m_stateLayerAlpha != Style::checkboxStateLayerPressedAlpha) {
+          applyState();
+        }
+      }
+  );
+  markPaintDirty();
 }

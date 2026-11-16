@@ -475,6 +475,8 @@ namespace ui {
     std::optional<ColorSpec> checkedFill = std::nullopt;
     std::optional<ColorSpec> checkedBorder = std::nullopt;
     std::optional<ColorSpec> checkedGlyph = std::nullopt;
+    std::optional<bool> indeterminate = std::nullopt;
+    std::optional<bool> error = std::nullopt;
     std::optional<float> width = std::nullopt;
     std::optional<float> height = std::nullopt;
     std::optional<float> flexGrow = std::nullopt;

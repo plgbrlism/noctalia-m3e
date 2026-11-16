@@ -65,6 +65,16 @@ namespace Style {
   inline constexpr float controlHeightSm = 36.0F;
   inline constexpr float controlHeight = 42.0F;
   inline constexpr float controlHeightLg = 44.0F;
+
+  inline constexpr float checkboxTargetSize = 48.0F;
+  inline constexpr float checkboxStateLayerSize = 40.0F;
+  inline constexpr float checkboxContainerSize = 18.0F;
+  inline constexpr float checkboxIconSize = 18.0F;
+  inline constexpr float checkboxCornerRadius = 2.0F;
+  inline constexpr float checkboxOutlineWidth = 2.0F;
+  inline constexpr float checkboxStateLayerHoverAlpha = 0.08F;
+  inline constexpr float checkboxStateLayerPressedAlpha = 0.12F;
+
   inline constexpr float scrollWheelStep = 56.0F;
   // Pointer distance in logical px before an armed drag becomes active.
   inline constexpr float dragStartThreshold = 6.0F;
