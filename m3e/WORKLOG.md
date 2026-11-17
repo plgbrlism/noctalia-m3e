@@ -68,3 +68,19 @@ Status: `pending-test` | `pass` | `fail` | `reverted`
 - d127eb777 2026-11-11 fix(m3e): configEqual persistence + Smooth mapping
 - efbfd6ac7 2026-11-11 feat(m3e): DES-004 restructure — Expressive bool + 3-preset spring
 - b4c9be656 2026-11-11 feat(m3e): DES-005 panel motion — Depth + Fluid, drop Directional
+
+## Git history appended (since 90ce3703b)
+- 457e40345 2026-11-11 feat(m3e): Phase G — Corner Style Material grouped-pill rows
+- e1786ece0 2026-11-12 feat(m3e): UI-001 tooltip border toggle + UI-001b auto-elevation
+- ef74d002e 2026-11-12 fix(m3e): remove segmented separators and fix tab/ghost palettes
+- 5fa095f84 2026-11-12 feat(m3e): expand sidebar padding and use ghost buttons
+- ce58b46fd 2026-11-12 feat(m3e): replace corner_radius_scale slider with corner_shape preset
+- 6b3ed38d0 2026-11-12 fix(m3e): control center sidebar layout and native scrolling
+- 2cb97fdc7 2026-11-14 refactor(motion): remove deprecated motion presets and reduce/ripple toggles
+- ebb96345e 2026-11-14 feat(config): add density preset rework and migration v22
+- 89572d8b5 2026-11-14 feat(ui): unify panel header surfaces and ghost icon buttons
+- 928879226 2026-11-14 feat(ui): update toggle rest color and stepper segmented row layout
+- 62ad097fc 2026-11-14 docs(m3e): add upstream vs fork diff summary table
+- d998410c0 2026-11-16 feat(ui): implement M3 Expressive checkbox with state layer and indeterminate state
+- 1bfb7572e 2026-11-16 feat(shell): apply tonal surface and typography to panel headers
+- d10812ce1 2026-11-16 refactor(settings): migrate template store to flex list, add built-in modal, and fix hover/click routing

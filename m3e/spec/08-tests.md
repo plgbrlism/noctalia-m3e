@@ -47,3 +47,20 @@ Keep these even solo. Everything else is Opt.
 *Note:* AT-PRESET-05/06/07 verify removals — legacy config files fail fast with actionable errors, no silent ignore.
 
 P2 adds: AT-SHP all-35 render, star-convex per name, AA thin features, cross-profile morph interruptibility, AT-CMP golden checks, AT-COL contrast checker.
+
+## Added in rev8
+
+| ID | Test | Coverage |
+|---|---|---|
+| AT-CTL-01 | `tests/checkbox_test.cpp` | M3 Checkbox state layer, indeterminate state, hover tracking |
+| AT-CTL-02 | `tests/button_shape_test.cpp` | Press morph radii clamp at 1.25x/1.5x |
+| AT-CTL-03 | `tests/button_row_group_test.cpp` | Row grouping corner shaping |
+| AT-UI-01 | `tests/tooltip_border_test.cpp` | Tooltip border toggle |
+| AT-UI-02 | `tests/tooltip_surface_test.cpp` | Tooltip surface elevation |
+| AT-CFG-04 | `tests/des_presets_test.cpp` | density/corner presets, migration v22 |
+| AT-CFG-05 | `tests/config_motion_test.cpp` | `[motion]` scheme/reduce/token parse |
+| AT-DES-13 | `tests/design_system_test.cpp` | `[theme].expressive` bool (replaced design_system) |
+| AT-PANEL-06 | `tests/panel_reveal_test.cpp` | 4 panel motion variants + reduce |
+| AT-MOT-07 | `tests/spring_test.cpp`, `tests/idle_test.cpp` | Spring settle + zero idle ticks |
+
+Template store (community + built-in modal) verified manually: row 1 not clipped, hover tooltip on row body/checkbox, readme opens browser, checkbox toggles config, search/category/sort/empty state, no per-row tab stop.

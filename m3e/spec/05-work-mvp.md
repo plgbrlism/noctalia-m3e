@@ -15,3 +15,6 @@ Full table (all tiers) lives in `m3e/spec.md` §5. This file is MVP only.
 | COL-001 | Contrast checker test against src/theme/contrast.h (WCAG 2.1 formula) | tests/color_contrast_test.cpp | AT-COL-01 passes: formula correct on known pairs (black/white → 21, identity → 1, symmetry, mid-gray boundary). No control edits needed. | MVP | S |
 | COL-002 | Expose SchemeExpressive as [theme].wallpaper_scheme = "m3-expressive" | src/theme/scheme.h, src/theme/m3_schemes.cpp, settings dropdown | "m3-expressive" accepted in config; resolves to SchemeExpressive Palette; existing schemes unchanged. SchemeExpressive already vendored at third_party/material_color_utilities/cpp/scheme/scheme_expressive.cc. | MVP | S |
 | CFG-001 | `[motion]` schema: scheme, reduce, per-token overrides; defaults expressive/false | config_types.* | Invalid token errors, no partial apply | MVP | S |
+
+## Status (rev8)
+Shipped: MOT-001 to MOT-006, SHP-001, SHP-002, COL-001, COL-002, CFG-001. M0 to M3 complete; MVP tier gate satisfied. Evidence: `m3e/facts/VG-*.md`, WORKLOG MOT/CFG/SHP/COL entries, tests in 08-tests.md.

@@ -11,3 +11,6 @@ Full table (all tiers) lives in `m3e/spec.md` §5. This file is P3 and Opt only.
 | PLG-001 | Plugin token-read API | src/scripting | INV-08 preserved | Opt | M |
 | TEST-001 | Golden visual tests | CI | Threshold enforced | Opt | M |
 | TEST-002 | RSS and frame-time budgets (RSS delta 10 MB max, 60fps 1080p) | bench | Within budget | Opt | M |
+
+## Status (rev8)
+Not started: TYP-001, TYP-002, CHO-001, CHO-002, PLG-001, TEST-001, TEST-002.

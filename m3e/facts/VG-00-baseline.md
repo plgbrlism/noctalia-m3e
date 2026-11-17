@@ -20,4 +20,7 @@ Date: 2026-11-08
 ## Notes
 Baseline recorded post-rebase. All M1-critical components present.
 
+## Amendment (2026-11-17)
+Fork head is now d10812ce1 on branch `m3e` (tracking fork/m3e). Upstream merge base with origin/main remains 76637f9d4. Re-run VG-00 after each upstream rebase; component names above are unchanged.
+
 ---
