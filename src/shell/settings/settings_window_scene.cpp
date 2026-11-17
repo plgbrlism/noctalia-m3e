@@ -773,6 +773,7 @@ settings::RegistryEnvironment SettingsWindow::buildRegistryEnvironment() const {
             .value = paletteInfo.name,
             .label = paletteInfo.name,
             .description = {},
+            .group = paletteInfo.base,
             .preview = availablePaletteSwatchPreview(paletteInfo, previewMode),
         }
     );
@@ -783,6 +784,7 @@ settings::RegistryEnvironment SettingsWindow::buildRegistryEnvironment() const {
             .value = p.name,
             .label = p.name,
             .description = {},
+            .group = p.base,
             .preview = availablePaletteSwatchPreview(p, previewMode),
         }
     );

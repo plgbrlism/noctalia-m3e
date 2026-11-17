@@ -527,6 +527,7 @@ void SettingsWindow::openSearchPickerPopup(settings::SearchPickerOpenRequest req
             .value = opt.value,
             .label = opt.label,
             .description = opt.description,
+            .group = opt.group,
             .enabled = true,
             .icon = opt.icon,
             .preview = opt.preview,
