@@ -4,9 +4,10 @@
 #include "core/input/key_symbols.h"
 #include "core/input/keybind_matcher.h"
 #include "cursor-shape-v1-client-protocol.h"
+#include "render/animation/animation_manager.h"
 #include "render/core/render_styles.h"
 #include "render/scene/input_area.h"
-#include "render/scene/rect_node.h"
+#include "ui/controls/box.h"
 #include "ui/palette.h"
 #include "ui/style.h"
 #include "util/clamp.h"
@@ -20,47 +21,46 @@ namespace {
 
   constexpr double kValueEpsilon = 0.0001;
 
-  RoundedRectStyle solidStyle(const Color& fill, float radius) {
-    return RoundedRectStyle{
-        .fill = fill,
-        .border = fill,
-        .fillMode = FillMode::Solid,
-        .radius = radius,
-        .softness = 1.0F,
-        .borderWidth = 0.0F,
-    };
-  }
-
   Color resolved(ColorRole role, float alpha = 1.0F) { return colorForRole(role, alpha); }
 
 } // namespace
 
 RangeSlider::RangeSlider() {
-  auto track = std::make_unique<RectNode>();
-  m_track = static_cast<RectNode*>(addChild(std::move(track)));
+  auto inactiveLeft = std::make_unique<Box>();
+  m_inactiveTrackLeft = static_cast<Box*>(addChild(std::move(inactiveLeft)));
+  m_inactiveTrackLeft->setParticipatesInLayout(false);
 
-  auto fill = std::make_unique<RectNode>();
-  m_fill = static_cast<RectNode*>(addChild(std::move(fill)));
+  auto active = std::make_unique<Box>();
+  m_activeTrack = static_cast<Box*>(addChild(std::move(active)));
+  m_activeTrack->setParticipatesInLayout(false);
 
-  auto lowThumb = std::make_unique<RectNode>();
-  m_lowThumb = static_cast<RectNode*>(addChild(std::move(lowThumb)));
+  auto inactiveRight = std::make_unique<Box>();
+  m_inactiveTrackRight = static_cast<Box*>(addChild(std::move(inactiveRight)));
+  m_inactiveTrackRight->setParticipatesInLayout(false);
 
-  auto highThumb = std::make_unique<RectNode>();
-  m_highThumb = static_cast<RectNode*>(addChild(std::move(highThumb)));
+  auto lowHandle = std::make_unique<Box>();
+  m_lowHandle = static_cast<Box*>(addChild(std::move(lowHandle)));
+  m_lowHandle->setParticipatesInLayout(false);
+
+  auto highHandle = std::make_unique<Box>();
+  m_highHandle = static_cast<Box*>(addChild(std::move(highHandle)));
+  m_highHandle->setParticipatesInLayout(false);
+
+  auto dotLeft = std::make_unique<Box>();
+  m_dotLeft = static_cast<Box*>(addChild(std::move(dotLeft)));
+  m_dotLeft->setParticipatesInLayout(false);
+
+  auto dotRight = std::make_unique<Box>();
+  m_dotRight = static_cast<Box*>(addChild(std::move(dotRight)));
+  m_dotRight->setParticipatesInLayout(false);
 
   auto area = std::make_unique<InputArea>();
-  area->setOnEnter([this](const InputArea::PointerData& /*data*/) {
-    applyVisualState();
-    markPaintDirty();
-  });
-  area->setOnLeave([this] {
-    applyVisualState();
-    markPaintDirty();
-  });
   area->setOnPress([this](const InputArea::PointerData& data) {
     if (!m_enabled || data.button != BTN_LEFT) {
       return;
     }
+    m_pressed = data.pressed;
+    updateSquishState();
     if (!data.pressed) {
       m_activeThumb = ActiveThumb::None;
       applyVisualState();
@@ -195,9 +195,57 @@ RangeSlider::RangeSlider() {
     markPaintDirty();
   });
   m_inputArea = static_cast<InputArea*>(addChild(std::move(area)));
+  m_inputArea->setParticipatesInLayout(false);
   m_inputArea->setCursorShape(WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_POINTER);
 
   applyVisualState();
+}
+
+RangeSlider::~RangeSlider() {
+  if (m_squishAnimId != 0 && animationManager() != nullptr) {
+    animationManager()->cancel(m_squishAnimId);
+    m_squishAnimId = 0;
+  }
+}
+
+void RangeSlider::updateSquishState() {
+  if (animationManager() == nullptr || !m_enabled) {
+    m_handleSquish = 0.0F;
+    applyVisualState();
+    return;
+  }
+  if (m_squishAnimId != 0) {
+    animationManager()->cancel(m_squishAnimId);
+    m_squishAnimId = 0;
+  }
+  const float target = m_pressed ? 1.0F : 0.0F;
+  if (std::abs(m_handleSquish - target) < 0.001F) {
+    m_handleSquish = target;
+    applyVisualState();
+    return;
+  }
+  const float from = m_handleSquish;
+  m_squishAnimId = animationManager()->animate(
+      from, target, Style::animFast, Easing::EaseOutCubic,
+      [this](float s) {
+        m_handleSquish = s;
+        updateGeometry();
+        markLayoutDirty();
+      },
+      [this] {
+        m_squishAnimId = 0;
+      },
+      this
+  );
+  markPaintDirty();
+}
+
+void RangeSlider::setScale(float scale) {
+  m_scale = std::max(0.01F, scale);
+  m_trackHeight = Style::sliderTrackHeight * m_scale;
+  m_controlHeightPx = Style::sliderHandleHeight * m_scale;
+  updateGeometry();
+  markLayoutDirty();
 }
 
 void RangeSlider::setRange(double minValue, double maxValue) {
@@ -311,40 +359,108 @@ LayoutSize RangeSlider::doMeasure(Renderer& renderer, const LayoutConstraints& c
 void RangeSlider::doArrange(Renderer& renderer, const LayoutRect& rect) { arrangeByLayout(renderer, rect); }
 
 void RangeSlider::updateGeometry() {
-  const float widthPx = width() > 0.0F ? width() : Style::sliderDefaultWidth;
-  const float heightPx = std::max({m_thumbSizePx, m_trackHeight, m_controlHeightPx});
+  const float widthPx = width() > 0.0F ? width() : Style::sliderDefaultWidth * m_scale;
+  const float heightPx = std::max({Style::sliderHandleHeight * m_scale, m_trackHeight, m_controlHeightPx});
   setSize(widthPx, heightPx);
 
   const float trackY = (heightPx - m_trackHeight) * 0.5F;
-  const float trackX = Style::sliderHorizontalPadding;
-  const float trackW = std::max(0.0F, widthPx - Style::sliderHorizontalPadding * 2.0F);
+  const float trackX = Style::sliderHorizontalPadding * m_scale;
+  const float trackW = std::max(0.0F, widthPx - trackX * 2.0F);
+
+  const float outerR = Style::sliderTrackRadiusOuter * m_scale;
+  const float innerR = Style::sliderTrackRadiusInner * m_scale;
+  const auto clampR = [](float radius, float segW) { return std::min(radius, segW * 0.5F); };
+
+  const float hw =
+      std::lerp(Style::sliderHandleWidth, Style::sliderHandlePressedWidth, m_handleSquish) * m_scale;
+  const float hh = Style::sliderHandleHeight * m_scale;
+  const float handleY = (heightPx - hh) * 0.5F;
+  const float gap = Style::sliderGap * m_scale;
+  const float minCenter = trackX + hw * 0.5F;
+  const float maxCenter = trackX + trackW - hw * 0.5F;
+
   const float lowT = normalized(m_low);
   const float highT = normalized(m_high);
-  const float lowX = trackX + (Style::rtl() ? 1.0F - lowT : lowT) * trackW;
-  const float highX = trackX + (Style::rtl() ? 1.0F - highT : highT) * trackW;
-  const float thumbY = (heightPx - m_thumbSizePx) * 0.5F;
+  const float lowRaw = trackX + (Style::rtl() ? 1.0F - lowT : lowT) * trackW;
+  const float highRaw = trackX + (Style::rtl() ? 1.0F - highT : highT) * trackW;
+  float lowCenter = std::clamp(lowRaw, minCenter, maxCenter);
+  float highCenter = std::clamp(highRaw, minCenter, maxCenter);
 
-  m_track->setPosition(trackX, trackY);
-  m_track->setFrameSize(trackW, m_trackHeight);
+  const float minSep = hw + gap;
+  if (highCenter - lowCenter < minSep) {
+    const float mid = (lowCenter + highCenter) * 0.5F;
+    lowCenter = std::max(minCenter, mid - minSep * 0.5F);
+    highCenter = std::min(maxCenter, lowCenter + minSep);
+    if (highCenter - lowCenter < minSep) {
+      lowCenter = std::max(minCenter, maxCenter - minSep);
+      highCenter = std::min(maxCenter, lowCenter + minSep);
+    }
+  }
 
-  const float fillX = std::min(lowX, highX);
-  m_fill->setPosition(fillX, trackY);
-  m_fill->setFrameSize(std::abs(highX - lowX), m_trackHeight);
+  const float leftW = std::max(0.0F, lowCenter - hw * 0.5F - gap - trackX);
+  const float activeStart = lowCenter + hw * 0.5F + gap;
+  const float activeW = std::max(0.0F, highCenter - hw * 0.5F - gap - activeStart);
+  const float rightStart = highCenter + hw * 0.5F + gap;
+  const float rightW = std::max(0.0F, (trackX + trackW) - rightStart);
 
-  const float maxThumbX = trackX + trackW - m_thumbSizePx;
-  m_lowThumb->setPosition(util::clampOrdered(lowX - m_thumbSizePx * 0.5F, trackX, maxThumbX), thumbY);
-  m_lowThumb->setFrameSize(m_thumbSizePx, m_thumbSizePx);
-  m_highThumb->setPosition(util::clampOrdered(highX - m_thumbSizePx * 0.5F, trackX, maxThumbX), thumbY);
-  m_highThumb->setFrameSize(m_thumbSizePx, m_thumbSizePx);
+  m_inactiveTrackLeft->setVisible(leftW > 0.0F && m_enabled);
+  m_inactiveTrackLeft->setPosition(trackX, trackY);
+  m_inactiveTrackLeft->setFrameSize(leftW, m_trackHeight);
+  m_inactiveTrackLeft->setRadii(Radii{
+      clampR(outerR, leftW), clampR(innerR, leftW), clampR(innerR, leftW), clampR(outerR, leftW)
+  });
+
+  m_activeTrack->setVisible(activeW > 0.0F && m_enabled);
+  m_activeTrack->setPosition(activeStart, trackY);
+  m_activeTrack->setFrameSize(activeW, m_trackHeight);
+  m_activeTrack->setRadii(Radii{
+      clampR(innerR, activeW), clampR(innerR, activeW), clampR(innerR, activeW), clampR(innerR, activeW)
+  });
+
+  m_inactiveTrackRight->setVisible(rightW > 0.0F && m_enabled);
+  m_inactiveTrackRight->setPosition(rightStart, trackY);
+  m_inactiveTrackRight->setFrameSize(rightW, m_trackHeight);
+  m_inactiveTrackRight->setRadii(Radii{
+      clampR(innerR, rightW), clampR(outerR, rightW), clampR(outerR, rightW), clampR(innerR, rightW)
+  });
+
+  m_lowHandle->setVisible(m_enabled);
+  m_lowHandle->setPosition(lowCenter - hw * 0.5F, handleY);
+  m_lowHandle->setFrameSize(hw, hh);
+  m_lowHandle->setRadius(hw * 0.5F);
+
+  m_highHandle->setVisible(m_enabled);
+  m_highHandle->setPosition(highCenter - hw * 0.5F, handleY);
+  m_highHandle->setFrameSize(hw, hh);
+  m_highHandle->setRadius(hw * 0.5F);
+
+  const float dotSize = Style::sliderDotSize * m_scale;
+  const float dotInset = Style::sliderDotInset * m_scale;
+
+  const bool showDotLeft = leftW >= (dotInset + dotSize);
+  m_dotLeft->setVisible(showDotLeft && m_enabled);
+  if (showDotLeft) {
+    m_dotLeft->setPosition(trackX + dotInset, trackY + (m_trackHeight - dotSize) * 0.5F);
+    m_dotLeft->setFrameSize(dotSize, dotSize);
+    m_dotLeft->setRadius(dotSize * 0.5F);
+  }
+
+  const bool showDotRight = rightW >= (dotInset + dotSize);
+  m_dotRight->setVisible(showDotRight && m_enabled);
+  if (showDotRight) {
+    m_dotRight->setPosition(trackX + trackW - dotInset - dotSize, trackY + (m_trackHeight - dotSize) * 0.5F);
+    m_dotRight->setFrameSize(dotSize, dotSize);
+    m_dotRight->setRadius(dotSize * 0.5F);
+  }
 
   m_inputArea->setPosition(0.0F, 0.0F);
   m_inputArea->setFrameSize(widthPx, heightPx);
 }
 
 void RangeSlider::updateFromLocalX(float x) {
-  const float widthPx = width() > 0.0F ? width() : Style::sliderDefaultWidth;
-  const float trackX = Style::sliderHorizontalPadding;
-  const float trackW = std::max(0.0F, widthPx - Style::sliderHorizontalPadding * 2.0F);
+  const float widthPx = width() > 0.0F ? width() : Style::sliderDefaultWidth * m_scale;
+  const float trackX = Style::sliderHorizontalPadding * m_scale;
+  const float trackW = std::max(0.0F, widthPx - trackX * 2.0F);
   if (trackW <= 0.0F || m_activeThumb == ActiveThumb::None) {
     return;
   }
@@ -359,45 +475,27 @@ void RangeSlider::updateFromLocalX(float x) {
 }
 
 void RangeSlider::applyVisualState() {
-  const bool hovering = m_inputArea != nullptr && m_inputArea->hovered();
-  const bool focused = m_inputArea != nullptr && m_inputArea->focused();
-
-  Color trackColor = resolved(ColorRole::OutlineVariant);
-  Color fillColor = resolved(ColorRole::Primary);
-  Color thumbColor = resolved(ColorRole::OnPrimary);
-  Color thumbBorder = resolved(ColorRole::OutlineVariant);
-
-  m_lowThumb->setVisible(m_enabled);
-  m_highThumb->setVisible(m_enabled);
+  Color inactiveTrackColor = resolved(ColorRole::SecondaryContainer);
+  Color activeTrackColor = resolved(ColorRole::Primary);
+  Color handleColor = resolved(ColorRole::Primary);
+  Color dotColor = resolved(ColorRole::Primary);
 
   if (!m_enabled) {
-    trackColor = resolved(ColorRole::OutlineVariant, Style::disabledOutlineAlpha);
-    fillColor = resolved(ColorRole::Primary, 0.5F);
-  } else if (focused) {
-    thumbBorder = resolveColorSpec(focusRingColorSpec());
-  } else if (hovering) {
-    thumbBorder = resolved(ColorRole::Hover);
+    inactiveTrackColor = resolved(ColorRole::SecondaryContainer, 0.12F);
+    activeTrackColor = resolved(ColorRole::Primary, 0.38F);
+    handleColor = resolved(ColorRole::Primary, 0.38F);
+    dotColor = resolved(ColorRole::Primary, 0.38F);
   }
 
-  m_track->setStyle(solidStyle(trackColor, m_trackHeight * 0.5F));
-  m_fill->setStyle(solidStyle(fillColor, m_trackHeight * 0.5F));
+  m_inactiveTrackLeft->setFill(inactiveTrackColor);
+  m_inactiveTrackRight->setFill(inactiveTrackColor);
+  m_activeTrack->setFill(activeTrackColor);
+  m_lowHandle->setFill(handleColor);
+  m_highHandle->setFill(handleColor);
+  m_dotLeft->setFill(dotColor);
+  m_dotRight->setFill(dotColor);
 
-  auto thumbStyle = solidStyle(thumbColor, m_thumbSizePx * 0.5F);
-  thumbStyle.border = thumbBorder;
-  thumbStyle.borderWidth = focused ? Style::focusRingWidth : Style::borderWidth;
-  m_lowThumb->setStyle(thumbStyle);
-  m_highThumb->setStyle(thumbStyle);
-
-  if (m_enabled && focused && m_activeThumb != ActiveThumb::None) {
-    auto activeStyle = thumbStyle;
-    activeStyle.border = resolveColorSpec(focusRingColorSpec());
-    activeStyle.borderWidth = Style::focusRingWidth;
-    if (m_activeThumb == ActiveThumb::Low) {
-      m_lowThumb->setStyle(activeStyle);
-    } else {
-      m_highThumb->setStyle(activeStyle);
-    }
-  }
+  markPaintDirty();
 }
 
 float RangeSlider::normalized(double value) const noexcept {
@@ -408,11 +506,14 @@ float RangeSlider::normalized(double value) const noexcept {
 }
 
 float RangeSlider::thumbCenterX(double value) const noexcept {
-  const float widthPx = width() > 0.0F ? width() : Style::sliderDefaultWidth;
-  const float trackX = Style::sliderHorizontalPadding;
-  const float trackW = std::max(0.0F, widthPx - Style::sliderHorizontalPadding * 2.0F);
+  const float widthPx = width() > 0.0F ? width() : Style::sliderDefaultWidth * m_scale;
+  const float trackX = Style::sliderHorizontalPadding * m_scale;
+  const float trackW = std::max(0.0F, widthPx - trackX * 2.0F);
+  const float hw =
+      std::lerp(Style::sliderHandleWidth, Style::sliderHandlePressedWidth, m_handleSquish) * m_scale;
   const float t = normalized(value);
-  return trackX + (Style::rtl() ? 1.0F - t : t) * trackW;
+  const float raw = trackX + (Style::rtl() ? 1.0F - t : t) * trackW;
+  return std::clamp(raw, trackX + hw * 0.5F, trackX + trackW - hw * 0.5F);
 }
 
 double RangeSlider::snapped(double value) const noexcept {

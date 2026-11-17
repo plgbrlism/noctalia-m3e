@@ -594,6 +594,10 @@ namespace ui {
 
   std::unique_ptr<Slider> slider(SliderProps props) {
     auto control = std::make_unique<Slider>();
+    const float scale = props.trackHeight.has_value()
+        ? *props.trackHeight / Style::sliderTrackHeight
+        : 1.0F;
+    control->setScale(scale);
     if (props.minValue.has_value() || props.maxValue.has_value()) {
       control->setRange(props.minValue.value_or(control->minValue()), props.maxValue.value_or(control->maxValue()));
     }
@@ -636,6 +640,10 @@ namespace ui {
 
   std::unique_ptr<RangeSlider> rangeSlider(RangeSliderProps props) {
     auto control = std::make_unique<RangeSlider>();
+    const float scale = props.trackHeight.has_value()
+        ? *props.trackHeight / Style::sliderTrackHeight
+        : 1.0F;
+    control->setScale(scale);
     if (props.minValue.has_value() || props.maxValue.has_value()) {
       control->setRange(props.minValue.value_or(control->minValue()), props.maxValue.value_or(control->maxValue()));
     }

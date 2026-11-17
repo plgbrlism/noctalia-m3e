@@ -5,15 +5,17 @@
 
 #include <functional>
 
+class Box;
 class InputArea;
-class RectNode;
 
 // Dual-thumb slider expressing a low/high pair on one axis (e.g. activity + critical
 // thresholds). The two thumbs cannot cross — the low value is always <= the high value.
 class RangeSlider : public Flex {
 public:
   RangeSlider();
+  ~RangeSlider() override;
 
+  void setScale(float scale);
   void setRange(double minValue, double maxValue);
   void setStep(double step);
   void setLowValue(double value);
@@ -32,6 +34,7 @@ public:
   double highValue() const noexcept { return m_high; }
   double minValue() const noexcept { return m_min; }
   double maxValue() const noexcept { return m_max; }
+  float scale() const noexcept { return m_scale; }
   bool enabled() const noexcept { return m_enabled; }
   bool dragging() const noexcept;
 
@@ -44,14 +47,18 @@ private:
   void updateFromLocalX(float x);
   void updateGeometry();
   void applyVisualState();
+  void updateSquishState();
   float normalized(double value) const noexcept;
   double snapped(double value) const noexcept;
   float thumbCenterX(double value) const noexcept;
 
-  RectNode* m_track = nullptr;
-  RectNode* m_fill = nullptr;
-  RectNode* m_lowThumb = nullptr;
-  RectNode* m_highThumb = nullptr;
+  Box* m_inactiveTrackLeft = nullptr;
+  Box* m_inactiveTrackRight = nullptr;
+  Box* m_activeTrack = nullptr;
+  Box* m_lowHandle = nullptr;
+  Box* m_highHandle = nullptr;
+  Box* m_dotLeft = nullptr;
+  Box* m_dotRight = nullptr;
   InputArea* m_inputArea = nullptr;
 
   std::function<void(double)> m_onLowChanged;
@@ -65,7 +72,11 @@ private:
   double m_high = 75.0;
   ActiveThumb m_activeThumb = ActiveThumb::None;
   bool m_enabled = true;
+  bool m_pressed = false;
+  float m_scale = 1.0F;
+  float m_handleSquish = 0.0F;
+  std::uint32_t m_squishAnimId = 0;
   float m_trackHeight = Style::sliderTrackHeight;
-  float m_thumbSizePx = Style::sliderThumbSize;
-  float m_controlHeightPx = Style::controlHeight;
+  float m_thumbSizePx = Style::sliderHandleWidth;
+  float m_controlHeightPx = Style::sliderHandleHeight;
 };

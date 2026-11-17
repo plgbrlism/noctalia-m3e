@@ -124,10 +124,26 @@ namespace Style {
   inline constexpr float toggleInsetLg = 4.0F;
   inline constexpr float toggleTravelLg = 20.0F;
 
+  inline constexpr float toggleTrackWidth = 52.0F;
+  inline constexpr float toggleTrackHeight = 32.0F;
+  inline constexpr float toggleThumbSize = 24.0F;     // on state diameter
+  inline constexpr float toggleThumbOff = 16.0F;      // off state diameter
+  inline constexpr float togglePadding = 4.0F;        // space between thumb and track
+  inline constexpr float toggleIconSize = 16.0F;
+  inline constexpr float toggleHaloSize = 40.0F;
+
   // Slider geometry.
   inline constexpr float sliderDefaultWidth = 180.0F;
-  inline constexpr float sliderTrackHeight = 8.0F;
-  inline constexpr float sliderThumbSize = 18.0F;
+  inline constexpr float sliderTrackHeight = 16.0F;
+  inline constexpr float sliderHandleHeight = 32.0F;
+  inline constexpr float sliderHandleWidth = 4.0F;
+  inline constexpr float sliderHandlePressedWidth = 2.0F;
+  inline constexpr float sliderGap = 6.0F;
+  inline constexpr float sliderTrackRadiusOuter = 8.0F;
+  inline constexpr float sliderTrackRadiusInner = 2.0F;
+  inline constexpr float sliderDotSize = 4.0F;
+  inline constexpr float sliderDotInset = 8.0F;
+  inline constexpr float sliderThumbSize = sliderHandleWidth;
   inline constexpr float sliderHorizontalPadding = 2.0F;
 
   CornerShapePreset cornerShape() noexcept;
@@ -142,6 +158,7 @@ namespace Style {
   bool buttonBordersEnabled() noexcept;
   void setButtonBordersEnabled(bool enabled);
   Signal<>& buttonBordersChanged();
+
 
   bool inputBordersEnabled() noexcept;
   void setInputBordersEnabled(bool enabled);

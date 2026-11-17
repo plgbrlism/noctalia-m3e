@@ -6,25 +6,47 @@
 #include "render/core/render_styles.h"
 #include "render/scene/input_area.h"
 #include "render/scene/rect_node.h"
+#include "ui/controls/glyph.h"
 #include "ui/palette.h"
 #include "ui/style.h"
 
 #include <algorithm>
+#include <cmath>
 #include <memory>
+
+namespace {
+  constexpr float haloAlphaHover = 0.16F;
+  constexpr float haloAlphaPress = 0.24F;
+} // namespace
 
 Toggle::Toggle() {
   setAlign(FlexAlign::Center);
   setDirection(FlexDirection::Horizontal);
   setMirrorInRtl(false);
-  setBorder(colorSpecFromRole(ColorRole::OutlineVariant), Style::borderWidth);
+  setBorder(colorSpecFromRole(ColorRole::SurfaceContainerHighest), Style::borderWidth);
+
+  auto halo = std::make_unique<RectNode>();
+  halo->setParticipatesInLayout(false);
+  m_halo = static_cast<RectNode*>(addChild(std::move(halo)));
 
   auto thumb = std::make_unique<RectNode>();
+  thumb->setParticipatesInLayout(false);
   m_thumb = static_cast<RectNode*>(addChild(std::move(thumb)));
 
+  auto checkGlyph = std::make_unique<Glyph>();
+  checkGlyph->setGlyph("check");
+  m_checkGlyph = static_cast<Glyph*>(m_thumb->addChild(std::move(checkGlyph)));
+
   auto area = std::make_unique<InputArea>();
-  area->setOnEnter([this](const InputArea::PointerData& /*data*/) { applyState(); });
-  area->setOnLeave([this] { applyState(); });
-  area->setOnPress([this](const InputArea::PointerData& /*data*/) { applyState(); });
+  area->setOnEnter([this](const InputArea::PointerData& /*data*/) {
+    updateHaloState();
+  });
+  area->setOnLeave([this] {
+    updateHaloState();
+  });
+  area->setOnPress([this](const InputArea::PointerData& /*data*/) {
+    updateHaloState();
+  });
   area->setOnClick([this](const InputArea::PointerData& /*data*/) {
     if (!m_enabled) {
       return;
@@ -51,6 +73,17 @@ Toggle::Toggle() {
   m_paletteConn = paletteChanged().connect([this] { applyAnimatedState(m_animationProgress); });
 }
 
+Toggle::~Toggle() {
+  if (m_animId != 0 && animationManager() != nullptr) {
+    animationManager()->cancel(m_animId);
+    m_animId = 0;
+  }
+  if (m_haloAnimId != 0 && animationManager() != nullptr) {
+    animationManager()->cancel(m_haloAnimId);
+    m_haloAnimId = 0;
+  }
+}
+
 void Toggle::setChecked(bool checked) {
   if (m_checked == checked) {
     return;
@@ -67,8 +100,7 @@ void Toggle::setChecked(bool checked) {
         from, to, Style::animFast, Easing::EaseOutCubic, [this](float t) { applyAnimatedState(t); },
         [this] { m_animId = 0; }, this
     );
-    // Mark dirty so the surface's frame loop restarts and ticks the animation
-    markPaintDirty();
+    markLayoutDirty();
   } else {
     applyState();
   }
@@ -136,10 +168,17 @@ bool Toggle::pressed() const noexcept { return m_inputArea != nullptr && m_input
 void Toggle::doLayout(Renderer& renderer) {
   Flex::doLayout(renderer);
 
+  if (m_checkGlyph != nullptr) {
+    m_checkGlyph->setGlyphSize(Style::toggleIconSize * m_scale);
+    m_checkGlyph->measure(renderer);
+  }
+
   if (m_inputArea != nullptr) {
     m_inputArea->setPosition(0.0F, 0.0F);
     m_inputArea->setFrameSize(width(), height());
   }
+
+  applyAnimatedState(m_animationProgress);
 }
 
 LayoutSize Toggle::doMeasure(Renderer& renderer, const LayoutConstraints& constraints) {
@@ -148,64 +187,104 @@ LayoutSize Toggle::doMeasure(Renderer& renderer, const LayoutConstraints& constr
 
 void Toggle::doArrange(Renderer& renderer, const LayoutRect& rect) { arrangeByLayout(renderer, rect); }
 
-void Toggle::applySize() {
-  switch (m_size) {
-  case ToggleSize::Small:
-    m_thumbSize = Style::toggleThumbSizeSm * m_scale;
-    m_inset = Style::toggleInsetSm * m_scale;
-    m_travel = Style::toggleTravelSm * m_scale;
-    break;
-  case ToggleSize::Medium:
-    m_thumbSize = Style::toggleThumbSizeMd * m_scale;
-    m_inset = Style::toggleInsetMd * m_scale;
-    m_travel = Style::toggleTravelMd * m_scale;
-    break;
-  case ToggleSize::Large:
-    m_thumbSize = Style::toggleThumbSizeLg * m_scale;
-    m_inset = Style::toggleInsetLg * m_scale;
-    m_travel = Style::toggleTravelLg * m_scale;
-    break;
+void Toggle::updateHaloState() {
+  if (animationManager() == nullptr || !m_enabled) {
+    m_haloProgress = 0.0F;
+    applyAnimatedState(m_animationProgress);
+    return;
   }
+  if (m_haloAnimId != 0) {
+    animationManager()->cancel(m_haloAnimId);
+    m_haloAnimId = 0;
+  }
+  const float target = (hovered() || pressed()) ? 1.0F : 0.0F;
+  if (std::abs(m_haloProgress - target) < 0.001F) {
+    m_haloProgress = target;
+    applyAnimatedState(m_animationProgress);
+    return;
+  }
+  const float from = m_haloProgress;
+  m_haloAnimId = animationManager()->animate(
+      from, target, Style::animFast, Easing::EaseOutCubic,
+      [this](float s) {
+        m_haloProgress = s;
+        applyAnimatedState(m_animationProgress);
+      },
+      [this] { m_haloAnimId = 0; },
+      this
+  );
+  applyAnimatedState(m_animationProgress);
+}
 
-  m_thumb->setFrameSize(m_thumbSize, m_thumbSize);
-  setRadius((m_thumbSize + (m_inset * 2.0F)) * 0.5F);
+void Toggle::applySize() {
+  m_thumbSize = Style::toggleThumbSize * m_scale;
+  setSize(Style::toggleTrackWidth * m_scale, Style::toggleTrackHeight * m_scale);
+  setRadius(Style::toggleTrackHeight * 0.5F * m_scale);
 }
 
 void Toggle::applyState() { applyAnimatedState(m_checked ? 1.0F : 0.0F); }
 
 void Toggle::applyAnimatedState(float t) {
   m_animationProgress = t;
-  const Color trackColor = lerpColor(colorForRole(ColorRole::OutlineVariant), colorForRole(ColorRole::Primary), t);
-  const Color thumbColor =
-      lerpColor(colorForRole(ColorRole::SurfaceContainerHighest), colorForRole(ColorRole::OnPrimary), t);
-  const float thumbX = m_inset + m_travel * (Style::rtl() ? 1.0F - t : t);
-  ColorSpec borderColor = colorSpecFromRole(ColorRole::OutlineVariant);
-
-  if (m_enabled) {
-    if (m_inputArea != nullptr && m_inputArea->focused()) {
-      borderColor = focusRingColorSpec();
-    } else if (hovered()) {
-      borderColor = colorSpecFromRole(ColorRole::Hover);
-    } else if (m_checked) {
-      borderColor = colorSpecFromRole(ColorRole::Primary);
-    }
+  if (!m_enabled) {
+    m_haloProgress = 0.0F;
   }
 
-  setFill(trackColor);
-  setBorder(borderColor, m_inputArea != nullptr && m_inputArea->focused() ? Style::focusRingWidth : Style::borderWidth);
-  m_thumb->setPosition(thumbX, m_inset);
+  const Color trackColor = lerpColor(colorForRole(ColorRole::OutlineVariant), colorForRole(ColorRole::Primary), t);
+  const Color thumbColor =
+      lerpColor(colorForRole(ColorRole::OnSurfaceVariant), colorForRole(ColorRole::OnPrimary), t);
 
+  const float off = Style::toggleThumbOff * m_scale;
+  const float on = Style::toggleThumbSize * m_scale;
+  const float d = std::lerp(off, on, t);
+
+  const float p = Style::rtl() ? 1.0F - t : t;
+  const float centerX = std::lerp(16.0F, 36.0F, p) * m_scale;
+  const float thumbX = centerX - d * 0.5F;
+  const float thumbY = (Style::toggleTrackHeight * m_scale - d) * 0.5F;
+
+  setFill(trackColor);
+  setBorder(fixedColorSpec(lerpColor(colorForRole(ColorRole::OutlineVariant), colorForRole(ColorRole::Primary), t)), Style::borderWidth);
+
+  m_thumb->setPosition(thumbX, thumbY);
   auto thumbStyle = m_thumb->style();
   thumbStyle.fillMode = FillMode::Solid;
-  thumbStyle.radius = m_thumbSize * 0.5F;
+  thumbStyle.radius = d * 0.5F;
   thumbStyle.softness = 1.0F;
   thumbStyle.borderWidth = 0.0F;
   thumbStyle.fill = thumbColor;
   m_thumb->setStyle(thumbStyle);
+  m_thumb->setFrameSize(d, d);
 
-  // Padding keeps Flex size consistent regardless of thumb position
-  const float rightPad = m_inset + m_travel - (thumbX - m_inset);
-  setPadding(m_inset, rightPad, m_inset, thumbX);
+  const float haloDiam = std::lerp(d, Style::toggleHaloSize * m_scale, m_haloProgress);
+  const float haloX = centerX - haloDiam * 0.5F;
+  const float haloY = (Style::toggleTrackHeight * m_scale - haloDiam) * 0.5F;
+  m_halo->setPosition(haloX, haloY);
+  auto haloStyle = m_halo->style();
+  haloStyle.fillMode = FillMode::Solid;
+  haloStyle.radius = haloDiam * 0.5F;
+  haloStyle.softness = 1.0F;
+  haloStyle.borderWidth = 0.0F;
+  haloStyle.fill = lerpColor(colorForRole(ColorRole::OnSurface), colorForRole(ColorRole::Primary), t);
+  m_halo->setStyle(haloStyle);
+  m_halo->setFrameSize(haloDiam, haloDiam);
+  const float haloAlpha = (!m_enabled) ? 0.0F : (pressed() ? haloAlphaPress : haloAlphaHover);
+  m_halo->setOpacity(m_haloProgress * haloAlpha);
+
+  if (m_checkGlyph != nullptr) {
+    if (m_checkGlyph->width() > 0.0F && m_checkGlyph->height() > 0.0F) {
+      m_checkGlyph->setPosition(
+          std::round((d - m_checkGlyph->width()) * 0.5F),
+          std::round((d - m_checkGlyph->height()) * 0.5F)
+      );
+    }
+    m_checkGlyph->setColor(colorSpecFromRole(ColorRole::OnPrimaryContainer));
+    m_checkGlyph->setVisible(m_checked);
+    m_checkGlyph->setOpacity(m_checked ? 1.0F : 0.0F);
+  }
+
+  const float rightPad = Style::toggleTrackWidth * m_scale - thumbX - d;
+  setPadding(0.0F, rightPad, 0.0F, thumbX);
 
   if (m_enabled) {
     setOpacity(1.0F);

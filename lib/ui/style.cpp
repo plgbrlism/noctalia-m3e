@@ -97,6 +97,7 @@ namespace Style {
     return signal;
   }
 
+
   bool inputBordersEnabled() noexcept { return g_inputBordersEnabled; }
 
   void setInputBordersEnabled(bool enabled) {
