@@ -84,3 +84,8 @@ Status: `pending-test` | `pass` | `fail` | `reverted`
 - d998410c0 2026-11-16 feat(ui): implement M3 Expressive checkbox with state layer and indeterminate state
 - 1bfb7572e 2026-11-16 feat(shell): apply tonal surface and typography to panel headers
 - d10812ce1 2026-11-16 refactor(settings): migrate template store to flex list, add built-in modal, and fix hover/click routing
+[SLDR-001] lib/ui/controls/slider.{h,cpp} M3E XS 7-Box layout, 6px gaps, press squish, stop dots, scaled geometry pass
+[SLDR-001] lib/ui/controls/range_slider.{h,cpp} M3E XS 7-Box layout, 6px gaps, press squish, stop dots, scaled geometry pass
+[SLDR-001] lib/ui/builders.cpp propagate trackHeight-derived scale to Slider/RangeSlider setScale pass
+[TOG-001] lib/ui/controls/toggle.{h,cpp} animated hover/press halo and centered check glyph pass
+[SHP-002] lib/ui/style.{h,cpp} slider/toggle tokens updated for M3E XS scale propagation pass

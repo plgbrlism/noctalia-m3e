@@ -62,5 +62,7 @@ P2 adds: AT-SHP all-35 render, star-convex per name, AA thin features, cross-pro
 | AT-DES-13 | `tests/design_system_test.cpp` | `[theme].expressive` bool (replaced design_system) |
 | AT-PANEL-06 | `tests/panel_reveal_test.cpp` | 4 panel motion variants + reduce |
 | AT-MOT-07 | `tests/spring_test.cpp`, `tests/idle_test.cpp` | Spring settle + zero idle ticks |
+| AT-SLD-01 | `tests/slider_test.cpp` | Standard and Range Slider non-zero handle bounds, exact sliderGap spacing, endpoint clamping, press squish, and 1.25x/1.5x scaling |
+| AT-SLD-02 | `tests/range_slider_test.cpp` | RangeSlider dual handle visibility, 4-boundary sliderGap spacing, low <= high ordering, and active track hiding on convergence |
 
 Template store (community + built-in modal) verified manually: row 1 not clipped, hover tooltip on row body/checkbox, readme opens browser, checkbox toggles config, search/category/sort/empty state, no per-row tab stop.
