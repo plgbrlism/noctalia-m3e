@@ -31,6 +31,11 @@ Regenerate only via the spec-verify or spec-amend skills.
 - Invariants: INV-01, SHP-EXT-001, SHP-SCALE-001
 - Work items: SHP-002, SHP-003, SHP-005, CMP-003
 ---
+## Build system
+
+- `lib/meson.build` — library source list and test registration
+- `meson.build` — root targets, test suite, and version
+---
 ## Controls
 
 - `lib/ui/controls/` — Button, Label, Switch, Chip, and other primitive controls
@@ -43,6 +48,13 @@ Regenerate only via the spec-verify or spec-amend skills.
 - `src/shell/surface/shadow.*` — shared shadow logic for panels, bars, dock
 - `src/shell/render/` — shell-only custom draw nodes and render extensions
 - `src/shell/desktop/widgets/` — desktop widget tick/request call sites
+- `src/shell/bar/bar.cpp` — bar panels and widget hosts
+- `src/shell/control_center/` — control center panel, tabs, and shortcut registry
+- `src/shell/greeter/` — greeter appearance sync
+- `src/shell/launcher/launcher_panel.cpp` — launcher panel, categories, and filter state
+- `src/shell/osd/osd_overlay.cpp` — OSD overlay and surface styling
+- `src/shell/settings/` — settings window, registry, content, and sheet modals
+- `src/shell/switcher/window_switcher.cpp` — window switcher panel and grid layout
 - Invariants: INV-02, INV-03, INV-04
 - Work items: MOT-004, COL-003, SHP-007
 ---
@@ -50,6 +62,8 @@ Regenerate only via the spec-verify or spec-amend skills.
 
 - `src/config/config_types.*` — schema structs and enums
 - `src/config/config_overrides.cpp` — override persistence and settings.toml writes
+- `src/config/config_migrations.cpp` — config migration chain (fork migration v22 density rework)
+- `src/config/schema/config_schema.cpp` — schema parsers and validators for all sections
 - Invariants: INV-07, INV-09
 - Work items: CFG-001, MOT-006, SHP-007
 ---
