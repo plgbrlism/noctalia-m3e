@@ -24,6 +24,11 @@ namespace noctalia::config::schema {
         std::vector<Enum> Struct::* member, std::string_view key, const EnumOption<Enum> (&options)[N],
         std::optional<Enum> fallbackIfEmpty
     );
+
+    template <typename Struct>
+    Field<Struct> optionalFloatField(
+        std::optional<float> Struct::* member, std::string_view key, std::optional<Range<float>> range = std::nullopt
+    );
   }
 
   const Schema<AudioConfig>& audioSchema() {
@@ -2475,7 +2480,7 @@ namespace noctalia::config::schema {
 
     template <typename Struct>
     Field<Struct> optionalFloatField(
-        std::optional<float> Struct::* member, std::string_view key, std::optional<Range<float>> range = std::nullopt
+        std::optional<float> Struct::* member, std::string_view key, std::optional<Range<float>> range
     ) {
       return custom<Struct>(
           key,
