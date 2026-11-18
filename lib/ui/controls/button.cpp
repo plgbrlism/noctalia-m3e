@@ -501,7 +501,7 @@ void Button::updateButtonRadii() {
 }
 
 void Button::syncPressMorph(bool isPressed) {
-  if (Style::designSystem() != Style::DesignSystem::Expressive) {
+  if (!MotionService::instance().enabled() || Style::designSystem() != Style::DesignSystem::Expressive) {
     if (m_shapeState.animId != 0 && animationManager() != nullptr) {
       animationManager()->cancel(m_shapeState.animId);
       m_shapeState.animId = 0;
@@ -529,7 +529,7 @@ void Button::syncPressMorph(bool isPressed) {
       m_shapeState.progress, targetProgress,
       MotionService::instance().resolve(SpringToken::SpatialFast),
       [this](float progress) {
-        m_shapeState.progress = progress;
+        m_shapeState.progress = MotionService::instance().enabled() ? progress : 0.0F;
         updateButtonRadii();
         markPaintDirty();
       },
