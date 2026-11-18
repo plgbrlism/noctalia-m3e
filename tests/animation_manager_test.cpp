@@ -93,5 +93,56 @@ int main() {
   }
 
   resetMotion();
+
+  {
+    AnimationManager manager;
+    int requests = 0;
+    manager.setFrameRequest([&requests] { ++requests; });
+    MotionService::instance().setEnabled(false);
+
+    float value = -1.0F;
+    bool completed = false;
+    const auto id = manager.animateSpring(
+        0.0F, 5.0F, SpringSpec{0.8F, 380.0F}, [&value](float v) { value = v; }, [&completed] { completed = true; }
+    );
+
+    ok &= check(id == 0, "disabled spring should not be registered");
+    TEST_NEAR(value, 5.0F, 0.0001F);
+    ok &= check(completed, "disabled spring completion did not run synchronously");
+    ok &= check(!manager.hasActiveSprings(), "disabled spring stayed active");
+    ok &= check(requests == 0, "disabled spring requested a frame");
+
+    manager.tickSprings(0.016F);
+    ok &= check(requests == 0, "disabled spring requested a frame on tick");
+  }
+
+  resetMotion();
+
+  {
+    AnimationManager manager;
+    int requests = 0;
+    manager.setFrameRequest([&requests] { ++requests; });
+
+    float value = 0.0F;
+    bool completed = false;
+    const auto id = manager.animateSpring(
+        0.0F, 10.0F, SpringSpec{0.8F, 380.0F}, [&value](float v) { value = v; }, [&completed] { completed = true; }
+    );
+    ok &= check(id != 0, "in-flight spring did not start");
+    ok &= check(requests == 1, "in-flight spring did not request a frame");
+
+    MotionService::instance().setEnabled(false);
+
+    TEST_NEAR(value, 10.0F, 0.0001F);
+    ok &= check(completed, "in-flight spring completion did not run on disable");
+    ok &= check(!manager.hasActiveSprings(), "in-flight spring stayed active after disable");
+    ok &= check(!manager.retargetSpring(id, 5.0F), "disabled spring retarget should fail");
+
+    requests = 0;
+    manager.tickSprings(0.016F);
+    ok &= check(requests == 0, "snapped spring requested another frame");
+  }
+
+  resetMotion();
   return ok ? 0 : 1;
 }

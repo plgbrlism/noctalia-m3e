@@ -108,10 +108,41 @@ void AnimationManager::reduceMotion() {
     anim.elapsedMs = 0.0F;
     anim.startedAt = now
         - std::chrono::duration_cast<std::chrono::steady_clock::duration>(
-                         std::chrono::duration<float, std::milli>(kReducedMotionDurationMs)
+                                 std::chrono::duration<float, std::milli>(kReducedMotionDurationMs)
         );
   }
+
+  std::vector<Id> springIds;
+  springIds.reserve(m_springs.size());
+  for (const auto& [id, state] : m_springs) {
+    (void)id;
+    if (!state.finished) {
+      springIds.push_back(id);
+    }
+  }
+
+  std::vector<std::function<void()>> springCallbacks;
+  for (Id id : springIds) {
+    const auto it = m_springs.find(id);
+    if (it == m_springs.end() || it->second.finished) {
+      continue;
+    }
+    auto& state = it->second;
+    state.x = state.target;
+    state.v = 0.0F;
+    state.finished = true;
+    if (state.setter) {
+      state.setter(state.target);
+    }
+    if (state.onComplete) {
+      springCallbacks.push_back(state.onComplete);
+    }
+  }
+  for (auto& callback : springCallbacks) {
+    callback();
+  }
 }
+
 
 void AnimationManager::cancelForOwner(const void* owner) {
   if (owner == nullptr) {
@@ -176,6 +207,16 @@ AnimationManager::Id AnimationManager::animateSpring(
     float initial, float target, SpringSpec spec, std::function<void(float)> setter,
     std::function<void()> onComplete, const void* owner, float eps_x, float eps_v
 ) {
+  if (!MotionService::instance().enabled()) {
+    if (setter) {
+      setter(target);
+    }
+    if (onComplete) {
+      onComplete();
+    }
+    return 0;
+  }
+
   const Id id = m_nextId++;
   m_springs.emplace(
       id, SpringState{
@@ -188,7 +229,7 @@ AnimationManager::Id AnimationManager::animateSpring(
 }
 
 bool AnimationManager::retargetSpring(Id id, float target) {
-  if (id == 0) {
+  if (id == 0 || !MotionService::instance().enabled()) {
     return false;
   }
   const auto it = m_springs.find(id);
@@ -210,7 +251,7 @@ bool AnimationManager::retargetSpring(Id id, float target) {
 }
 
 bool AnimationManager::retargetSpringSpec(Id id, SpringSpec spec) {
-  if (id == 0) {
+  if (id == 0 || !MotionService::instance().enabled()) {
     return false;
   }
   const auto it = m_springs.find(id);
