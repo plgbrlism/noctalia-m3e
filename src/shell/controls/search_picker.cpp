@@ -83,9 +83,10 @@ namespace {
         setFill(clearColorSpec());
       }
 
-      ColorSpec foreground =
-          option.enabled ? colorSpecFromRole(ColorRole::OnSurface) : colorSpecFromRole(ColorRole::OnSurface, 0.55F);
-      ColorSpec detailForeground = colorSpecFromRole(ColorRole::OnSurfaceVariant, option.enabled ? 1.0F : 0.55F);
+      ColorSpec foreground = option.enabled ? colorSpecFromRole(ColorRole::OnSurface)
+                                            : colorSpecFromRole(ColorRole::OnSurface, Style::disabledAlpha);
+      ColorSpec detailForeground =
+          colorSpecFromRole(ColorRole::OnSurfaceVariant, option.enabled ? 1.0F : Style::disabledAlpha);
       if (highlighted) {
         foreground = colorSpecFromRole(ColorRole::OnPrimary);
         detailForeground = colorSpecFromRole(ColorRole::OnPrimary);
@@ -96,7 +97,6 @@ namespace {
         foreground = colorSpecFromRole(ColorRole::OnPrimaryContainer);
         detailForeground = colorSpecFromRole(ColorRole::OnPrimaryContainer);
       }
-
       if (m_preview != nullptr) {
         m_preview->setMetricsFromFontSize(Style::fontSizeBody);
         m_preview->setPreview(option.preview);
@@ -254,7 +254,7 @@ void SearchPicker::setEnabled(bool enabled) {
   if (m_list != nullptr) {
     m_list->notifyDataChanged();
   }
-  setOpacity(enabled ? 1.0F : 0.55F);
+  setOpacity(enabled ? 1.0F : Style::disabledAlpha);
 }
 
 void SearchPicker::doLayout(Renderer& renderer) { Flex::doLayout(renderer); }
