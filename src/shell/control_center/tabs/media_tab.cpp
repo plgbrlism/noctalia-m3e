@@ -468,7 +468,7 @@ std::unique_ptr<Flex> MediaTab::create() {
   });
 
   auto visualizerSpectrum = std::make_unique<AudioVisualizer>();
-  visualizerSpectrum->setGradient(colorForRole(ColorRole::Secondary), colorForRole(ColorRole::Tertiary));
+  visualizerSpectrum->setGradient(colorForRole(ColorRole::Primary), colorForRole(ColorRole::SurfaceContainerHigh));
   visualizerSpectrum->setOrientation(AudioSpectrumOrientation::Vertical);
   visualizerSpectrum->setMirrored(true);
   visualizerSpectrum->setCentered(true);

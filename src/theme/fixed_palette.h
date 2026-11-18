@@ -138,7 +138,7 @@ namespace noctalia::theme {
   FixedPalette fixedPaletteFromTokens(const TokenMap& tokens);
   ::Palette mapGeneratedPaletteMode(const TokenMap& tokens);
 
-  // Wallpaper schemes have no hover role of their own: hover mirrors the tertiary accent,
+  // Wallpaper schemes have no hover role of their own: hover uses the highest surface tone,
   // the pairing the builtin palettes use.
   void setGeneratedHoverTokens(GeneratedPalette& palette);
 

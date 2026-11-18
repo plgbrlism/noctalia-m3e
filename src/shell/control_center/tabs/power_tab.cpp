@@ -26,7 +26,7 @@ namespace {
       return ColorRole::Primary;
     }
     if (health >= 50.0) {
-      return ColorRole::Tertiary;
+      return ColorRole::PrimaryContainer;
     }
     return ColorRole::Error;
   }

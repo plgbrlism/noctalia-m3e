@@ -635,7 +635,7 @@ void WallpaperTile::applyVisualState() {
 
   ColorSpec borderColor = m_selected ? colorSpecFromRole(ColorRole::Primary)
       : m_current                    ? colorSpecFromRole(ColorRole::Secondary)
-      : m_hoveredVisual              ? colorSpecFromRole(ColorRole::Hover)
+      : m_hoveredVisual              ? colorSpecFromRole(ColorRole::Primary)
                                      : colorSpecFromRole(ColorRole::OutlineVariant);
   ColorSpec labelColor =
       m_current ? colorSpecFromRole(ColorRole::Secondary) : colorSpecFromRole(ColorRole::OnSurfaceVariant);

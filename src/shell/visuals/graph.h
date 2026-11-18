@@ -57,7 +57,7 @@ private:
   std::array<ColorSpec, 3> m_colors = {
       colorSpecFromRole(ColorRole::Primary),
       colorSpecFromRole(ColorRole::Secondary),
-      colorSpecFromRole(ColorRole::Tertiary),
+      colorSpecFromRole(ColorRole::SurfaceContainerHighest),
   };
   float m_lineWidth = 1.5F;
   float m_fillOpacity = 0.2F;

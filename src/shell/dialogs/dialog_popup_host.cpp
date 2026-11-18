@@ -9,7 +9,10 @@
 #include "ui/builders.h"
 #include "ui/popup_chrome.h"
 #include "ui/popup_parent.h"
+#include "ui/palette.h"
 #include "ui/style.h"
+#include "shell/wayland/layer_shell.h"
+#include "shell/wayland/layer_surface.h"
 #include "wayland/popup_surface.h"
 #include "wayland/wayland_connection.h"
 #include "wayland/wayland_seat.h"
@@ -96,6 +99,7 @@ bool DialogPopupHost::openPopup(std::uint32_t width, std::uint32_t height) {
     return false;
   }
   m_parentSurface = parentContext->surface;
+  const bool hasDim = createDimSurface(parentContext->output);
 
   auto surface = std::make_unique<PopupSurface>(*m_wayland);
   surface->setRenderContext(m_renderContext);
@@ -123,9 +127,11 @@ bool DialogPopupHost::openPopup(std::uint32_t width, std::uint32_t height) {
   m_popupHosts->beginAttachedPopup(m_parentSurface);
   m_attachedToHost = true;
   m_openInProgress = true;
-  const bool initialized = parentContext->xdgSurface != nullptr
-      ? m_surface->initializeAsChild(parentContext->xdgSurface, parentContext->output, popupConfig)
-      : m_surface->initialize(parentContext->attach, parentContext->output, popupConfig);
+  const bool initialized = hasDim
+      ? m_surface->initialize(LayerShell::popupAttach(m_dimSurface->layerSurface()), parentContext->output, popupConfig)
+      : (parentContext->xdgSurface != nullptr
+            ? m_surface->initializeAsChild(parentContext->xdgSurface, parentContext->output, popupConfig)
+            : m_surface->initialize(parentContext->attach, parentContext->output, popupConfig));
   m_openInProgress = false;
   if (!initialized) {
     destroyPopup();
@@ -152,6 +158,7 @@ bool DialogPopupHost::openPopupAsChild(PopupSurfaceConfig config, const XdgPopup
 
   destroyPopup();
   m_parentSurface = parent.wlSurface;
+  const bool hasDim = createDimSurface(parent.output);
 
   auto surface = std::make_unique<PopupSurface>(*m_wayland);
   surface->setRenderContext(m_renderContext);
@@ -177,7 +184,9 @@ bool DialogPopupHost::openPopupAsChild(PopupSurfaceConfig config, const XdgPopup
 
   m_surface = std::move(surface);
   m_openInProgress = true;
-  const bool initialized = m_surface->initializeAsChild(parent.xdgSurface, parent.output, config);
+  const bool initialized = hasDim
+      ? m_surface->initialize(LayerShell::popupAttach(m_dimSurface->layerSurface()), parent.output, config)
+      : m_surface->initializeAsChild(parent.xdgSurface, parent.output, config);
   m_openInProgress = false;
   if (!initialized) {
     destroyPopup();
@@ -223,12 +232,75 @@ void DialogPopupHost::destroyPopup() {
   m_contentNode = nullptr;
   m_sceneRoot.reset();
   m_surface.reset();
+  m_dimBox = nullptr;
+  m_dimRoot.reset();
+  m_dimSurface.reset();
   m_chrome = {};
 }
 
 void DialogPopupHost::closeAfterAccept() { destroyPopup(); }
 
 DialogPopupSettings DialogPopupHost::settings() const { return m_settings ? m_settings() : DialogPopupSettings{}; }
+
+bool DialogPopupHost::createDimSurface(wl_output* output) {
+  if (m_wayland == nullptr || m_renderContext == nullptr || output == nullptr) {
+    return false;
+  }
+
+  auto config = LayerSurfaceConfig{
+      .nameSpace = "noctalia-dialog-dim",
+      .layer = LayerShellLayer::Overlay,
+      .anchor = LayerShellAnchor::Top | LayerShellAnchor::Bottom | LayerShellAnchor::Left | LayerShellAnchor::Right,
+      .width = 0,
+      .height = 0,
+      .exclusiveZone = -1,
+      .keyboard = LayerShellKeyboard::None,
+      .defaultWidth = 1920,
+      .defaultHeight = 1080,
+  };
+  m_dimSurface = std::make_unique<LayerSurface>(*m_wayland, std::move(config));
+  auto* dim = m_dimSurface.get();
+  dim->setConfigureCallback([this](std::uint32_t /*width*/, std::uint32_t /*height*/) {
+    if (m_dimSurface != nullptr) {
+      m_dimSurface->requestLayout();
+    }
+  });
+  dim->setPrepareFrameCallback([this](bool /*needsUpdate*/, bool needsLayout) {
+    if (needsLayout && m_dimSurface != nullptr) {
+      buildDimScene(m_dimSurface->width(), m_dimSurface->height());
+    }
+  });
+  dim->setAnimationManager(&m_animations);
+  dim->setRenderContext(m_renderContext);
+  dim->setClickThrough(true);
+  if (!dim->initialize(output)) {
+    m_dimSurface.reset();
+    return false;
+  }
+  buildDimScene(dim->width(), dim->height());
+  return true;
+}
+
+void DialogPopupHost::buildDimScene(std::uint32_t width, std::uint32_t height) {
+  if (m_dimSurface == nullptr || width == 0 || height == 0) {
+    return;
+  }
+
+  const float w = static_cast<float>(width);
+  const float h = static_cast<float>(height);
+  const float alpha = Style::popupBordersEnabled() ? 0.38F : 0.55F;
+  m_dimRoot = ui::node({});
+  m_dimRoot->setSize(w, h);
+  auto dim = ui::box({});
+  dim->setFill(colorSpecFromRole(ColorRole::Shadow, alpha));
+  dim->clearBorder();
+  dim->setRadius(0.0F);
+  dim->setPosition(0.0F, 0.0F);
+  dim->setSize(w, h);
+  m_dimBox = static_cast<Box*>(m_dimRoot->addChild(std::move(dim)));
+  m_dimSurface->setSceneRoot(m_dimRoot.get());
+  m_dimSurface->requestRedraw();
+}
 
 float DialogPopupHost::uiScale() const { return std::max(0.1F, settings().uiScale); }
 
@@ -423,7 +495,7 @@ void DialogPopupHost::buildScene(std::uint32_t width, std::uint32_t height) {
   }
 
   auto bg = ui::box({
-      .configure = [](Box& box) { box.setDialogStyle(); },
+      .configure = [](Box& box) { box.setPanelStyle(Style::popupBordersEnabled()); },
   });
   m_bgNode = static_cast<Box*>(m_sceneRoot->addChild(std::move(bg)));
 

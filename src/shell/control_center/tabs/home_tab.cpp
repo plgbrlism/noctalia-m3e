@@ -144,7 +144,7 @@ namespace {
   // signal that reads consistently across all three cards.
   void applyHomeCardHover(Flex& card, bool hovered) {
     if (hovered) {
-      card.setBorder(colorSpecFromRole(ColorRole::Hover), Style::borderWidth);
+      card.setBorder(colorSpecFromRole(ColorRole::Primary), Style::borderWidth);
     } else if (Style::cardBordersEnabled()) {
       card.setBorder(colorSpecFromRole(ColorRole::OutlineVariant), Style::borderWidth);
     } else {
@@ -166,7 +166,7 @@ namespace {
     }
     const float borderWidth = Style::borderWidth * 3.0F;
     if (highlighted) {
-      avatar->setBorder(colorSpecFromRole(ColorRole::Hover), borderWidth);
+      avatar->setBorder(colorSpecFromRole(ColorRole::Primary), borderWidth);
       return;
     }
     avatar->setBorder(colorSpecFromRole(ColorRole::Primary), borderWidth);

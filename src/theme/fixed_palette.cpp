@@ -680,8 +680,8 @@ namespace noctalia::theme {
 
   void setGeneratedHoverTokens(GeneratedPalette& palette) {
     for (TokenMap* tokens : {&palette.dark, &palette.light}) {
-      (*tokens)["hover"] = tokens->at("tertiary");
-      (*tokens)["on_hover"] = tokens->at("on_tertiary");
+      (*tokens)["hover"] = tokens->at("surface_container_highest");
+      (*tokens)["on_hover"] = tokens->at("on_surface");
     }
   }
 

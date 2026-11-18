@@ -214,9 +214,9 @@ namespace settings {
     } else {
       m_badge->setVisible(true);
       m_badge->setParticipatesInLayout(true);
-      m_badge->setFill(colorSpecFromRole(ColorRole::TertiaryContainer));
+      m_badge->setFill(colorSpecFromRole(ColorRole::SurfaceContainerHighest));
       m_badgeLabel->setText(source);
-      m_badgeLabel->setColor(colorSpecFromRole(ColorRole::OnTertiaryContainer));
+      m_badgeLabel->setColor(colorSpecFromRole(ColorRole::OnSurfaceVariant));
     }
 
     // The grid is where a user first meets a plugin, so an unusable or older-than-latest
@@ -226,10 +226,10 @@ namespace settings {
     m_statusBadge->setParticipatesInLayout(hasStatus);
     if (hasStatus) {
       m_statusBadge->setFill(
-          colorSpecFromRole(entry.compatible ? ColorRole::TertiaryContainer : ColorRole::ErrorContainer)
+          colorSpecFromRole(entry.compatible ? ColorRole::SurfaceContainerHighest : ColorRole::ErrorContainer)
       );
       m_statusLabel->setColor(
-          colorSpecFromRole(entry.compatible ? ColorRole::OnTertiaryContainer : ColorRole::OnErrorContainer)
+          colorSpecFromRole(entry.compatible ? ColorRole::OnSurfaceVariant : ColorRole::OnErrorContainer)
       );
       m_statusLabel->setText(
           i18n::tr(
@@ -255,7 +255,7 @@ namespace settings {
     m_addedGlyph->setParticipatesInLayout(onDisk);
 
     const ColorRole borderRole =
-        selected ? ColorRole::Primary : (hovered ? ColorRole::Hover : ColorRole::OutlineVariant);
+        selected || hovered ? ColorRole::Primary : ColorRole::OutlineVariant;
     setBorder(colorSpecFromRole(borderRole), selected ? Style::borderWidth * 2.0F : Style::borderWidth);
   }
 

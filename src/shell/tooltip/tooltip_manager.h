@@ -22,17 +22,6 @@ struct wl_output;
 struct xdg_surface;
 struct zwlr_layer_surface_v1;
 
-struct TooltipSurfaceRoles {
-  ColorRole background;
-  ColorRole text;
-};
-
-inline TooltipSurfaceRoles resolveTooltipRoles(bool borderOn) noexcept {
-  return borderOn
-      ? TooltipSurfaceRoles{ColorRole::Surface, ColorRole::OnSurface}
-      : TooltipSurfaceRoles{ColorRole::SurfaceContainerHighest, ColorRole::OnSurface};
-}
-
 class TooltipManager {
 public:
   static TooltipManager& instance();

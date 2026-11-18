@@ -324,7 +324,7 @@ void WindowSwitcherTile::applyVisualState() {
     m_previewHost->setFill(colorSpecFromRole(ColorRole::SurfaceContainer));
   } else if (m_pointerHovered) {
     m_frame->setFill(colorSpecFromRole(ColorRole::Surface));
-    m_frame->setBorder(colorSpecFromRole(ColorRole::Hover), Style::emphasizedBorderWidth);
+    m_frame->setBorder(colorSpecFromRole(ColorRole::Primary), Style::emphasizedBorderWidth);
     m_previewHost->setFill(colorSpecFromRole(ColorRole::SurfaceContainer));
   } else {
     m_frame->setFill(colorSpecFromRole(ColorRole::Surface));

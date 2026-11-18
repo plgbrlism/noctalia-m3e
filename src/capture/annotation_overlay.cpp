@@ -150,11 +150,11 @@ namespace capture {
 
     const std::array<GradientPreset, kGradientPresetCount>& gradientPresets() {
       static const std::array<GradientPreset, kGradientPresetCount> presets = {{
-          {colorSpecFromRole(ColorRole::Primary), colorSpecFromRole(ColorRole::Tertiary),
+          {colorSpecFromRole(ColorRole::Primary), colorSpecFromRole(ColorRole::SurfaceContainerHigh),
            "bar.annotate.gradient-theme"},
           {colorSpecFromRole(ColorRole::Primary), colorSpecFromRole(ColorRole::Secondary),
            "bar.annotate.gradient-theme-accent"},
-          {colorSpecFromRole(ColorRole::PrimaryContainer), colorSpecFromRole(ColorRole::TertiaryContainer),
+          {colorSpecFromRole(ColorRole::PrimaryContainer), colorSpecFromRole(ColorRole::SurfaceContainerHighest),
            "bar.annotate.gradient-theme-soft"},
           {colorSpecFromRole(ColorRole::SurfaceContainer), colorSpecFromRole(ColorRole::SurfaceContainerHigh),
            "bar.annotate.gradient-theme-subtle"},

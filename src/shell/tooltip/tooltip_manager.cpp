@@ -649,7 +649,7 @@ TooltipManager::Size TooltipManager::measureContent(Renderer& renderer, const To
   }
 
   const float bw = tooltipBorderWidth();
-  const auto roles = resolveTooltipRoles(bw > 0.0F);
+  const auto roles = resolveSurfaceRoles(bw > 0.0F);
   const float scale = Style::densityScale();
   const float maxContentWidth = kMaxContentWidth * scale;
   const float fontSize = Style::fontSizeCaption * scale;
@@ -697,7 +697,7 @@ void TooltipManager::buildScene(const TooltipContent& content, float w, float h,
   }
   Renderer& renderer = m_surface->renderTarget().renderer();
   const float bw = tooltipBorderWidth();
-  const auto roles = resolveTooltipRoles(bw > 0.0F);
+  const auto roles = resolveSurfaceRoles(bw > 0.0F);
 
   m_sceneRoot = ui::node({});
   m_sceneRoot->setSize(w, h);

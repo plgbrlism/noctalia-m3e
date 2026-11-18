@@ -78,6 +78,16 @@ inline constexpr std::array<ColorRoleToken, 28> kColorRoleTokens = {{
     {ColorRole::OnHover, "on_hover"},
 }};
 
+struct SurfaceRoles {
+  ColorRole background;
+  ColorRole text;
+};
+
+inline SurfaceRoles resolveSurfaceRoles(bool borderOn) noexcept {
+  return borderOn ? SurfaceRoles{ColorRole::Surface, ColorRole::OnSurface}
+                  : SurfaceRoles{ColorRole::SurfaceContainerHighest, ColorRole::OnSurface};
+}
+
 constexpr Color clearColor() noexcept { return rgba(0.0F, 0.0F, 0.0F, 0.0F); }
 
 struct ColorSpec {

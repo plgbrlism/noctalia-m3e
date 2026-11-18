@@ -980,13 +980,19 @@ namespace settings {
           i18n::tr("settings.badges.community"), ColorRole::Secondary, ColorRole::Secondary, 0.15F, kSourceBadgeMaxWidth
       ));
     } else {
-      addMetaItem(pill(storeEntry.source, ColorRole::Tertiary, ColorRole::Tertiary, 0.15F, kSourceBadgeMaxWidth));
+      addMetaItem(pill(
+          storeEntry.source, ColorRole::OnSurfaceVariant, ColorRole::SurfaceContainerHighest, 0.15F,
+          kSourceBadgeMaxWidth
+      ));
     }
     if (entry.deprecated) {
       addMetaItem(pill(i18n::tr("settings.badges.deprecated"), ColorRole::Error, ColorRole::Error, 0.15F));
     }
     if (entry.heldBack) {
-      addMetaItem(pill(i18n::tr("settings.plugins.store.held-back"), ColorRole::Tertiary, ColorRole::Tertiary, 0.15F));
+      addMetaItem(pill(
+          i18n::tr("settings.plugins.store.held-back"), ColorRole::OnSurfaceVariant, ColorRole::SurfaceContainerHighest,
+          0.15F
+      ));
     }
     info->addChild(std::move(meta));
 
@@ -1013,7 +1019,7 @@ namespace settings {
                   "current", scripting::kCurrentPluginApiVersion
               ),
               .fontSize = Style::fontSizeMini * scale,
-              .color = colorSpecFromRole(ColorRole::Tertiary),
+              .color = colorSpecFromRole(ColorRole::OnSurfaceVariant),
               .maxLines = 3,
           })
       );

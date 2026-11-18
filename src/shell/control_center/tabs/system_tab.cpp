@@ -615,14 +615,14 @@ void SystemTab::doUpdate(Renderer& renderer) {
   }
 
   if (m_netGraph != nullptr) {
-    m_netGraph->setColor(colorSpecFromRole(ColorRole::Tertiary));
+    m_netGraph->setColor(colorSpecFromRole(ColorRole::Primary));
     m_netGraph->setColor2(colorSpecFromRole(ColorRole::Secondary));
   }
   if (m_rxIcon != nullptr) {
-    m_rxIcon->setColor(colorSpecFromRole(ColorRole::Tertiary));
+    m_rxIcon->setColor(colorSpecFromRole(ColorRole::Primary));
   }
   if (m_rxLabel != nullptr) {
-    m_rxLabel->setColor(colorSpecFromRole(ColorRole::Tertiary));
+    m_rxLabel->setColor(colorSpecFromRole(ColorRole::Primary));
   }
   if (m_txIcon != nullptr) {
     m_txIcon->setColor(colorSpecFromRole(ColorRole::Secondary));

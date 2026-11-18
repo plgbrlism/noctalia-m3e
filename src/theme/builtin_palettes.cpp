@@ -32,8 +32,8 @@ namespace noctalia::theme {
                                     .onSurfaceVariant = hex("#8E959E"),
                                     .outlineVariant = hex("#565B66"),
                                     .shadow = hex("#000000"),
-                                    .hover = hex("#39BAE6"),
-                                    .onHover = hex("#0B0E14"),
+                                    .hover = hex("#1e222a"),
+                                    .onHover = hex("#D1D1C7"),
                                 },
                             .terminal =
                                 TerminalPalette{
@@ -85,8 +85,8 @@ namespace noctalia::theme {
                                     .onSurfaceVariant = hex("#6E757C"),
                                     .outlineVariant = hex("#8A9199"),
                                     .shadow = hex("#F8F9FA"),
-                                    .hover = hex("#55B4D4"),
-                                    .onHover = hex("#F8F9FA"),
+                                    .hover = hex("#E4E6E9"),
+                                    .onHover = hex("#42474C"),
                                 },
                             .terminal =
                                 TerminalPalette{
@@ -141,8 +141,8 @@ namespace noctalia::theme {
                                     .onSurfaceVariant = hex("#a3b4eb"),
                                     .outlineVariant = hex("#4c4f69"),
                                     .shadow = hex("#11111b"),
-                                    .hover = hex("#94e2d5"),
-                                    .onHover = hex("#11111b"),
+                                    .hover = hex("#313244"),
+                                    .onHover = hex("#cdd6f4"),
                                 },
                             .terminal =
                                 TerminalPalette{
@@ -194,8 +194,8 @@ namespace noctalia::theme {
                                     .onSurfaceVariant = hex("#6c6f85"),
                                     .outlineVariant = hex("#a5adcb"),
                                     .shadow = hex("#dce0e8"),
-                                    .hover = hex("#40a02b"),
-                                    .onHover = hex("#eff1f5"),
+                                    .hover = hex("#ccd0da"),
+                                    .onHover = hex("#4c4f69"),
                                 },
                             .terminal =
                                 TerminalPalette{
@@ -250,8 +250,8 @@ namespace noctalia::theme {
                                     .onSurfaceVariant = hex("#d6d8e0"),
                                     .outlineVariant = hex("#5a5e77"),
                                     .shadow = hex("#282A36"),
-                                    .hover = hex("#8be9fd"),
-                                    .onHover = hex("#003543"),
+                                    .hover = hex("#44475A"),
+                                    .onHover = hex("#F8F8F2"),
                                 },
                             .terminal =
                                 TerminalPalette{
@@ -303,8 +303,8 @@ namespace noctalia::theme {
                                     .onSurfaceVariant = hex("#44475a"),
                                     .outlineVariant = hex("#cacad3"),
                                     .shadow = hex("#d6d8e0"),
-                                    .hover = hex("#0398b9"),
-                                    .onHover = hex("#ffffff"),
+                                    .hover = hex("#e6e6ea"),
+                                    .onHover = hex("#282a36"),
                                 },
                             .terminal =
                                 TerminalPalette{
@@ -359,8 +359,8 @@ namespace noctalia::theme {
                                     .onSurfaceVariant = hex("#ABB4DA"),
                                     .outlineVariant = hex("#3b4261"),
                                     .shadow = hex("#414868"),
-                                    .hover = hex("#a48cf2"),
-                                    .onHover = hex("#171928"),
+                                    .hover = hex("#292e42"),
+                                    .onHover = hex("#ebfafa"),
                                 },
                             .terminal =
                                 TerminalPalette{
@@ -412,7 +412,7 @@ namespace noctalia::theme {
                                     .onSurfaceVariant = hex("#1e2029"),
                                     .outlineVariant = hex("#c9cbcd"),
                                     .shadow = hex("#e2e6e8"),
-                                    .hover = hex("#8a69f7"),
+                                    .hover = hex("#d5d9db"),
                                     .onHover = hex("#1e2029"),
                                 },
                             .terminal =
@@ -468,8 +468,8 @@ namespace noctalia::theme {
                                     .onSurfaceVariant = hex("#ebdbb2"),
                                     .outlineVariant = hex("#57514e"),
                                     .shadow = hex("#282828"),
-                                    .hover = hex("#83a598"),
-                                    .onHover = hex("#282828"),
+                                    .hover = hex("#3c3836"),
+                                    .onHover = hex("#fbf1c7"),
                                 },
                             .terminal =
                                 TerminalPalette{
@@ -521,8 +521,8 @@ namespace noctalia::theme {
                                     .onSurfaceVariant = hex("#7c6f64"),
                                     .outlineVariant = hex("#bdae93"),
                                     .shadow = hex("#d5c4a1"),
-                                    .hover = hex("#458588"),
-                                    .onHover = hex("#fbf1c7"),
+                                    .hover = hex("#ebdbb2"),
+                                    .onHover = hex("#3c3836"),
                                 },
                             .terminal =
                                 TerminalPalette{
@@ -577,8 +577,8 @@ namespace noctalia::theme {
                                     .onSurfaceVariant = hex("#717c7c"),
                                     .outlineVariant = hex("#363646"),
                                     .shadow = hex("#1f1f28"),
-                                    .hover = hex("#7e9cd8"),
-                                    .onHover = hex("#1f1f28"),
+                                    .hover = hex("#2a2a37"),
+                                    .onHover = hex("#c8c093"),
                                 },
                             .terminal =
                                 TerminalPalette{
@@ -630,8 +630,8 @@ namespace noctalia::theme {
                                     .onSurfaceVariant = hex("#8a8980"),
                                     .outlineVariant = hex("#cfc49c"),
                                     .shadow = hex("#f2ecbc"),
-                                    .hover = hex("#4d699b"),
-                                    .onHover = hex("#f2ecbc"),
+                                    .hover = hex("#e5ddb0"),
+                                    .onHover = hex("#545464"),
                                 },
                             .terminal =
                                 TerminalPalette{
@@ -686,8 +686,8 @@ namespace noctalia::theme {
                                     .onSurfaceVariant = hex("#7c80b4"),
                                     .outlineVariant = hex("#21215F"),
                                     .shadow = hex("#070722"),
-                                    .hover = hex("#9BFECE"),
-                                    .onHover = hex("#0e0e43"),
+                                    .hover = hex("#11112d"),
+                                    .onHover = hex("#f3edf7"),
                                 },
                             .terminal =
                                 TerminalPalette{
@@ -739,8 +739,8 @@ namespace noctalia::theme {
                                     .onSurfaceVariant = hex("#4b55c8"),
                                     .outlineVariant = hex("#8288fc"),
                                     .shadow = hex("#f3edf7"),
-                                    .hover = hex("#0e0e43"),
-                                    .onHover = hex("#fef29a"),
+                                    .hover = hex("#eff0ff"),
+                                    .onHover = hex("#0e0e43"),
                                 },
                             .terminal =
                                 TerminalPalette{
@@ -795,8 +795,8 @@ namespace noctalia::theme {
                                     .onSurfaceVariant = hex("#d8dee9"),
                                     .outlineVariant = hex("#505a70"),
                                     .shadow = hex("#2e3440"),
-                                    .hover = hex("#5e81ac"),
-                                    .onHover = hex("#2e3440"),
+                                    .hover = hex("#3b4252"),
+                                    .onHover = hex("#eceff4"),
                                 },
                             .terminal =
                                 TerminalPalette{
@@ -848,8 +848,8 @@ namespace noctalia::theme {
                                     .onSurfaceVariant = hex("#4c566a"),
                                     .outlineVariant = hex("#c5cedd"),
                                     .shadow = hex("#d8dee9"),
-                                    .hover = hex("#6fa9a8"),
-                                    .onHover = hex("#eceff4"),
+                                    .hover = hex("#e5e9f0"),
+                                    .onHover = hex("#2e3440"),
                                 },
                             .terminal =
                                 TerminalPalette{
@@ -904,7 +904,7 @@ namespace noctalia::theme {
                                     .onSurfaceVariant = hex("#908caa"),
                                     .outlineVariant = hex("#403d52"),
                                     .shadow = hex("#191724"),
-                                    .hover = hex("#524f67"),
+                                    .hover = hex("#26233a"),
                                     .onHover = hex("#e0def4"),
                                 },
                             .terminal =
@@ -957,7 +957,7 @@ namespace noctalia::theme {
                                     .onSurfaceVariant = hex("#797593"),
                                     .outlineVariant = hex("#dfdad9"),
                                     .shadow = hex("#faf4ed"),
-                                    .hover = hex("#cecacd"),
+                                    .hover = hex("#f2e9e1"),
                                     .onHover = hex("#575279"),
                                 },
                             .terminal =
@@ -1013,8 +1013,8 @@ namespace noctalia::theme {
                                     .onSurfaceVariant = hex("#9aa5ce"),
                                     .outlineVariant = hex("#353D57"),
                                     .shadow = hex("#15161e"),
-                                    .hover = hex("#9ece6a"),
-                                    .onHover = hex("#16161e"),
+                                    .hover = hex("#24283b"),
+                                    .onHover = hex("#c0caf5"),
                                 },
                             .terminal =
                                 TerminalPalette{
@@ -1066,8 +1066,8 @@ namespace noctalia::theme {
                                     .onSurfaceVariant = hex("#6172b0"),
                                     .outlineVariant = hex("#b4b5b9"),
                                     .shadow = hex("#a8aecb"),
-                                    .hover = hex("#587539"),
-                                    .onHover = hex("#e1e2e7"),
+                                    .hover = hex("#d0d5e3"),
+                                    .onHover = hex("#3760bf"),
                                 },
                             .terminal =
                                 TerminalPalette{

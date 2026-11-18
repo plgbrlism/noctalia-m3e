@@ -13,6 +13,7 @@
 
 class Box;
 class InputArea;
+class LayerSurface;
 class Node;
 class RectNode;
 class Renderer;
@@ -194,6 +195,9 @@ protected:
   Box* m_bgNode = nullptr;
   RectNode* m_panelShadow = nullptr;
   Node* m_contentNode = nullptr;
+  std::unique_ptr<LayerSurface> m_dimSurface;
+  std::unique_ptr<Node> m_dimRoot;
+  Box* m_dimBox = nullptr;
   InputDispatcher m_inputDispatcher;
   bool m_attachedToHost = false;
   wl_surface* m_parentSurface = nullptr;
@@ -209,6 +213,8 @@ private:
   // direct handle to.
   void closeChildPopups();
 
+  bool createDimSurface(wl_output* output);
+  void buildDimScene(std::uint32_t width, std::uint32_t height);
   void prepareFrame(bool needsUpdate, bool needsLayout);
   void buildScene(std::uint32_t width, std::uint32_t height);
   void layoutScene(float width, float height);

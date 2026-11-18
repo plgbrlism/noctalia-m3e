@@ -32,7 +32,8 @@ namespace settings {
         auto dim = ui::box({
             .out = &m_dim,
             .configure = [](Box& box) {
-              box.setFill(colorSpecFromRole(ColorRole::Shadow, 0.38F));
+              const float dimAlpha = Style::popupBordersEnabled() ? 0.38F : 0.55F;
+              box.setFill(colorSpecFromRole(ColorRole::Shadow, dimAlpha));
               box.clearBorder();
               box.setRadius(0.0F);
             },
@@ -43,7 +44,7 @@ namespace settings {
         auto panel = ui::box({
             .out = &m_panel,
             .configure = [this](Box& box) {
-              box.setDialogStyle();
+              box.setPanelStyle(Style::popupBordersEnabled());
               box.setRadius(Style::scaledRadiusXl(m_scale()));
             },
         });

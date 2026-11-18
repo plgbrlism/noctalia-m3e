@@ -103,7 +103,7 @@ void RadioButton::applyState() {
     fill = colorSpecFromRole(ColorRole::Primary);
     border = colorSpecFromRole(ColorRole::Primary);
   } else if (hovered()) {
-    border = colorSpecFromRole(ColorRole::Hover);
+    border = colorSpecFromRole(ColorRole::Primary);
   }
 
   m_outer->setFill(fill);

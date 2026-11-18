@@ -202,7 +202,17 @@ namespace settings {
       return row;
     }
 
+    std::unique_ptr<Flex> makeRoleBadge(
+        std::string_view label, ColorRole role, float scale, float fillAlpha, ColorRole textRole
+    );
+
     std::unique_ptr<Flex> makeRoleBadge(std::string_view label, ColorRole role, float scale, float fillAlpha = 0.15F) {
+      return makeRoleBadge(label, role, scale, fillAlpha, role);
+    }
+
+    std::unique_ptr<Flex> makeRoleBadge(
+        std::string_view label, ColorRole role, float scale, float fillAlpha, ColorRole textRole
+    ) {
       return ui::row(
           {.align = FlexAlign::Center,
            .paddingH = Style::spaceXs * scale,
@@ -212,7 +222,7 @@ namespace settings {
               .text = std::string(label),
               .fontSize = Style::fontSizeCaption * scale,
               .fontWeight = FontWeight::Bold,
-              .color = colorSpecFromRole(role),
+              .color = colorSpecFromRole(textRole),
           })
       );
     }
@@ -244,7 +254,10 @@ namespace settings {
       } else if (plugin.source == "community") {
         title->addChild(makeRoleBadge(i18n::tr("settings.badges.community"), ColorRole::Secondary, scale));
       } else if (!plugin.source.empty()) {
-        title->addChild(makeRoleBadge(pluginSourceDisplayName(plugin.source), ColorRole::Tertiary, scale));
+        title->addChild(makeRoleBadge(
+            pluginSourceDisplayName(plugin.source), ColorRole::SurfaceContainerHighest, scale, 0.15F,
+            ColorRole::OnSurfaceVariant
+        ));
       }
       title->addChild(makeLabel("v" + version, Style::fontSizeCaption * scale, ColorRole::OnSurfaceVariant));
       if (!plugin.compatible) {
@@ -254,7 +267,10 @@ namespace settings {
         ));
       }
       if (plugin.heldBack) {
-        title->addChild(makeRoleBadge(i18n::tr("settings.plugins.plugins.held-back"), ColorRole::Tertiary, scale));
+        title->addChild(makeRoleBadge(
+            i18n::tr("settings.plugins.plugins.held-back"), ColorRole::SurfaceContainerHighest, scale, 0.15F,
+            ColorRole::OnSurfaceVariant
+        ));
       }
       if (plugin.deprecated) {
         title->addChild(makeLabel(
@@ -266,7 +282,7 @@ namespace settings {
         const std::string badge = plugin.availableVersion.empty()
             ? i18n::tr("settings.plugins.plugins.update-available")
             : i18n::tr("settings.plugins.plugins.update-to", "version", plugin.availableVersion);
-        title->addChild(makeRoleBadge(badge, ColorRole::Tertiary, scale));
+        title->addChild(makeRoleBadge(badge, ColorRole::Primary, scale));
       }
       info->addChild(std::move(title));
       if (plugin.heldBack) {
@@ -275,7 +291,7 @@ namespace settings {
                 "settings.plugins.plugins.held-back-hint", "version", plugin.latestVersion, "required",
                 plugin.latestPluginApiVersion, "current", scripting::kCurrentPluginApiVersion
             ),
-            Style::fontSizeMini * scale, ColorRole::Tertiary
+            Style::fontSizeMini * scale, ColorRole::OnSurfaceVariant
         ));
       }
       if (!plugin.description.empty()) {

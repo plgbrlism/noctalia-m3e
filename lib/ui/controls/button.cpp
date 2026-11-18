@@ -42,7 +42,10 @@ namespace {
               colorSpecFromRole(ColorRole::OnSurface)
           ),
           .hover =
-              makeState(colorSpecFromRole(ColorRole::Hover), clearColorSpec(), colorSpecFromRole(ColorRole::OnHover)),
+              makeState(
+                  colorSpecFromRole(ColorRole::Hover), colorSpecFromRole(ColorRole::Primary),
+                  colorSpecFromRole(ColorRole::OnHover)
+              ),
           .pressed = makeState(
               colorSpecFromRole(ColorRole::Primary), colorSpecFromRole(ColorRole::Primary),
               colorSpecFromRole(ColorRole::OnPrimary)
@@ -60,8 +63,10 @@ namespace {
           .normal = makeState(
               colorSpecFromRole(ColorRole::Primary), clearColorSpec(), colorSpecFromRole(ColorRole::OnPrimary)
           ),
-          .hover =
-              makeState(colorSpecFromRole(ColorRole::Hover), clearColorSpec(), colorSpecFromRole(ColorRole::OnHover)),
+          .hover = makeState(
+              colorSpecFromRole(ColorRole::Primary), clearColorSpec(), colorSpecFromRole(ColorRole::OnPrimary)
+          ),
+
           .pressed = makeState(
               colorSpecFromRole(ColorRole::Primary), clearColorSpec(), colorSpecFromRole(ColorRole::OnPrimary)
           ),
@@ -79,7 +84,10 @@ namespace {
               colorSpecFromRole(ColorRole::OnSecondary)
           ),
           .hover =
-              makeState(colorSpecFromRole(ColorRole::Hover), clearColorSpec(), colorSpecFromRole(ColorRole::OnHover)),
+              makeState(
+                  colorSpecFromRole(ColorRole::Hover), colorSpecFromRole(ColorRole::Primary),
+                  colorSpecFromRole(ColorRole::OnHover)
+              ),
           .pressed = makeState(
               colorSpecFromRole(ColorRole::Primary), colorSpecFromRole(ColorRole::Primary),
               colorSpecFromRole(ColorRole::OnPrimary)
@@ -99,7 +107,10 @@ namespace {
               colorSpecFromRole(ColorRole::OnError)
           ),
           .hover =
-              makeState(colorSpecFromRole(ColorRole::Hover), clearColorSpec(), colorSpecFromRole(ColorRole::OnHover)),
+              makeState(
+                  colorSpecFromRole(ColorRole::Hover), colorSpecFromRole(ColorRole::Primary),
+                  colorSpecFromRole(ColorRole::OnHover)
+              ),
           .pressed = makeState(
               colorSpecFromRole(ColorRole::Error), colorSpecFromRole(ColorRole::Error),
               colorSpecFromRole(ColorRole::OnError)
@@ -119,7 +130,10 @@ namespace {
               colorSpecFromRole(ColorRole::OnSurface)
           ),
           .hover =
-              makeState(colorSpecFromRole(ColorRole::Hover), clearColorSpec(), colorSpecFromRole(ColorRole::OnHover)),
+              makeState(
+                  colorSpecFromRole(ColorRole::Hover), colorSpecFromRole(ColorRole::Primary),
+                  colorSpecFromRole(ColorRole::OnHover)
+              ),
           .pressed = makeState(
               colorSpecFromRole(ColorRole::Primary), colorSpecFromRole(ColorRole::Primary),
               colorSpecFromRole(ColorRole::OnPrimary)

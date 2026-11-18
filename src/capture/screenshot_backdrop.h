@@ -34,7 +34,7 @@ namespace capture {
     bool enabled = false;
     bool gradient = true;
     ColorSpec gradientStart = colorSpecFromRole(ColorRole::Primary);
-    ColorSpec gradientEnd = colorSpecFromRole(ColorRole::Tertiary);
+    ColorSpec gradientEnd = colorSpecFromRole(ColorRole::SurfaceContainerHighest);
     float gradientAngle = 135.0F;
     std::int32_t padding = 64;
     std::int32_t cornerRadius = 12;
