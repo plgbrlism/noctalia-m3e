@@ -1,5 +1,5 @@
 // Locks schema::isKnownConfigPath — the path-resolution the settings GUI uses to
-// keep its hand-written override paths (e.g. {"shell","ui_scale"}) tied to the
+// keep its hand-written override paths (e.g. {"accessibility","density"}) tied to the
 // single schema source. A schema rename that breaks one of these real paths fails
 // here; bad paths must be rejected.
 
@@ -41,7 +41,11 @@ namespace {
 int main() {
   // Real override paths the settings registry emits — leaf, nested sub-table,
   // enum, named-map, and bar/monitor forms.
-  expectKnown({"accessibility", "ui_scale"});
+  expectKnown({"accessibility", "density"});
+  expectKnown({"shell", "corner_style"});
+  expectKnown({"shell", "corner_shape"});
+  expectKnown({"motion", "expressive"});
+  expectKnown({"motion", "panel"});
   expectKnown({"shell", "animation", "speed"});
   expectKnown({"shell", "panel_anchor_bar"});
   expectKnown({"shell", "panel", "control_center_placement"});

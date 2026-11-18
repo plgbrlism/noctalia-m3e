@@ -532,7 +532,6 @@ location = "https://example.invalid/bad"
     c.wallpaper.monitorOverrides = {
         {"DP-1", true, colorSpecFromConfigString("#00ff00"), std::string("/srv/wp1"), std::nullopt, std::nullopt},
     };
-    c.theme.density = Style::Density::Standard;
     c.shell.buttonBorders = false;
     c.shell.showCloseButtons = false;
     c.shell.fontFamily = "Inter";
@@ -641,7 +640,11 @@ location = "https://example.invalid/bad"
             3,
         },
     };
-    c.theme.density = Style::Density::Compact;
+    c.accessibility.density = Style::Density::Compact;
+    c.shell.cornerStyle = Style::CornerStyle::Fixed;
+    c.shell.cornerShape = Style::CornerShapePreset::Round;
+    c.motion.expressive = false;
+    c.motion.panel = PanelMotion::Depth;
     c.accessibility.highContrast = true;
 
     c.hotCorners.enabled = true;

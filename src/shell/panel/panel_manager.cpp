@@ -54,6 +54,10 @@ namespace {
   constexpr auto kKeyboardRelaxDelay = std::chrono::milliseconds(100);
   constexpr auto kCaptureCloseTimeout = std::chrono::milliseconds(250);
 
+  bool shellAnimationsEnabled(const ConfigService* config) {
+    return config == nullptr || config->config().shell.animation.enabled;
+  }
+
   // Layer-shell keyboard interactivity for a panel surface: `initial` is applied at
   // map time, `relaxed` (when set) shortly after by m_keyboardRelaxTimer.
   struct PanelKeyboardPlan {
@@ -1536,6 +1540,16 @@ void PanelManager::closePanel(bool animateClose) {
   m_attachedOpenAnimationPending = false;
 
   if (animateClose && m_sceneRoot != nullptr && m_activePanel != nullptr && m_activePanel->wantsCloseAnimation()) {
+    if (!shellAnimationsEnabled(m_config)) {
+      if (m_attachedToBar) {
+        applyAttachedReveal(0.0F);
+      } else {
+        applyDetachedReveal(0.0F);
+      }
+      destroyPanel();
+      return;
+    }
+
     const std::uint64_t gen = ++m_destroyGeneration;
     if (m_attachedToBar && m_attachedRevealClipNode != nullptr) {
       m_animations.cancelForOwner(m_attachedRevealClipNode);
@@ -2255,7 +2269,7 @@ void PanelManager::applyAttachedReveal(float progress) {
   const float panelW = m_panelVisualWidth > 0 ? static_cast<float>(m_panelVisualWidth) : w;
   const float panelH = m_panelVisualHeight > 0 ? static_cast<float>(m_panelVisualHeight) : h;
   const auto variant = m_config
-      ? m_config->config().motionPreset.panel
+      ? m_config->config().motion.panel
       : PanelMotion::Standard;
   const float travelX = (m_attachedRevealDirection == AttachedRevealDirection::Left
                          || m_attachedRevealDirection == AttachedRevealDirection::Right)
@@ -2338,7 +2352,7 @@ void PanelManager::applyDetachedReveal(float progress) {
   float clipH = spanH;
 
   const auto variant = m_config
-      ? m_config->config().motionPreset.panel
+      ? m_config->config().motion.panel
       : PanelMotion::Standard;
   const bool directional = reveal::isDirectional(variant);
   if (directional) {
@@ -2394,6 +2408,10 @@ void PanelManager::startAttachedOpenAnimation() {
   }
 
   m_attachedOpenAnimationPending = false;
+  if (!shellAnimationsEnabled(m_config)) {
+    applyAttachedReveal(1.0F);
+    return;
+  }
   m_animations.animateSpring(
       m_attachedRevealProgress, 1.0F, MotionService::instance().resolve(SpringToken::SpatialFast),
       [this](float v) { applyAttachedReveal(v); }, {}, m_attachedRevealClipNode
@@ -2814,10 +2832,14 @@ void PanelManager::buildScene(std::uint32_t width, std::uint32_t height) {
       m_attachedOpenAnimationPending = true;
     } else {
       applyDetachedReveal(0.0F);
-      m_animations.animateSpring(
-          0.0F, 1.0F, MotionService::instance().resolve(SpringToken::SpatialFast), [this](float v) { applyDetachedReveal(v); }, {},
-          m_sceneRoot.get()
-      );
+      if (shellAnimationsEnabled(m_config)) {
+        m_animations.animateSpring(
+            0.0F, 1.0F, MotionService::instance().resolve(SpringToken::SpatialFast), [this](float v) { applyDetachedReveal(v); }, {},
+            m_sceneRoot.get()
+        );
+      } else {
+        applyDetachedReveal(1.0F);
+      }
     }
 
     m_surface->setSceneRoot(m_sceneRoot.get());

@@ -45,7 +45,7 @@ namespace {
       TEST_CHECK(config.getGreeterSyncWallpaperPath() == bundled);
       TEST_CHECK(!config.hasOverride({"wallpaper", "default", "path"}));
       TEST_CHECK(!config.hasOverride({"wallpaper", "last", "path"}));
-      TEST_CHECK(config.setOverride({"accessibility", "ui_scale"}, 1.25));
+      TEST_CHECK(config.setOverride({"accessibility", "density"}, std::string("compact")));
     }
     {
       ConfigService config;
@@ -95,7 +95,7 @@ namespace {
     TEST_CHECK(config.markSetupWizardCompleted());
     TEST_CHECK(!config.hasOverride({"wallpaper", "default", "path"}));
 
-    expect(config.setOverride({"accessibility", "ui_scale"}, 1.25), "setOverride failed");
+    expect(config.setOverride({"accessibility", "density"}, std::string("compact")), "setOverride failed");
     expect(std::filesystem::exists(sidecar), "setOverride did not create settings.toml");
 
     expect(

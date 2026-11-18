@@ -1,8 +1,8 @@
-[accessibility]
-ui_scale = 1.0
-
 [theme]
 mode = "dark"
+
+[accessibility]
+density = "standard"
 
 [widget.clock]
 enabled = false

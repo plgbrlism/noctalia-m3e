@@ -1343,6 +1343,8 @@ struct ShellConfig {
     bool operator==(const WindowSwitcherConfig&) const = default;
   };
 
+  Style::CornerStyle cornerStyle = Style::CornerStyle::Material;
+  Style::CornerShapePreset cornerShape = Style::CornerShapePreset::Standard;
   bool buttonBorders = true;
   bool inputBorders = true;
   bool popupBorders = true;
@@ -1840,9 +1842,10 @@ constexpr EnumOption<ControlCenterSidebarMode> kControlCenterSidebarModes[] = {
       {PanelMotion::Fluid, "fluid", "motion.panel.fluid"},
   };
 
-  struct MotionPresetConfig {
-    PanelMotion panel = PanelMotion::Standard;
-    bool operator==(const MotionPresetConfig&) const = default;
+  struct MotionUiConfig {
+    bool expressive = true;
+    PanelMotion panel = PanelMotion::Directional;
+    bool operator==(const MotionUiConfig&) const = default;
   };
 
   constexpr EnumOption<Style::CornerStyle> kCornerStyles[] = {
@@ -1922,10 +1925,6 @@ constexpr EnumOption<ControlCenterSidebarMode> kControlCenterSidebarModes[] = {
   std::string communityPalette = "Oxocarbon";
   std::string customPalette;
   std::string wallpaperScheme = "m3-content";
-  bool expressive = true;
-  Style::CornerStyle cornerStyle = Style::CornerStyle::Material;
-  Style::CornerShapePreset cornerShape = Style::CornerShapePreset::Standard;
-  Style::Density density = Style::Density::Comfortable;
   ThemeMode mode = ThemeMode::Dark;
   ShellThemeMode shellMode = ShellThemeMode::Follow;
   bool pureBlackDark = false;
@@ -2047,6 +2046,7 @@ bool isValidPluginSourceName(std::string_view name);
 
 struct AccessibilityConfig {
   bool highContrast = false;
+  Style::Density density = Style::Density::Standard;
   bool operator==(const AccessibilityConfig&) const = default;
 };
 
@@ -2099,8 +2099,7 @@ struct Config {
   ControlCenterConfig controlCenter;
   PluginsConfig plugins;
   AccessibilityConfig accessibility;
-  MotionConfig motion;
-  MotionPresetConfig motionPreset;
+  MotionUiConfig motion;
 };
 // Which top-level config sections changed across a reload. Default-constructed
 // to all-true (conservative: "assume everything changed") so any path that does
@@ -2136,7 +2135,6 @@ struct ConfigChangeSet {
   bool storage = true;
   bool accessibility = true;
   bool motion = true;
-  bool motionPreset = true;
 
   bool any() const noexcept {
     return bars
@@ -2168,8 +2166,7 @@ struct ConfigChangeSet {
         || hotCorners
         || storage
         || accessibility
-        || motion
-        || motionPreset;
+        || motion;
   }
 };
 

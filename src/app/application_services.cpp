@@ -560,19 +560,18 @@ void Application::initStyleThemeAndWayland() {
     auto& cfg = m_configService.config();
     motion.setSpeed(cfg.shell.animation.speed);
     motion.setEnabled(cfg.shell.animation.enabled);
-    motion.setMotionConfig(cfg.motion);
   };
   auto applyStyleConfig = [this, lastCornerShape = std::optional<Style::CornerShapePreset>{},
                            lastDensity = std::optional<Style::Density>{}] mutable {
     auto& cfg = m_configService.config();
-    Style::setDesignSystem(cfg.theme.expressive
+    Style::setDesignSystem(cfg.motion.expressive
         ? Style::DesignSystem::Expressive
         : Style::DesignSystem::Custom);
-    Style::setCornerStyle(cfg.theme.cornerStyle);
-    const Style::CornerShapePreset cornerShape = cfg.theme.cornerShape;
+    Style::setCornerStyle(cfg.shell.cornerStyle);
+    const Style::CornerShapePreset cornerShape = cfg.shell.cornerShape;
     const bool cornerChanged = lastCornerShape.has_value() && *lastCornerShape != cornerShape;
     Style::setCornerShape(cornerShape);
-    const Style::Density density = cfg.theme.density;
+    const Style::Density density = cfg.accessibility.density;
     const bool densityChanged = lastDensity.has_value() && *lastDensity != density;
     const float densityScale = density == Style::Density::Standard ? 0.85F
         : density == Style::Density::Compact                        ? 0.75F

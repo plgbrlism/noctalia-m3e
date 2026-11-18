@@ -427,8 +427,7 @@ namespace {
         && a.controlCenter == b.controlCenter
         && pluginsConfigEqual(a.plugins, b.plugins)
         && a.storage == b.storage
-        && a.motion == b.motion
-        && a.motionPreset == b.motionPreset;
+        && a.motion == b.motion;
   }
 
   toml::table* ensureTable(toml::table& parent, std::string_view key) {
@@ -930,6 +929,7 @@ ConfigChangeSet computeConfigChangeSet(const Config& prev, const Config& next) {
       .hotCorners = !(prev.hotCorners == next.hotCorners),
       .storage = !(prev.storage == next.storage),
       .accessibility = !(prev.accessibility == next.accessibility),
+      .motion = !(prev.motion == next.motion),
   };
 }
 

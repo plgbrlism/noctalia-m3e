@@ -38,6 +38,7 @@ namespace noctalia::config {
     constexpr int kCornerShapePresetMigrationVersion = 20;
     constexpr int kDensityMigrationVersion = 22;
     constexpr int kCircularAvatarMigrationVersion = 23;
+    constexpr int kUiConfigRefactorMigrationVersion = 24;
     constexpr std::int64_t kMaxBarRadius = 500;
     constexpr std::array<std::string_view, 5> kBarRadiusKeys = {
         "radius", "radius_top_left", "radius_top_right", "radius_bottom_left", "radius_bottom_right",
@@ -1033,7 +1034,7 @@ namespace noctalia::config {
       );
     }
 
-    // `[shell].corner_radius_scale` became the three-value `[theme].corner_shape` preset.
+    // `[shell].corner_radius_scale` became the three-value `[shell].corner_shape` preset.
     template <typename OnChanged> void migrateCornerRadiusScale(toml::table& root, OnChanged&& onChanged) {
       auto* shell = root["shell"].as_table();
       if (shell == nullptr || !shell->contains("corner_radius_scale")) {
@@ -1066,7 +1067,7 @@ namespace noctalia::config {
 
     void migrateCornerRadiusScaleSidecar(toml::table& root, const toml::table& /*base*/, schema::Diagnostics& diag) {
       migrateCornerRadiusScale(root, [&diag](const std::string& path) {
-        diag.warn(path, "migrated legacy corner_radius_scale to theme.corner_shape");
+        diag.warn(path, "migrated legacy corner_radius_scale to shell.corner_shape");
       });
     }
 
@@ -1145,6 +1146,61 @@ namespace noctalia::config {
           },
           true
       );
+    }
+
+    template <typename OnChanged>
+    void moveConfigKey(
+        toml::table& root, std::string_view fromSection, std::string_view fromKey, std::string_view toSection,
+        std::string_view toKey, OnChanged&& onChanged
+    ) {
+      auto* source = root[std::string(fromSection)].as_table();
+      if (source == nullptr || !source->contains(std::string(fromKey))) {
+        return;
+      }
+
+      const std::string oldPath = std::string(fromSection) + "." + std::string(fromKey);
+      toml::table target;
+      if (auto* existing = root[std::string(toSection)].as_table()) {
+        target = *existing;
+      }
+      if (!target.contains(std::string(toKey))) {
+        target.insert_or_assign(std::string(toKey), (*source)[std::string(fromKey)]);
+      }
+      source->erase(std::string(fromKey));
+      root.insert_or_assign(std::string(toSection), std::move(target));
+      if (source->empty()) {
+        root.erase(std::string(fromSection));
+      }
+      onChanged(oldPath);
+    }
+
+    template <typename OnChanged> void migrateUiConfigLayout(toml::table& root, OnChanged&& onChanged) {
+      moveConfigKey(root, "theme", "expressive", "motion", "expressive", onChanged);
+      moveConfigKey(root, "theme", "corner_style", "shell", "corner_style", onChanged);
+      moveConfigKey(root, "theme", "corner_shape", "shell", "corner_shape", onChanged);
+      moveConfigKey(root, "theme", "density", "accessibility", "density", onChanged);
+      moveConfigKey(root, "motion_preset", "panel", "motion", "panel", onChanged);
+
+      if (auto* motion = root["motion"].as_table()) {
+        for (const std::string_view key : {"scheme", "reduce", "spatial", "effects"}) {
+          if (motion->erase(std::string(key)) > 0) {
+            onChanged("motion." + std::string(key));
+          }
+        }
+        if (motion->empty()) {
+          root.erase("motion");
+        }
+      }
+      if (root.contains("motion_preset")) {
+        root.erase("motion_preset");
+        onChanged("motion_preset");
+      }
+    }
+
+    void migrateUiConfigLayoutSidecar(toml::table& root, const toml::table& /*base*/, schema::Diagnostics& diag) {
+      migrateUiConfigLayout(root, [&diag](const std::string& path) {
+        diag.warn(path, "moved " + path + " to its new UI config section");
+      });
     }
 
     std::uint64_t stableIssueHash(int migrationVersion, std::string_view path) {
@@ -1281,7 +1337,7 @@ namespace noctalia::config {
         },
         {
             .toVersion = kCornerShapePresetMigrationVersion,
-            .summary = "theme: replace shell corner_radius_scale with theme corner_shape",
+            .summary = "shell: replace shell corner_radius_scale with shell corner_shape",
             .apply = migrateCornerRadiusScaleSidecar,
         },
         {
@@ -1293,6 +1349,11 @@ namespace noctalia::config {
             .toVersion = kCircularAvatarMigrationVersion,
             .summary = "shell: move circular_avatar from Control Center to shared avatar settings",
             .apply = migrateCircularAvatarSidecar,
+        },
+        {
+            .toVersion = kUiConfigRefactorMigrationVersion,
+            .summary = "config: relocate UI settings into shell, accessibility and motion sections",
+            .apply = migrateUiConfigLayoutSidecar,
         },
     };
     return migrations;
@@ -1489,7 +1550,7 @@ namespace noctalia::config {
       issues.push_back({
           .migrationVersion = kCornerShapePresetMigrationVersion,
           .path = path,
-          .message = "corner_radius_scale is now theme.corner_shape",
+          .message = "corner_radius_scale is now shell.corner_shape",
       });
     });
     migrateDensity(root, [&issues](const std::string& path) {
@@ -1512,6 +1573,13 @@ namespace noctalia::config {
           .path = path,
           .message = keptCanonical ? "removed control_center.circular_avatar; kept existing shell.circular_avatar"
                                    : "control_center.circular_avatar moved to shell.circular_avatar",
+      });
+    });
+    migrateUiConfigLayout(root, [&issues](const std::string& path) {
+      issues.push_back({
+          .migrationVersion = kUiConfigRefactorMigrationVersion,
+          .path = path,
+          .message = "moved to its new UI config section",
       });
     });
   }

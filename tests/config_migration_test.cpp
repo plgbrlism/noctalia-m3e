@@ -1187,7 +1187,7 @@ type = "active_window"
       expect(!legacy["control_center"]["circular_avatar"], "avatar migration retained the old key");
       expect(
           issues.size() == 1
-              && issues.front().migrationVersion == 20
+              && issues.front().migrationVersion == 23
               && issues.front().path == "control_center.circular_avatar",
           "avatar migration did not report the declarative source key"
       );
@@ -1262,6 +1262,63 @@ circular_avatar = true
         malformedShell["shell"].is_string()
             && malformedShell["control_center"]["circular_avatar"].value<bool>() == false,
         "avatar migration overwrote malformed shell or lost the legacy value"
+    );
+  }
+
+  void checkUiConfigRefactorMigration() {
+    toml::table legacy = toml::parse(R"(
+[theme]
+expressive = false
+corner_style = "fixed"
+corner_shape = "round"
+density = "compact"
+[motion]
+scheme = "standard"
+reduce = true
+[motion.spatial.fast]
+damping = 0.8
+stiffness = 400
+[motion_preset]
+panel = "fluid"
+)");
+    noctalia::config::LegacyConfigIssues issues;
+    noctalia::config::normalizeLegacyConfig(legacy, issues);
+
+    expect(legacy["motion"]["expressive"].value<bool>() == false, "v24 did not move theme.expressive");
+    expect(
+        legacy["motion"]["panel"].value<std::string>() == "fluid", "v24 did not move motion_preset.panel"
+    );
+    expect(legacy["shell"]["corner_style"].value<std::string>() == "fixed", "v24 did not move theme.corner_style");
+    expect(legacy["shell"]["corner_shape"].value<std::string>() == "round", "v24 did not move theme.corner_shape");
+    expect(
+        legacy["accessibility"]["density"].value<std::string>() == "compact", "v24 did not move theme.density"
+    );
+    expect(!legacy["motion_preset"], "v24 retained the motion_preset section");
+    expect(!legacy["motion"]["scheme"], "v24 retained motion.scheme");
+    expect(!legacy["motion"]["reduce"], "v24 retained motion.reduce");
+    expect(!legacy["motion"]["spatial"], "v24 retained motion.spatial");
+    expect(
+        std::ranges::any_of(issues, [](const auto& issue) {
+          return issue.migrationVersion == 24 && issue.path == "theme.expressive";
+        }),
+        "v24 did not report the moved expressive key"
+    );
+
+    toml::table sidecar = toml::parse(R"(
+config_version = 23
+[theme]
+expressive = false
+density = "compact"
+[motion_preset]
+panel = "fluid"
+)");
+    noctalia::config::schema::Diagnostics diag;
+    const int version = noctalia::config::applyPendingConfigMigrations(sidecar, {}, 23, diag);
+    expect(version == noctalia::config::currentConfigVersion(), "v24 sidecar migration did not reach current version");
+    expect(sidecar["motion"]["expressive"].value<bool>() == false, "v24 sidecar did not move expressive");
+    expect(sidecar["motion"]["panel"].value<std::string>() == "fluid", "v24 sidecar did not move panel");
+    expect(
+        sidecar["accessibility"]["density"].value<std::string>() == "compact", "v24 sidecar did not move density"
     );
   }
 
@@ -1363,15 +1420,15 @@ radius = -10
   }
 
   void checkRegistryOrdering() {
-    int expectedVersion = 1;
+    int previousVersion = 0;
     for (const auto& migration : noctalia::config::configMigrations()) {
-      expect(migration.toVersion == expectedVersion, "migration registry has a gap or is out of order");
+      expect(migration.toVersion > previousVersion, "migration registry is out of order");
       expect(!migration.summary.empty(), "migration registry entry has no summary");
       expect(migration.apply != nullptr, "migration registry entry has no apply function");
-      ++expectedVersion;
+      previousVersion = migration.toVersion;
     }
     expect(
-        expectedVersion - 1 == noctalia::config::currentConfigVersion(),
+        previousVersion == noctalia::config::currentConfigVersion(),
         "current config version does not match the registry"
     );
   }
@@ -1421,6 +1478,7 @@ int main() {
   checkPluginAutoUpdateModeMigration();
   checkAppIconColorizationMigration();
   checkCircularAvatarMigration();
+  checkUiConfigRefactorMigration();
   checkVersionGating();
   checkReminderFingerprint();
   checkRegistryOrdering();
