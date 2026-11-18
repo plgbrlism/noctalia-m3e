@@ -2,17 +2,17 @@
 
 | File | Δ | Change |
 |---|---|---|
-| `src/config/config_types.h` | +60/-4 | `MotionConfig`, `MotionPresetConfig`, `ThemeConfig` explicit expressive/density/corner_style/corner_shape fields, wallpaper_scheme, migration v22 |
-| `src/config/schema/config_schema.{h,cpp}` | +168/-3 | `[motion]`, `[motion_preset]`, `[theme]` preset enums and validators; fail-fast for removed keys |
-| `src/config/config_overrides.cpp` | modified | Override handling for new sections |
-| `src/config/config_migrations.cpp` | +147 | Migration v22 (density rework, remove legacy motion/design_system keys) |
-| `src/app/application_services.cpp` | +23/-9 | `Style::setDesignSystem`, `setCornerStyle`, `setDensityScale`, `setCornerShape`, `MotionService::setMotionConfig` wiring |
+| `src/config/config_types.h` | refactor | `MotionUiConfig{expressive,panel}`, `AccessibilityConfig::density`, `ShellConfig::cornerStyle/cornerShape`; old `MotionConfig`/`MotionPresetConfig` and `ThemeConfig` UI keys removed |
+| `src/config/schema/config_schema.{h,cpp}` | refactor | `[motion]`, `[accessibility]`, `[shell]` schemas; spring-token and `motionPresetSchema()` removed |
+| `src/config/config_overrides.cpp` | modified | `configEqual` and `computeConfigChangeSet` use single motion struct |
+| `src/config/config_migrations.cpp` | +v24 | Relocates UI keys into shell/accessibility/motion; v20 message targets shell.corner_shape |
+| `src/app/application_services.cpp` | modified | `Style::setDesignSystem`, `setCornerStyle`, `setDensityScale`, `setCornerShape` from new sections; `MotionService::setMotionConfig` dropped |
 
-rev8 config reality (see `m3e/spec/06-config.md`):
-- `[theme].expressive` bool replaces `design_system`.
-- `[theme].density` = comfortable/standard/compact.
-- `[theme].corner_shape` replaces `corner_radius_scale`.
-- `[motion_preset]` keeps only `panel`.
-- `motion_preset.preset`, `ripple`, deprecated reduce/motion presets removed.
+Current config reality:
+- `[motion].expressive` bool replaces the old `[theme].expressive` (Button Morphing toggle).
+- `[motion].panel` = standard/directional/depth/fluid; default directional.
+- `[accessibility].density` = comfortable/standard/compact.
+- `[shell].corner_style` = material/fixed; `[shell].corner_shape` = sharp/standard/round.
+- v24 moves all five keys and removes old spring/motion_preset config. Internal fixed spring tables remain.
 
-Work item: CFG-001, DES-004. Test: `AT-CFG-01..05`, `AT-DES-07..13`.
+Work item: CFG-REFACTOR. Test: config_motion/config_migration/config_schema_roundtrip/config_path_resolution.

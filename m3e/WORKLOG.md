@@ -89,3 +89,12 @@ Status: `pending-test` | `pass` | `fail` | `reverted`
 [SLDR-001] lib/ui/builders.cpp propagate trackHeight-derived scale to Slider/RangeSlider setScale pass
 [TOG-001] lib/ui/controls/toggle.{h,cpp} animated hover/press halo and centered check glyph pass
 [SHP-002] lib/ui/style.{h,cpp} slider/toggle tokens updated for M3E XS scale propagation pass
+[CFG-REFACTOR] src/config/config_types.h MotionUiConfig; density→accessibility, corner_*→shell, expressive/panel→motion
+[CFG-REFACTOR] src/config/schema/config_schema.{h,cpp} motion/accessibility/shell schemas; spring-token schema removed
+[CFG-REFACTOR] src/config/schema/config_sections.cpp motion_preset section removed
+[CFG-REFACTOR] src/config/config_migrations.cpp v24 relocates UI keys; v20 message targets shell.corner_shape
+[CFG-REFACTOR] src/config/config_overrides.cpp configEqual/change set use single motion struct
+[CFG-REFACTOR] src/app/application_services.cpp runtime reads new sections; setMotionConfig dropped
+[CFG-REFACTOR] src/shell/panel/panel_manager.cpp motion.panel; snap open/close when animations disabled
+[CFG-REFACTOR] src/shell/settings/settings_registry.cpp new paths, motion order, visibility gating
+[CFG-REFACTOR] tests/config_* + config_validate/generated-config v24 + new section paths pending-test
