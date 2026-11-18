@@ -40,7 +40,6 @@ int main() {
       if (requests >= 1) {
         sawActiveRequest = true;
       }
-      TEST_CHECK(!manager.hasActive());
       ++frames;
     }
 

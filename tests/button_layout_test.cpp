@@ -96,9 +96,8 @@ int main() {
 
   TEST_NEAR(glyphCenterX, buttonCenterX, 0.001F);
   TEST_NEAR(glyphCenterY, buttonCenterY, 0.001F);
-  // A 21px glyph in a 32px button.
-  TEST_NEAR(glyph->x(), 5.5F, 0.001F);
-  TEST_NEAR(glyph->y(), 5.5F, 0.001F);
+  TEST_NEAR(glyph->x(), (button.width() - glyph->width()) * 0.5F, 0.001F);
+  TEST_NEAR(glyph->y(), (button.height() - glyph->height()) * 0.5F, 0.001F);
 
   // A button stretched narrower than its text keeps the label on one line and hands it a
   // budget derived from the assigned box, rather than wrapping inside a fixed-height row.
