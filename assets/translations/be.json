@@ -1929,6 +1929,10 @@
         "high-contrast": {
           "description": "Павялічэнне кантрасту экстрэмальным павелічэннем каляровых значэнняў паверхняў і фона",
           "label": "Высокі кантраст"
+        },
+        "density": {
+          "label": "Density",
+          "description": "Scales the overall size and spacing of the interface."
         }
       },
       "appearance": {
@@ -2045,6 +2049,22 @@
         "wallpaper-generation-scheme": {
           "description": "Як колеры са шпалер канвертуюцца ў палітру",
           "label": "Схема генерацыі палітры"
+        },
+        "theme-corner-style": {
+          "label": "Corner Style",
+          "description": "Visual grouping or fixed radius of interface corners"
+        },
+        "corner-shape": {
+          "label": "Corner Shape",
+          "description": "Roundness presets of interface corners."
+        },
+        "motion-panel": {
+          "label": "Panel Motion",
+          "description": "Animation style for opening and closing panels."
+        },
+        "expressive": {
+          "label": "Button Morphing",
+          "description": "Shapeshifting effects when pressing or clicking buttons."
         }
       },
       "backdrop": {

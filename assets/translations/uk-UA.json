@@ -1871,6 +1871,22 @@
         "wallpaper-generation-scheme": {
           "description": "Як створюватиметься палітра на основі кольорів тла.",
           "label": "Схема генерування палітри"
+        },
+        "theme-corner-style": {
+          "label": "Corner Style",
+          "description": "Visual grouping or fixed radius of interface corners"
+        },
+        "corner-shape": {
+          "label": "Corner Shape",
+          "description": "Roundness presets of interface corners."
+        },
+        "motion-panel": {
+          "label": "Panel Motion",
+          "description": "Animation style for opening and closing panels."
+        },
+        "expressive": {
+          "label": "Button Morphing",
+          "description": "Shapeshifting effects when pressing or clicking buttons."
         }
       },
       "backdrop": {
@@ -3091,6 +3107,12 @@
         "transitions": {
           "description": "Ефекти, які застосовуються під час зміни зображення тла (вибирається щоразу випадково серед вказаних).",
           "label": "Ефекти переходу"
+        }
+      },
+      "accessibility": {
+        "density": {
+          "label": "Density",
+          "description": "Scales the overall size and spacing of the interface."
         }
       }
     },

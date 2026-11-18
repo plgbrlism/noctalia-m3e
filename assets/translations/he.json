@@ -1570,6 +1570,10 @@
         "high-contrast": {
           "description": "מגביר את הניגודיות על ידי דחיפת צבעי המשטח והרקע לערכים קיצוניים",
           "label": "ניגודיות גבוהה"
+        },
+        "density": {
+          "label": "Density",
+          "description": "Scales the overall size and spacing of the interface."
         }
       },
       "appearance": {
@@ -1665,6 +1669,22 @@
         "wallpaper-generation-scheme": {
           "description": "בחר כיצד צבעי הטפט יומרו לפלטת צבעים",
           "label": "סכמת יצירת טפטים"
+        },
+        "theme-corner-style": {
+          "label": "Corner Style",
+          "description": "Visual grouping or fixed radius of interface corners"
+        },
+        "corner-shape": {
+          "label": "Corner Shape",
+          "description": "Roundness presets of interface corners."
+        },
+        "motion-panel": {
+          "label": "Panel Motion",
+          "description": "Animation style for opening and closing panels."
+        },
+        "expressive": {
+          "label": "Button Morphing",
+          "description": "Shapeshifting effects when pressing or clicking buttons."
         }
       },
       "backdrop": {

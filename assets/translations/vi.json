@@ -1934,6 +1934,10 @@
         "high-contrast": {
           "description": "Tăng độ tương phản bằng cách điều chỉnh màu bề mặt và màu nền về các mức cực đại hoặc cực tiểu",
           "label": "Độ tương phản cao"
+        },
+        "density": {
+          "label": "Density",
+          "description": "Scales the overall size and spacing of the interface."
         }
       },
       "appearance": {
@@ -2028,6 +2032,22 @@
         "wallpaper-generation-scheme": {
           "description": "Chọn cách màu sắc hình nền được chuyển đổi thành bảng màu",
           "label": "Cơ chế tạo hình nền"
+        },
+        "theme-corner-style": {
+          "label": "Corner Style",
+          "description": "Visual grouping or fixed radius of interface corners"
+        },
+        "corner-shape": {
+          "label": "Corner Shape",
+          "description": "Roundness presets of interface corners."
+        },
+        "motion-panel": {
+          "label": "Panel Motion",
+          "description": "Animation style for opening and closing panels."
+        },
+        "expressive": {
+          "label": "Button Morphing",
+          "description": "Shapeshifting effects when pressing or clicking buttons."
         }
       },
       "backdrop": {

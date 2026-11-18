@@ -609,24 +609,16 @@ namespace settings {
     entries.push_back(makeEntry(
         SettingsSection::Appearance, "interface",
         tr("settings.schema.appearance.theme-corner-style.label"),
-        tr("settings.schema.appearance.theme-corner-style.description"), {"theme", "corner_style"},
-        asSegmented(enumSelect(kCornerStyles, cfg.theme.cornerStyle)), "corner style material fixed"
+        tr("settings.schema.appearance.theme-corner-style.description"), {"shell", "corner_style"},
+        asSegmented(enumSelect(kCornerStyles, cfg.shell.cornerStyle)), "corner style material fixed"
     ));
     entries.push_back(makeEntry(
         SettingsSection::Appearance, "interface",
         tr("settings.schema.appearance.corner-shape.label"),
         tr("settings.schema.appearance.corner-shape.description"),
-        {"theme", "corner_shape"},
-        asSegmented(enumSelect(kCornerShapePresets, cfg.theme.cornerShape)),
+        {"shell", "corner_shape"},
+        asSegmented(enumSelect(kCornerShapePresets, cfg.shell.cornerShape)),
         "rounded corners radius shape"
-    ));
-    entries.push_back(makeEntry(
-        SettingsSection::Appearance, "interface",
-        tr("settings.schema.appearance.theme-density.label"),
-        tr("settings.schema.appearance.theme-density.description"),
-        {"theme", "density"},
-        asSegmented(enumSelect(kDensities, cfg.theme.density)),
-        "density spacing compact standard comfortable"
     ));
     {
       const ColorSpec pickerColor = *effectiveShellAppIconColorizationTint(cfg.shell, true);
@@ -648,31 +640,44 @@ namespace settings {
         ToggleSetting{cfg.accessibility.highContrast}, "accessibility high contrast visually impaired"
     ));
     entries.push_back(makeEntry(
+        SettingsSection::Appearance, "accessibility", tr("settings.schema.accessibility.density.label"),
+        tr("settings.schema.accessibility.density.description"), {"accessibility", "density"},
+        asSegmented(enumSelect(kDensities, cfg.accessibility.density)),
+        "density spacing compact standard comfortable"
+    ));
+    entries.push_back(makeEntry(
         SettingsSection::Appearance, "motion", tr("settings.schema.appearance.animations.label"),
         tr("settings.schema.appearance.animations.description"), {"shell", "animation", "enabled"},
         ToggleSetting{cfg.shell.animation.enabled}, "motion"
     ));
+    const std::size_t motionDependentStart = entries.size();
     entries.push_back(makeEntry(
         SettingsSection::Appearance, "motion",
         tr("settings.schema.appearance.motion-panel.label"),
         tr("settings.schema.appearance.motion-panel.description"),
-        {"motion_preset", "panel"},
-        asSegmented(enumSelect(kPanelMotions, cfg.motionPreset.panel)),
+        {"motion", "panel"},
+        asSegmented(enumSelect(kPanelMotions, cfg.motion.panel)),
         "panel motion reveal fade directional depth fluid"
-    ));
-    entries.push_back(makeEntry(
-        SettingsSection::Appearance, "motion",
-        tr("settings.schema.appearance.expressive.label"),
-        tr("settings.schema.appearance.expressive.description"),
-        {"theme", "expressive"},
-        ToggleSetting{cfg.theme.expressive},
-        "button morphing expressive classic morph material"
     ));
     entries.push_back(makeEntry(
         SettingsSection::Appearance, "motion", tr("settings.schema.appearance.animation-speed.label"),
         tr("settings.schema.appearance.animation-speed.description"), {"shell", "animation", "speed"},
         sliderFor(cfg.shell.animation.speed, noctalia::config::schema::kAnimationSpeedRange, false), "motion"
     ));
+    entries.push_back(makeEntry(
+        SettingsSection::Appearance, "motion",
+        tr("settings.schema.appearance.expressive.label"),
+        tr("settings.schema.appearance.expressive.description"),
+        {"motion", "expressive"},
+        ToggleSetting{cfg.motion.expressive},
+        "button morphing expressive classic morph material"
+    ));
+    for (std::size_t i = motionDependentStart; i < entries.size(); ++i) {
+      SettingVisibility prev = std::move(entries[i].visibleWhen);
+      entries[i].visibleWhen = prev
+          ? SettingVisibility{[prev = std::move(prev)](const Config& c) { return c.shell.animation.enabled && prev(c); }}
+          : SettingVisibility{[](const Config& c) { return c.shell.animation.enabled; }};
+    }
     entries.push_back(makeEntry(
         SettingsSection::Appearance, "borders", tr("settings.schema.appearance.button-borders.label"),
         tr("settings.schema.appearance.button-borders.description"), {"shell", "button_borders"},

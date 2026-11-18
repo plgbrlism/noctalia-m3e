@@ -51,6 +51,22 @@
         },
         "palette-source": {
           "description": "Where to derive the colour palette from"
+        },
+        "theme-corner-style": {
+          "label": "Corner Style",
+          "description": "Visual grouping or fixed radius of interface corners"
+        },
+        "corner-shape": {
+          "label": "Corner Shape",
+          "description": "Roundness presets of interface corners."
+        },
+        "motion-panel": {
+          "label": "Panel Motion",
+          "description": "Animation style for opening and closing panels."
+        },
+        "expressive": {
+          "label": "Button Morphing",
+          "description": "Shapeshifting effects when pressing or clicking buttons."
         }
       },
       "bar": {
@@ -76,6 +92,12 @@
       "wallpaper": {
         "fill-color": {
           "label": "Fill Colour"
+        }
+      },
+      "accessibility": {
+        "density": {
+          "label": "Density",
+          "description": "Scales the overall size and spacing of the interface."
         }
       }
     },

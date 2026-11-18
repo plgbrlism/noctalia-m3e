@@ -1948,6 +1948,10 @@
     },
     "schema": {
       "accessibility": {
+        "density": {
+          "description": "Scales the overall size and spacing of the interface.",
+          "label": "Density"
+        },
         "high-contrast": {
           "description": "Increase contrast by pushing surface and background colors towards extreme values",
           "label": "High Contrast"
@@ -1988,7 +1992,7 @@
           "search-placeholder": "Search palettes…"
         },
         "corner-shape": {
-          "description": "Corner roundness preset: Sharp, Standard, or Round",
+          "description": "Roundness presets of interface corners.",
           "label": "Corner Shape"
         },
         "custom-palette": {
@@ -2069,15 +2073,17 @@
           "label": "Wallpaper Generation Scheme"
         },
         "expressive": {
-          "description": "Enable M3 Expressive button morphing — turn off for vanilla noctalia",
+          "description": "Shapeshifting effects when pressing or clicking buttons.",
           "label": "Button Morphing"
         },
         "motion-panel": {
-          "description": "Panel reveal animation style",
+          "description": "Animation style for opening and closing panels.",
           "label": "Panel Motion"
         },
-        "theme-corner-style": { "label": "Corner Style", "description": "Material (grouped pill rows) or Fixed (uniform isolated pills)" },
-        "theme-density": { "label": "Density", "description": "Spacing preset: Comfortable, Standard, or Compact" }
+        "theme-corner-style": {
+          "description": "Visual grouping or fixed radius of interface corners",
+          "label": "Corner Style"
+        }
       },
       "backdrop": {
         "blur-intensity": {

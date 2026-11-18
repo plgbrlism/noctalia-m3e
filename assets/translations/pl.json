@@ -1318,6 +1318,22 @@
         "wallpaper-generation-scheme": {
           "description": "Wybierz, w jaki sposób kolory tapety są konwertowane na paletę",
           "label": "Schemat generowania tapety"
+        },
+        "theme-corner-style": {
+          "label": "Corner Style",
+          "description": "Visual grouping or fixed radius of interface corners"
+        },
+        "corner-shape": {
+          "label": "Corner Shape",
+          "description": "Roundness presets of interface corners."
+        },
+        "motion-panel": {
+          "label": "Panel Motion",
+          "description": "Animation style for opening and closing panels."
+        },
+        "expressive": {
+          "label": "Button Morphing",
+          "description": "Shapeshifting effects when pressing or clicking buttons."
         }
       },
       "backdrop": {
@@ -2353,6 +2369,12 @@
         "transitions": {
           "description": "Efekty dostępne podczas zmiany tapety (jeden wybierany losowo za każdym razem)",
           "label": "Efekty przejścia"
+        }
+      },
+      "accessibility": {
+        "density": {
+          "label": "Density",
+          "description": "Scales the overall size and spacing of the interface."
         }
       }
     },
