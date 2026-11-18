@@ -21,7 +21,7 @@ namespace noctalia::shell::panel::reveal {
   inline bool isDirectional(PanelMotion variant) noexcept { return variant == PanelMotion::Directional; }
 
   inline RevealTransform chromeTransform(float progress, PanelMotion variant,
-                                          RevealDirection dir, bool /*attached*/) noexcept {
+                                          RevealDirection dir, bool attached) noexcept {
     const float p = std::clamp(progress, 0.0F, 1.0F);
     switch (variant) {
     case PanelMotion::Standard:
@@ -37,24 +37,25 @@ namespace noctalia::shell::panel::reveal {
     // panel_manager.cpp. Belt-and-suspenders: if progress is exactly 1
     // we're already identity by construction.)
     const float s = 1.0F - p;
+    const float travel = attached ? 0.0F : kFluidTravel;
     RevealTransform t;
     const float swell = 1.0F + kFluidSquash * s;
     switch (dir) {
     case RevealDirection::Down:
       t.scaleX = swell;
-      t.offsetY = -kFluidTravel * s;
+      t.offsetY = -travel * s;
       break;
     case RevealDirection::Up:
       t.scaleX = swell;
-      t.offsetY = +kFluidTravel * s;
+      t.offsetY = +travel * s;
       break;
     case RevealDirection::Right:
       t.scaleY = swell;
-      t.offsetX = -kFluidTravel * s;
+      t.offsetX = -travel * s;
       break;
     case RevealDirection::Left:
       t.scaleY = swell;
-      t.offsetX = +kFluidTravel * s;
+      t.offsetX = +travel * s;
       break;
     }
     return t;
