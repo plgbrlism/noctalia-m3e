@@ -98,3 +98,4 @@ Status: `pending-test` | `pass` | `fail` | `reverted`
 [CFG-REFACTOR] src/shell/panel/panel_manager.cpp motion.panel; snap open/close when animations disabled
 [CFG-REFACTOR] src/shell/settings/settings_registry.cpp new paths, motion order, visibility gating
 [CFG-REFACTOR] tests/config_* + config_validate/generated-config v24 + new section paths pending-test
+- f737e2da2 2026-11-18 feat(icons): draw color-scheme icon themes with the shell palette
