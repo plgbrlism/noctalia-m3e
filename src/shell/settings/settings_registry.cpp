@@ -6,6 +6,7 @@
 #include "core/log.h"
 #include "i18n/i18n.h"
 #include "launcher/panel_catalog.h"
+#include "render/text/system_font.h"
 #include "pipewire/sound_player.h"
 #include "shell/app_icon_colorization_settings.h"
 #include "shell/bar/widget_gesture.h"
@@ -584,13 +585,14 @@ namespace settings {
         ToggleSetting{cfg.theme.syncColorScheme}, "gnome gtk portal dark light prefer color scheme apps"
     ));
     {
-      SettingControl fontFamilyControl =
-          TextSetting{.value = cfg.shell.fontFamily, .placeholder = "sans-serif", .browseFileExtensions = {}};
+      SettingControl fontFamilyControl = TextSetting{
+          .value = cfg.shell.fontFamily, .placeholder = text::resolveFontFamily(""), .browseFileExtensions = {}
+      };
       if (!env.fontFamilies.empty()) {
         fontFamilyControl = SearchPickerSetting{
             .options = env.fontFamilies,
             .selectedValue = cfg.shell.fontFamily,
-            .placeholder = "sans-serif",
+            .placeholder = text::resolveFontFamily(""),
             .emptyText = tr("ui.controls.search-picker.empty"),
             .preferredHeight = 280.0F,
         };
@@ -4040,17 +4042,18 @@ namespace settings {
           tr("settings.schema.bar.panel-overlap.description"), path("panel_overlap"),
           barPanelOverlapStepper(bar.panelOverlap), "seam gap overlap attached panel fractional scale", true
       ));
+      const std::string shellFontFamily = text::resolveFontFamily(cfg.shell.fontFamily);
       const std::string barResolvedFontFamily =
-          bar.fontFamily && !bar.fontFamily->empty() ? *bar.fontFamily : cfg.shell.fontFamily;
+          bar.fontFamily && !bar.fontFamily->empty() ? *bar.fontFamily : shellFontFamily;
       {
         SettingControl fontFamilyControl = TextSetting{
-            .value = bar.fontFamily.value_or(""), .placeholder = cfg.shell.fontFamily, .browseFileExtensions = {}
+            .value = bar.fontFamily.value_or(""), .placeholder = shellFontFamily, .browseFileExtensions = {}
         };
         if (!env.fontFamilies.empty()) {
           fontFamilyControl = SearchPickerSetting{
               .options = env.fontFamilies,
               .selectedValue = bar.fontFamily.value_or(""),
-              .placeholder = cfg.shell.fontFamily,
+              .placeholder = shellFontFamily,
               .emptyText = tr("ui.controls.search-picker.empty"),
               .preferredHeight = 280.0F,
           };
@@ -4451,7 +4454,8 @@ namespace settings {
             "seam gap overlap attached panel fractional scale", true
         ));
         {
-          const std::string monitorInheritedFontFamily = bar.fontFamily.value_or(cfg.shell.fontFamily);
+          const std::string monitorInheritedFontFamily =
+              bar.fontFamily.value_or(text::resolveFontFamily(cfg.shell.fontFamily));
           SettingControl fontFamilyControl = TextSetting{
               .value = ovr.fontFamily.value_or(""),
               .placeholder = monitorInheritedFontFamily,

@@ -7,6 +7,7 @@
 #include "dbus/polkit/polkit_session_support.h"
 #include "ipc/ipc_service.h"
 #include "render/core/color.h"
+#include "render/text/system_font.h"
 #include "shell/session/session_action_meta.h"
 #include "system/process.h"
 #include "ui/palette.h"
@@ -445,9 +446,8 @@ namespace {
         : (Style::cornerShape() == Style::CornerShapePreset::Round) ? 2.0F
         : 1.0F;
     appearance.insert_or_assign("corner_radius_scale", static_cast<double>(greeterScale));
-    if (!config.shell.fontFamily.empty()) {
-      appearance.insert_or_assign("font_family", config.shell.fontFamily);
-    }
+    // The greeter runs as another user and cannot read this user's GTK font setting.
+    appearance.insert_or_assign("font_family", text::resolveFontFamily(config.shell.fontFamily));
 
     // Keys follow the greeter's own 16-color palette schema; its surface_variant and outline are the
     // shell's surface_container and outline_variant.
