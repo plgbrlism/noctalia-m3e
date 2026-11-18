@@ -172,13 +172,23 @@ namespace {
         setFill(clearColorSpec());
       }
 
-      ColorSpec foreground = option.enabled ? colorSpecFromRole(ColorRole::OnSurface)
-                                            : colorSpecFromRole(ColorRole::OnSurface, Style::disabledAlpha);
-      ColorSpec detailForeground =
-          colorSpecFromRole(ColorRole::OnSurfaceVariant, option.enabled ? 1.0F : Style::disabledAlpha);
       if (highlighted) {
         return {colorSpecFromRole(ColorRole::OnPrimary), colorSpecFromRole(ColorRole::OnPrimary)};
       }
+      if (hovered) {
+        return {colorSpecFromRole(ColorRole::OnHover), colorSpecFromRole(ColorRole::OnHover)};
+      }
+      if (selected && enabled) {
+        return {colorSpecFromRole(ColorRole::OnPrimaryContainer), colorSpecFromRole(ColorRole::OnPrimaryContainer)};
+      }
+      return {
+          enabled ? colorSpecFromRole(ColorRole::OnSurface)
+                  : colorSpecFromRole(ColorRole::OnSurface, Style::disabledAlpha),
+          colorSpecFromRole(ColorRole::OnSurfaceVariant, enabled ? 1.0F : Style::disabledAlpha),
+      };
+    }
+
+    void bindPreview(const ColorSwatchPreview& preview, bool shown) {
       if (m_preview != nullptr) {
         m_preview->setMetricsFromFontSize(Style::fontSizeBody);
         m_preview->setPreview(preview);

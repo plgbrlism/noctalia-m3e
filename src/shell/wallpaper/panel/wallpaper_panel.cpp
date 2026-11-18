@@ -104,14 +104,6 @@ namespace {
     };
   }
 
-  std::vector<std::string> wallpaperSchemeValues() {
-    return {
-        "m3-content", "m3-tonal-spot", "m3-fruit-salad", "m3-rainbow",
-        "m3-monochrome", "m3-expressive", "vibrant", "faithful",
-        "soft", "dysfunctional", "muted",
-    };
-  }
-
   std::optional<ThemeMode> favoriteThemeBadge(const WallpaperFavorite* favorite) {
     if (favorite == nullptr) {
       return std::nullopt;
