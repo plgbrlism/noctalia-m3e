@@ -1,25 +1,23 @@
 #pragma once
 
-#include "render/animation/animation_manager.h"
 #include "shell/control_center/tab.h"
 #include "ui/signal.h"
 
 #include <array>
 #include <string>
-#include <vector>
 
 class Box;
-class Button;
 class Flex;
-class InputArea;
 class Glyph;
 class Image;
 class Label;
+class ProgressBar;
 class Renderer;
 class ScreenTimeService;
 class ConfigService;
 class ScrollView;
 class Segmented;
+struct ScreenTimeSnapshot;
 
 class ScreenTimeTab : public Tab {
 public:
@@ -34,17 +32,11 @@ private:
   void doUpdate(Renderer& renderer) override;
   void onPanelCardOpacityChanged(float opacity) override;
   void syncContent(Renderer& renderer);
-  void bindAppNameMaxWidths(Renderer& renderer, float gridWidth);
+  void syncChart(const ScreenTimeSnapshot& snapshot, float scale);
+  void bindAppRowWidths(Renderer& renderer, float rowWidth);
   void layoutChart(Renderer& renderer);
   void layoutAppRows(Renderer& renderer);
-  void beginRangeSlideOut(int nextRangeDays);
-  void beginRangeSlideIn();
-  void applyRangeSlide(float progress, bool slidingIn);
-  void cancelRangeSlide();
   void syncEnabledUi();
-  void syncDayLabelHover();
-  void openDayDetail(std::size_t bucketIndex);
-  void clearDayDetail();
   std::string resolveIconPath(const std::string& appKey) const;
 
   ScreenTimeService* m_screenTime = nullptr;
@@ -52,66 +44,47 @@ private:
   Signal<>::ScopedConnection m_appIconColorizeConn;
   bool m_active = false;
   int m_rangeDays = 1;
-  std::string m_detailDayKey;
-  std::vector<std::string> m_bucketDayKeys;
   std::string m_lastSnapshotKey;
-  int m_rangeSlideDirection = 0;
-  int m_pendingRangeDays = 1;
-  bool m_startRangeSlideIn = false;
-  AnimationManager::Id m_rangeSlideAnimId = 0;
-  float m_scrollBaseX = 0.0F;
-  float m_scrollBaseY = 0.0F;
 
   Flex* m_root = nullptr;
-  Flex* m_usageCard = nullptr;
-  Flex* m_detailBar = nullptr;
+  Flex* m_statsCard = nullptr;
+  Flex* m_appsCard = nullptr;
   Label* m_disabledLabel = nullptr;
-  Label* m_detailTitle = nullptr;
-  Button* m_detailBackButton = nullptr;
   Segmented* m_rangePicker = nullptr;
   ScrollView* m_scroll = nullptr;
   Flex* m_chartPlotRow = nullptr;
   Flex* m_chartLabelRow = nullptr;
-  Flex* m_mostUsedSection = nullptr;
-  Flex* m_appsGrid = nullptr;
+  Flex* m_appList = nullptr;
   Label* m_totalLabel = nullptr;
   Label* m_emptyLabel = nullptr;
 
-  static constexpr int kMaxBuckets = 24;
   static constexpr int kMaxAppRows = 12;
-  static constexpr int kMaxChartSeries = 5;
-  static constexpr int kAppsPerRow = 2;
-  static constexpr int kMostUsedRows = (kMaxAppRows + kAppsPerRow - 1) / kAppsPerRow;
+  static constexpr int kMaxBuckets = 24;
+  static constexpr float kChartHeight = 132.0F;
+  static constexpr float kChartBarWidthRatio = 0.70F;
+  static constexpr float kChartMinBarWidth = 10.0F;
+  static constexpr float kChartGap = 2.0F;
 
-  struct BucketColumnWidgets {
-    Flex* plotColumn = nullptr;
-    Box* track = nullptr;
-    Label* label = nullptr;
-    InputArea* labelHit = nullptr;
+  struct ChartColumnWidgets {
+    Flex* column = nullptr;
     Flex* labelCell = nullptr;
-    std::array<InputArea*, kMaxChartSeries> segmentHits{};
-    std::array<Box*, kMaxChartSeries> segments{};
-    std::array<float, kMaxChartSeries> segmentHeights{};
+    Box* fill = nullptr;
+    Label* label = nullptr;
+    float fillRatio = 0.0F;
   };
-  std::array<BucketColumnWidgets, kMaxBuckets> m_bucketColumns{};
+  std::array<ChartColumnWidgets, kMaxBuckets> m_chartColumns{};
 
   struct AppRowWidgets {
-    Flex* cell = nullptr;
     Flex* row = nullptr;
-    Box* chartSwatch = nullptr;
     Flex* iconSlot = nullptr;
     Image* icon = nullptr;
     Glyph* iconFallback = nullptr;
     Label* name = nullptr;
     Label* duration = nullptr;
-    Flex* barHost = nullptr;
-    Box* barTrack = nullptr;
-    Box* barFill = nullptr;
-    float barFillRatio = 0.0F;
+    ProgressBar* bar = nullptr;
     std::string iconPath;
   };
   std::array<AppRowWidgets, kMaxAppRows> m_appRows{};
-  std::array<Flex*, kMostUsedRows> m_appGridRows{};
   Signal<>::ScopedConnection m_paletteConn;
 
   void updateIconForRow(Renderer& renderer, AppRowWidgets& widgets, const std::string& appKey, float scale);
