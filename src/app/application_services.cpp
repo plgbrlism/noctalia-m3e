@@ -603,6 +603,16 @@ void Application::initStyleThemeAndWayland() {
   applyStyleConfig();
   applyPasswordMaskStyle();
   applyInputConfig();
+  m_cornerRadiusConn = Style::cornerRadiusChanged().connect([this] {
+    // Radius changes need a repaint everywhere; panels, bar, and desktop widgets also
+    // recompute derived geometry or custom-node radii during layout.
+    m_bar.refresh();
+    m_desktopWidgetsController.requestLayout();
+    m_notificationToast.requestLayout();
+    m_osdOverlay.requestLayout();
+    m_panelManager.requestLayout();
+    m_panelManager.refresh();
+  });
   m_httpClient.setOfflineMode(m_configService.config().shell.offlineMode);
   m_scriptApi.setConfigSnapshot(m_configService.configTable());
   m_configService.addReloadCallback(applyMotionConfig);
