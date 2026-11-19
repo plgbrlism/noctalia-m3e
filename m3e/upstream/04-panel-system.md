@@ -9,6 +9,7 @@
 | `src/shell/panel/panel_header_style.h` | +8 new | Tonal header surface |
 | `src/shell/panel/panel_surface_style.h` | +6 | Surface style |
 | `src/shell/panel/persistent_panel_host.cpp` | +6 | Variant propagation |
+| `src/shell/panel/panel_manager.cpp/.h` | +46/+1 | Shape-matched Shadow dim overlay for attached popups |
 
 Upstream reveal was a single fixed animation. The fork selects one of four via `[motion_preset].panel` and keeps reduce-motion as an instant snap.
 

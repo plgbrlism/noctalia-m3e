@@ -99,3 +99,9 @@ Status: `pending-test` | `pass` | `fail` | `reverted`
 [CFG-REFACTOR] src/shell/settings/settings_registry.cpp new paths, motion order, visibility gating
 [CFG-REFACTOR] tests/config_* + config_validate/generated-config v24 + new section paths pending-test
 - f737e2da2 2026-11-18 feat(icons): draw color-scheme icon themes with the shell palette
+- 39058f0c3 2026-11-19 fix(ui): de-tertiary context menu hover
+- 70b5e2aee 2026-11-19 feat(ui): dim attached popups on host panels
+- 5e11e337b 2026-11-19 test(panel): scale test panel and fill height
+- cf196d5f4 2026-11-19 feat(ui): standardize picker and widget dialog headers
+- 0e5248564 2026-11-19 feat(settings): color destructive sheet action
+- c115c8048 2026-11-19 feat(control-center): redesign screen time tab

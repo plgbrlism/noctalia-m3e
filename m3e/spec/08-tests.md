@@ -64,5 +64,11 @@ P2 adds: AT-SHP all-35 render, star-convex per name, AA thin features, cross-pro
 | AT-MOT-07 | `tests/spring_test.cpp`, `tests/idle_test.cpp` | Spring settle + zero idle ticks |
 | AT-SLD-01 | `tests/slider_test.cpp` | Standard and Range Slider non-zero handle bounds, exact sliderGap spacing, endpoint clamping, press squish, and 1.25x/1.5x scaling |
 | AT-SLD-02 | `tests/range_slider_test.cpp` | RangeSlider dual handle visibility, 4-boundary sliderGap spacing, low <= high ordering, and active track hiding on convergence |
+| AT-UI-03 | `tests/context_menu_control_test.cpp` | Neutral hover uses OnSurface; destructive hover keeps Error |
+| AT-UI-04 | manual | Search, color, clipboard, and widget-add dialogs use shared header surface and header icon buttons; picker/create modals fit without clipping at 1.25x and 1.5x |
+| AT-PANEL-07 | manual | Attached popups dim host panel with Shadow overlay and restore on close |
+| AT-CC-01 | manual | Screen Time tab shows two cards, primary-only height-scaled bars, 24/3/14 buckets, and spaced app rows |
 
 Template store (community + built-in modal) verified manually: row 1 not clipped, hover tooltip on row body/checkbox, readme opens browser, checkbox toggles config, search/category/sort/empty state, no per-row tab stop.
+
+Rev9 UI polish verified manually: panel dim follows host shape, search/color/widget-add headers match panel headers, widget-add modal fits after header changes, Screen Time chart has only blue bars, destructive settings action uses Error/OnError.

@@ -11,6 +11,9 @@
 | `src/shell/settings/settings_window_palette.cpp` | +2 | Palette inspector |
 | `src/shell/settings/settings_window_popups.cpp` | +32 | Community + built-in template-store modals |
 | `src/shell/settings/settings_window_scene.cpp` | +23/-22 | Callback wiring, registry action patch |
+| `src/shell/settings/settings_window_popups.cpp` | rev9 | Search picker hosted in SettingsModalHost with standard header |
+| `src/shell/settings/widget_add_popup.cpp` | rev9 | Shared header surface and larger picker/create sizing |
+| `src/shell/settings/settings_sheet.cpp` | rev9 | Destructive sheet action uses Error background and OnError glyph |
 
 Current settings paths:
 - Corner Style → `{shell,corner_style}`; Corner Shape → `{shell,corner_shape}`.

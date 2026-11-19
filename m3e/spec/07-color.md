@@ -8,3 +8,5 @@
 | COL-R-04 | OSD and notifications use `surface_container_high` + `on_surface` |
 | COL-R-05 | "color role" in UI strings; "theme" means the `[theme]` subsystem |
 | COL-R-06 | `[theme].design_system` is theme-level. When = expressive, settings GUI recommends `[theme].wallpaper_scheme = "m3-expressive"` (existing user value preserved if set). Palette generation unchanged — UX guidance only. |
+| COL-R-07 | Destructive icon actions use `Error` as background and `OnError` as glyph. |
+| COL-R-08 | Attached-popup dim overlays use `Shadow` on the host panel surface. |

@@ -40,6 +40,7 @@ Regenerate only via the spec-verify or spec-amend skills.
 
 - `lib/ui/controls/` — Button, Label, Switch, Chip, and other primitive controls
 - `src/shell/controls/` — shell-owned controls: MarkdownView, SearchPicker, ColorPicker
+- `src/shell/settings/widget_add_popup.*` — bar widget picker modal
 - Invariants: INV-02, PHASE-002, LIB-001
 - Work items: MOT-004, SHP-001, SHP-006, CMP-001, CMP-002, COL-001
 ---
@@ -50,6 +51,9 @@ Regenerate only via the spec-verify or spec-amend skills.
 - `src/shell/desktop/widgets/` — desktop widget tick/request call sites
 - `src/shell/bar/bar.cpp` — bar panels and widget hosts
 - `src/shell/control_center/` — control center panel, tabs, and shortcut registry
+- `src/shell/control_center/tabs/screen_time_tab.*` — screen time dashboard
+- `src/shell/dialogs/` — dialog popup hosts and search picker popup
+- `src/shell/clipboard/` — clipboard panel and header actions
 - `src/shell/greeter/` — greeter appearance sync
 - `src/shell/launcher/launcher_panel.cpp` — launcher panel, categories, and filter state
 - `src/shell/osd/osd_overlay.cpp` — OSD overlay and surface styling
@@ -99,7 +103,7 @@ Regenerate only via the spec-verify or spec-amend skills.
 ---
 ## Application lifecycle
 
-- `src/app/application.*` — Application lifecycle, service init, reload callback registration
+- `src/app/application.*`, `src/app/application_ui.cpp` — Application lifecycle, service init, reload callback registration
 - `src/app/application_services.*` — Service accessors and startup wiring (`MotionService::instance()` setup at :558)
 - `src/config/config_service.*` — Config load, validation, reload callback iteration (:630 register, :670/:715 iterate)
 - Invariants: INV-07, INV-09

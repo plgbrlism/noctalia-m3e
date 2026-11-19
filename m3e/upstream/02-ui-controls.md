@@ -13,6 +13,7 @@
 | `lib/ui/style.{h,cpp}` | +42/+98/-4 | `DesignSystem`, `CornerStyle`, `CornerShapePreset`, `Density`, `cornerShape()`, `densityScale()`, `designSystem()`, larger control heights; slider/toggle tokens rev8 |
 | `src/shell/panel/panel_header_style.h` | new | Shared header surface helper (`applyHeaderSurface`) |
 | `src/shell/panel/panel_button_style.h` | modified | 48/21px ghost icon buttons |
+| `lib/ui/controls/context_menu.cpp` | rev9 | Neutral hover uses OnSurface; destructive hover keeps Error at 16% |
 
 M3 control redesign in rev8: Checkbox with state layer + indeterminate; Toggle with animated hover/press halo and centered check glyph; Slider and RangeSlider with M3E XS Box-owned 7-node layout (inactive tracks, active track, pill handles with press squish, stop dots, 6px gaps) and fractional scale propagation via `setScale()`; template-store rows using a shared `TemplateStoreTile`.
 

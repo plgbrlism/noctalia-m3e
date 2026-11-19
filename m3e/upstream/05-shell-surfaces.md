@@ -10,5 +10,6 @@ Themes:
 - Tooltip border toggle and surface elevation (UI-001/UI-001b).
 - Control-center sidebar layout and native scrolling fix; wallpaper/launcher category and filter polish.
 - OSD and notification surfaces moved to `surface_container_high`.
+- Rev9: dialog hosts gained a bottom dim layer; clipboard sidebar uses the shared header surface; Screen Time tab uses two cards with primary-only vertical bars and pill app usage bars.
 
 Cross-reference: COL-003 (tonal elevation), DES-003 (border gating rev6), rev8 settings cleanup.
