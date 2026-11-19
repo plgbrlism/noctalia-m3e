@@ -6,6 +6,7 @@
 #include "render/core/renderer.h"
 #include "render/core/texture_manager.h"
 #include "render/scene/input_area.h"
+#include "shell/panel/panel_header_style.h"
 #include "ui/builders.h"
 #include "ui/controls/button.h"
 #include "ui/controls/image.h"
@@ -817,20 +818,18 @@ ColorPickerSheet::ColorPickerSheet(float chromeScale) : m_chromeScale(std::max(0
     headerRow->addChild(
         ui::button({
             .glyph = "close",
-            .glyphSize = Style::fontSizeBody * m_chromeScale,
-            .variant = ButtonVariant::Default,
-            .minWidth = Style::controlHeightSm * m_chromeScale,
-            .minHeight = Style::controlHeightSm * m_chromeScale,
-            .padding = Style::spaceXs * m_chromeScale,
-            .radius = Style::scaledRadiusMd(m_chromeScale),
             .onClick = [this] {
               if (m_onCancel) {
                 m_onCancel();
               }
             },
+            .configure = [scale = m_chromeScale](Button& button) {
+              panel_button_style::configureHeaderIconButton(button, scale, 1.0F);
+            },
         })
     );
   }
+  panel_header_style::applyHeaderSurface(*headerRow, 1.0F, m_chromeScale);
   addChild(std::move(headerRow));
 
   auto picker = std::make_unique<ColorPicker>();
@@ -894,15 +893,15 @@ void ColorPickerSheet::setPickerColumnWidth(float width) {
   }
 }
 
-float ColorPickerSheet::preferredDialogWidth(float scale) { return 340.0F * std::max(0.1F, scale); }
+float ColorPickerSheet::preferredDialogWidth(float scale) { return 420.0F * std::max(0.1F, scale); }
 
 float ColorPickerSheet::preferredDialogHeight(float dialogWidth, float scale) {
   const float s = std::max(0.1F, scale);
   const float pad = Style::spaceSm * s;
   const float innerW = std::max(160.0F, dialogWidth - 2.0F * pad);
   const float pickerColH = ColorPicker::intrinsicColumnHeight(innerW, s);
-  const float titleH = Style::fontSizeTitle * s * 1.3F;
+  const float titleH = panel_button_style::kIconButtonSize * s;
   const float actionsH = Style::controlHeight * s + 2.0F * Style::spaceSm * s;
   const float gapMd = Style::spaceMd * s;
-  return 2.0F * pad + titleH + pickerColH + actionsH + 2.0F * gapMd;
+  return 2.0F * pad + titleH + pickerColH + actionsH + 2.0F * gapMd + Style::controlHeight * s;
 }

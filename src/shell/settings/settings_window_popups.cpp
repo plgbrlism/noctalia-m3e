@@ -14,6 +14,8 @@
 #include "scripting/plugin_registry.h"
 #include "shell/dialog_popup_settings.h"
 #include "shell/dialogs/file_dialog.h"
+#include "shell/controls/search_picker.h"
+#include "shell/panel/panel_header_style.h"
 #include "shell/settings/bar_widget_editor.h"
 #include "shell/settings/color_spec_picker.h"
 #include "shell/settings/plugin_store_content.h"
@@ -60,6 +62,12 @@ namespace {
   constexpr std::int32_t kActionSupportReport = 1;
   constexpr std::int32_t kActionExportConfig = 2;
   constexpr std::string_view kCalendarDiscoveryOwner = "calendar_discovery";
+
+  struct SearchPickerModalState {
+    settings::SearchPickerOpenRequest request;
+    std::vector<SearchPickerOption> options;
+    std::string currentValue;
+  };
 
   std::string calendarCredentialError(CalendarService::CredentialOperationResult result) {
     switch (result) {
@@ -483,46 +491,20 @@ void SettingsWindow::openBarWidgetAddPopup(const std::vector<std::string>& laneP
 }
 
 void SettingsWindow::openSearchPickerPopup(settings::SearchPickerOpenRequest request) {
-  if (m_wayland == nullptr
-      || m_renderContext == nullptr
-      || m_surface == nullptr
-      || m_surface->xdgSurface() == nullptr
-      || m_config == nullptr
-      || request.options.empty()) {
+  if (m_config == nullptr || request.options.empty()) {
     return;
-  }
-
-  if (m_searchPickerPopup == nullptr) {
-    m_searchPickerPopup = std::make_unique<SearchPickerPopup>();
-    m_searchPickerPopup->initialize(*m_wayland, dialogPopupSettings(*m_config), *m_renderContext);
   }
 
   if (m_widgetAddPopup != nullptr && m_widgetAddPopup->isOpen()) {
     m_widgetAddPopup->close();
   }
 
-  // `currentValue` follows picks so a picker that stays open skips re-applying the option already applied.
-  m_searchPickerPopup->setOnSelect([this, settingPath = request.settingPath, currentValue = request.selectedValue,
-                                    onSelect = request.onSelect](const std::string& value) mutable {
-    if (value == currentValue) {
-      return;
-    }
-    currentValue = value;
-    if (onSelect) {
-      onSelect(value);
-      return;
-    }
-    if (value.empty()) {
-      clearSettingOverride(settingPath);
-      return;
-    }
-    setSettingOverride(settingPath, value);
-  });
-
-  std::vector<SearchPickerOption> pickerOptions;
-  pickerOptions.reserve(request.options.size());
-  for (const auto& opt : request.options) {
-    pickerOptions.push_back(
+  auto state = std::make_shared<SearchPickerModalState>();
+  state->request = std::move(request);
+  state->currentValue = state->request.selectedValue;
+  state->options.reserve(state->request.options.size());
+  for (const auto& opt : state->request.options) {
+    state->options.push_back(
         SearchPickerOption{
             .value = opt.value,
             .label = opt.label,
@@ -535,25 +517,106 @@ void SettingsWindow::openSearchPickerPopup(settings::SearchPickerOpenRequest req
     );
   }
 
-  wl_output* output = m_wayland->lastPointerOutput();
-  if (output == nullptr) {
-    output = m_output;
-  }
+  const float scale = contentScale();
+  auto modalId = std::make_shared<std::optional<settings::SettingsModalHost::ModalId>>();
+  const auto closeModal = [this, modalId] {
+    DeferredCall::callLater([this, modalId] {
+      if (modalId->has_value()) {
+        (void)m_modalHost.pop(modalId->value());
+      }
+    });
+  };
 
-  XdgPopupParent parent = popupParentFor(*m_surface, output, m_wayland->lastInputSerial());
+  const auto commit = [this, state, closeModal](const std::string& value) {
+    if (value == state->currentValue) {
+      return;
+    }
+    state->currentValue = value;
+    if (state->request.onSelect) {
+      state->request.onSelect(value);
+    } else if (value.empty()) {
+      clearSettingOverride(state->request.settingPath);
+    } else {
+      setSettingOverride(state->request.settingPath, value);
+    }
+    if (!state->request.keepOpenOnSelect) {
+      closeModal();
+    }
+  };
 
-  m_searchPickerPopup->open(
-      SearchPickerPopupRequest{
-          .parent = parent,
-          .title = std::move(request.title),
-          .options = std::move(pickerOptions),
-          .selectedValue = std::move(request.selectedValue),
-          .placeholder = std::move(request.placeholder),
-          .emptyText = std::move(request.emptyText),
-          .scale = contentScale(),
-          .keepOpenOnSelect = request.keepOpenOnSelect,
+  const auto id = m_modalHost.push(
+      settings::SettingsModalRequest{
+          .build =
+              [state, scale, commit, closeModal] {
+                auto body = ui::column({
+                    .align = FlexAlign::Stretch,
+                    .gap = Style::spaceSm * scale,
+                });
+                auto header = ui::row({
+                    .align = FlexAlign::Center,
+                    .gap = Style::spaceSm * scale,
+                });
+                header->addChild(
+                    ui::label({
+                        .out = nullptr,
+                        .text = state->request.title,
+                        .fontSize = Style::fontSizeBody * scale,
+                        .fontWeight = FontWeight::Bold,
+                        .color = colorSpecFromRole(ColorRole::OnSurface),
+                    })
+                );
+                header->addChild(ui::spacer());
+                if (Style::closeButtonsEnabled()) {
+                  header->addChild(
+                      ui::button({
+                          .glyph = "close",
+                          .onClick = closeModal,
+                          .configure = [scale](Button& button) {
+                            panel_button_style::configureHeaderIconButton(button, scale, 1.0F);
+                          },
+                      })
+                  );
+                }
+                panel_header_style::applyHeaderSurface(*header, 1.0F, scale);
+                body->addChild(std::move(header));
+                body->addChild(
+                    ui::searchPicker({
+                        .placeholder = state->request.placeholder,
+                        .emptyText = state->request.emptyText,
+                        .selectedValue = state->request.selectedValue,
+                        .options = state->options,
+                        .flexGrow = 1.0F,
+                        .onActivated =
+                            [commit](const SearchPickerOption& option) { commit(option.value); },
+                        .onCancel = closeModal,
+                        .configure =
+                            [](SearchPicker& picker) {
+                              picker.clearFill();
+                              picker.clearBorder();
+                              picker.setRadius(0.0F);
+                              picker.setPadding(0.0F);
+                            },
+                    })
+                );
+                return body;
+              },
+          .measure =
+              [scale](Renderer&, const settings::SettingsModalLayoutSpace& space) {
+                const float padding = 24.0F * scale;
+                const float width = std::min((480.0F - padding) * scale, std::max(1.0F, space.maxContentWidth));
+                const float height = std::min((460.0F - padding) * scale, std::max(1.0F, space.maxContentHeight));
+                return LayoutSize{.width = width, .height = height};
+              },
+          .requestClose = closeModal,
+          .onClosed = [modalId] { modalId->reset(); },
+          .contentPadding = 12.0F * scale,
+          .windowMargin = 24.0F * scale,
       }
   );
+  *modalId = id;
+  if (!id.has_value()) {
+    state.reset();
+  }
 }
 
 void SettingsWindow::openMonitorOverrideCreateDialog(std::optional<std::string> barName) {

@@ -8,6 +8,7 @@
 #include "render/scene/input_area.h"
 #include "render/scene/node.h"
 #include "shell/dialog_popup_settings.h"
+#include "shell/panel/panel_header_style.h"
 #include "shell/settings/widget_settings_registry.h"
 #include "ui/builders.h"
 #include "ui/style.h"
@@ -345,9 +346,9 @@ namespace settings {
 
     auto titleLabel = ui::label({
         .text = title,
-        .fontSize = Style::fontSizeBody * m_scale,
+        .fontSize = Style::fontSizeTitle * m_scale,
         .fontWeight = FontWeight::Bold,
-        .color = colorSpecFromRole(ColorRole::OnSurface),
+        .color = colorSpecFromRole(ColorRole::Primary),
     });
     if (m_createFormVisible) {
       titleLabel->setMaxLines(2);
@@ -356,15 +357,18 @@ namespace settings {
     header->addChild(ui::spacer());
 
     if (!m_createFormVisible) {
-      header->addChild(
+      auto toggleGroup = ui::row({
+          .align = FlexAlign::Center,
+          .gap = Style::spaceXs * m_scale,
+      });
+      toggleGroup->addChild(
           ui::label({
               .text = i18n::tr("settings.entities.widget.picker.instance-toggle"),
               .fontSize = Style::fontSizeCaption * m_scale,
               .color = colorSpecFromRole(ColorRole::OnSurfaceVariant),
           })
       );
-
-      header->addChild(
+      toggleGroup->addChild(
           ui::toggle({
               .checked = m_instanceModeEnabled,
               .scale = m_scale,
@@ -381,18 +385,13 @@ namespace settings {
               },
           })
       );
+      header->addChild(std::move(toggleGroup));
     }
 
     if (Style::closeButtonsEnabled()) {
       header->addChild(
           ui::button({
               .glyph = "close",
-              .glyphSize = Style::fontSizeBody * m_scale,
-              .variant = ButtonVariant::Default,
-              .minWidth = Style::controlHeightSm * m_scale,
-              .minHeight = Style::controlHeightSm * m_scale,
-              .padding = Style::spaceXs * m_scale,
-              .radius = Style::scaledRadiusMd(m_scale),
               .onClick = [this] {
                 const std::weak_ptr<void> aliveGuard = m_aliveGuard;
                 DeferredCall::callLater([this, aliveGuard] {
@@ -402,9 +401,13 @@ namespace settings {
                   close();
                 });
               },
+              .configure = [scale = m_scale](Button& button) {
+                panel_button_style::configureHeaderIconButton(button, scale, 1.0F);
+              },
           })
       );
     }
+    panel_header_style::applyHeaderSurface(*header, 1.0F, m_scale);
     root->addChild(std::move(header));
 
     root->addChild(
@@ -573,11 +576,11 @@ namespace settings {
   }
 
   std::pair<float, float> WidgetAddPopup::popupSize() const {
-    constexpr float kPickerWidth = 520.0F;
-    constexpr float kPickerHeight = 420.0F;
-    constexpr float kCreateMinWidth = 360.0F;
-    constexpr float kCreateHeight = 190.0F;
-    constexpr float kCreateMaxWidth = 640.0F;
+    constexpr float kPickerWidth = 560.0F;
+    constexpr float kPickerHeight = 480.0F;
+    constexpr float kCreateMinWidth = 420.0F;
+    constexpr float kCreateHeight = 260.0F;
+    constexpr float kCreateMaxWidth = 700.0F;
     constexpr float kParentMargin = 48.0F;
 
     if (!m_createFormVisible) {
@@ -595,7 +598,7 @@ namespace settings {
       }
       ScaledRenderer measureRenderer(*m_renderContext, measureScale);
       const TextMetrics titleMetrics = measureRenderer.measureText(instanceFormTitle(), fontSize, {FontWeight::Bold});
-      const float closeBtn = Style::controlHeightSm * m_scale;
+      const float closeBtn = panel_button_style::kIconButtonSize * m_scale;
       const float headerGap = Style::spaceSm * m_scale;
       const float rootPadding = Style::spaceSm * m_scale * 2.0F;
       const float sheetPadding = computePadding(m_scale) * 2.0F;

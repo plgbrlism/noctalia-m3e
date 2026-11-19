@@ -3,6 +3,7 @@
 #include "core/deferred_call.h"
 #include "render/render_context.h"
 #include "render/scene/node.h"
+#include "shell/panel/panel_header_style.h"
 #include "ui/builders.h"
 #include "ui/style.h"
 #include "xdg-shell-client-protocol.h"
@@ -16,8 +17,8 @@
 
 namespace {
 
-  constexpr float kPopupWidth = 420.0F;
-  constexpr float kPopupHeight = 380.0F;
+  constexpr float kPopupWidth = 480.0F;
+  constexpr float kPopupHeight = 460.0F;
 
   SearchPickerPopup* s_dialogPopup = nullptr;
 
@@ -127,12 +128,6 @@ void SearchPickerPopup::populateContent(Node* contentParent, std::uint32_t /*wid
     header->addChild(
         ui::button({
             .glyph = "close",
-            .glyphSize = Style::fontSizeBody * m_scale,
-            .variant = ButtonVariant::Default,
-            .minWidth = Style::controlHeightSm * m_scale,
-            .minHeight = Style::controlHeightSm * m_scale,
-            .padding = Style::spaceXs * m_scale,
-            .radius = Style::scaledRadiusMd(m_scale),
             .onClick = [this] {
               const std::weak_ptr<void> aliveGuard = m_aliveGuard;
               DeferredCall::callLater([this, aliveGuard] {
@@ -142,9 +137,13 @@ void SearchPickerPopup::populateContent(Node* contentParent, std::uint32_t /*wid
                 close();
               });
             },
+            .configure = [scale = m_scale](Button& button) {
+              panel_button_style::configureHeaderIconButton(button, scale, 1.0F);
+            },
         })
     );
   }
+  panel_header_style::applyHeaderSurface(*header, 1.0F, m_scale);
 
   contentParent->addChild(
       ui::column(

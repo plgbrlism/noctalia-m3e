@@ -604,7 +604,7 @@ void ClipboardPanel::create() {
       .flexGrow = 2.0F,
   });
 
-  auto sidebarHeader = ui::row(
+  std::unique_ptr<Flex> sidebarHeader = ui::row(
       {
           .out = &m_sidebarHeaderRow,
           .align = FlexAlign::Center,
@@ -623,6 +623,7 @@ void ClipboardPanel::create() {
         requestClearUnpinnedHistory();
       })
   );
+  panel_header_style::applyHeaderSurface(*sidebarHeader, panelCardOpacity(), scale);
   sidebar->addChild(std::move(sidebarHeader));
 
   auto clearConfirmPanel = makeInlineConfirmPanel(&m_clearConfirmPanel, scale);
