@@ -376,6 +376,24 @@ std::optional<LayerPopupParentContext> SettingsWindow::fallbackPopupParentContex
   return context;
 }
 
+void SettingsWindow::beginAttachedPopup() {
+  ++m_attachedPopupCount;
+  if (m_popupDim == nullptr) {
+    return;
+  }
+  m_popupDim->setFill(colorSpecFromRole(ColorRole::Shadow, Style::popupBordersEnabled() ? 0.38F : 0.55F));
+  m_popupDim->setVisible(true);
+}
+
+void SettingsWindow::endAttachedPopup() {
+  if (m_attachedPopupCount > 0) {
+    --m_attachedPopupCount;
+  }
+  if (m_attachedPopupCount == 0 && m_popupDim != nullptr) {
+    m_popupDim->setVisible(false);
+  }
+}
+
 std::optional<LayerPopupParentContext> SettingsWindow::popupParentContextForSurface(wl_surface* surface) const {
   if (!isOpen() || surface == nullptr || m_surface == nullptr) {
     return std::nullopt;
@@ -639,6 +657,8 @@ void SettingsWindow::destroyWindow() {
   }
   m_sceneRoot.reset();
   m_surface.reset();
+  m_popupDim = nullptr;
+  m_attachedPopupCount = 0;
   m_pointerInside = false;
   m_output = nullptr;
   m_minWidthHint = 0;
@@ -776,6 +796,9 @@ void SettingsWindow::prepareFrame(bool needsUpdate, bool needsLayout) {
     m_sceneRoot->setSize(w, h);
     if (m_panelBackground != nullptr) {
       m_panelBackground->setSize(w, h);
+    }
+    if (m_popupDim != nullptr) {
+      m_popupDim->setSize(w, h);
     }
     if (m_mainContainer != nullptr) {
       m_mainContainer->setSize(w, h);

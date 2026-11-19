@@ -2258,6 +2258,7 @@ void SettingsWindow::buildScene(std::uint32_t width, std::uint32_t height) {
   m_headerRow = nullptr;
   m_filterRow = nullptr;
   m_panelBackground = nullptr;
+  m_popupDim = nullptr;
   m_contentContainer = nullptr;
   m_sceneRoot = ui::node({});
   m_sceneRoot->setSize(w, h);
@@ -2317,6 +2318,22 @@ void SettingsWindow::buildScene(std::uint32_t width, std::uint32_t height) {
   logSettingsProfile("buildScene scrollTarget", phaseProfileWatch);
   phaseProfileWatch.reset();
   m_mainContainer = static_cast<Flex*>(m_sceneRoot->addChild(std::move(main)));
+
+  auto popupDim = ui::box({
+      .width = w,
+      .height = h,
+      .configure = [](Box& box) {
+        box.setFill(colorSpecFromRole(ColorRole::Shadow, 0.55F));
+        box.clearBorder();
+        box.setRadius(0.0F);
+        box.setPosition(0.0F, 0.0F);
+        box.setZIndex(6);
+        box.setVisible(false);
+        box.setParticipatesInLayout(false);
+      },
+  });
+  m_popupDim = static_cast<Box*>(m_sceneRoot->addChild(std::move(popupDim)));
+
   m_modalHost.attach(*m_sceneRoot, m_mainContainer, renderer, w, h);
 
   m_inputDispatcher.setTextInputContext(m_surface->wlSurface(), m_wayland->textInputService());

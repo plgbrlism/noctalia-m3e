@@ -1689,6 +1689,7 @@ void PanelManager::destroyPanel() {
   m_attachedRevealContentNode = nullptr;
   m_panelShadowNode = nullptr;
   m_panelContactShadowNode = nullptr;
+  m_popupDim = nullptr;
   m_selectPopup.reset();
   m_sceneRoot.reset();
   m_surface.reset();
@@ -2105,6 +2106,11 @@ void PanelManager::beginAttachedPopup(wl_surface* surface) {
     return;
   }
   ++m_attachedPopupCount;
+  if (m_popupDim != nullptr) {
+    m_popupDim->setFill(colorSpecFromRole(ColorRole::Shadow, Style::popupBordersEnabled() ? 0.38F : 0.55F));
+    m_popupDim->setVisible(true);
+    requestRedraw();
+  }
 }
 
 void PanelManager::endAttachedPopup(wl_surface* surface) {
@@ -2116,6 +2122,9 @@ void PanelManager::endAttachedPopup(wl_surface* surface) {
   }
   if (m_attachedPopupCount > 0) {
     return;
+  }
+  if (m_popupDim != nullptr) {
+    m_popupDim->setVisible(false);
   }
   m_pointerInside =
       m_platform != nullptr && m_platform->hasPointerPosition() && m_platform->lastPointerSurface() == m_wlSurface;
@@ -2810,6 +2819,28 @@ void PanelManager::buildScene(std::uint32_t width, std::uint32_t height) {
     }
     sceneParent->addChild(std::move(contentWrapper));
 
+    auto popupDim = ui::box({
+        .width = w,
+        .height = h,
+        .configure = [this](Box& box) {
+          box.setFill(colorSpecFromRole(ColorRole::Shadow, 0.55F));
+          box.clearBorder();
+          box.setRadius(0.0F);
+          box.setPosition(0.0F, 0.0F);
+          box.setZIndex(5);
+          box.setVisible(false);
+          box.setParticipatesInLayout(false);
+          const float dimRadius = m_attachedToBar ? Style::scaledRadiusXl(m_activePanel->contentScale())
+                                                  : Style::scaledRadiusXl();
+          box.setRadii(Radii{dimRadius, dimRadius, dimRadius, dimRadius});
+          if (m_attachedToBar) {
+            box.setCornerShapes(attached_panel::cornerShapes(m_attachedBarPosition));
+            box.setLogicalInset(attached_panel::logicalInset(m_attachedBarPosition, dimRadius));
+          }
+        },
+    });
+    m_popupDim = static_cast<Box*>(sceneParent->addChild(std::move(popupDim)));
+
     m_inputDispatcher.setSceneRoot(m_sceneRoot.get());
     m_inputDispatcher.setTextInputContext(m_wlSurface, m_platform->wayland().textInputService());
     m_inputDispatcher.setCursorShapeCallback([this](std::uint32_t serial, std::uint32_t shape) {
@@ -2949,6 +2980,21 @@ void PanelManager::placePanelChrome() {
   if (m_bgNode != nullptr) {
     m_bgNode->setPosition(bgX, bgY);
     m_bgNode->setSize(bgW, bgH);
+  }
+
+  if (m_popupDim != nullptr) {
+    m_popupDim->setPosition(bgX, bgY);
+    m_popupDim->setSize(bgW, bgH);
+    const float dimRadius = m_attachedToBar ? Style::scaledRadiusXl(m_activePanel->contentScale())
+                                            : Style::scaledRadiusXl();
+    m_popupDim->setRadii(Radii{dimRadius, dimRadius, dimRadius, dimRadius});
+    if (m_attachedToBar) {
+      m_popupDim->setCornerShapes(attached_panel::cornerShapes(m_attachedBarPosition));
+      m_popupDim->setLogicalInset(attached_panel::logicalInset(m_attachedBarPosition, dimRadius));
+    } else {
+      m_popupDim->setCornerShapes({});
+      m_popupDim->setLogicalInset({});
+    }
   }
 
   if (m_panelContactShadowNode != nullptr) {

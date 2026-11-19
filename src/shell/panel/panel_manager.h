@@ -258,6 +258,7 @@ private:
   Node* m_attachedRevealContentNode = nullptr;
   Box* m_panelShadowNode = nullptr;
   Box* m_panelContactShadowNode = nullptr;
+  Box* m_popupDim = nullptr;
   InputDispatcher m_inputDispatcher;
 
   std::unordered_map<std::string, std::unique_ptr<Panel>> m_panels;

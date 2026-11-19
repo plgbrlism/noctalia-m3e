@@ -11,7 +11,6 @@
 #include "ui/popup_parent.h"
 #include "ui/palette.h"
 #include "ui/style.h"
-#include "shell/wayland/layer_shell.h"
 #include "shell/wayland/layer_surface.h"
 #include "wayland/popup_surface.h"
 #include "wayland/wayland_connection.h"
@@ -99,7 +98,7 @@ bool DialogPopupHost::openPopup(std::uint32_t width, std::uint32_t height) {
     return false;
   }
   m_parentSurface = parentContext->surface;
-  const bool hasDim = createDimSurface(parentContext->output);
+  createDimSurface(parentContext->output);
 
   auto surface = std::make_unique<PopupSurface>(*m_wayland);
   surface->setRenderContext(m_renderContext);
@@ -127,11 +126,9 @@ bool DialogPopupHost::openPopup(std::uint32_t width, std::uint32_t height) {
   m_popupHosts->beginAttachedPopup(m_parentSurface);
   m_attachedToHost = true;
   m_openInProgress = true;
-  const bool initialized = hasDim
-      ? m_surface->initialize(LayerShell::popupAttach(m_dimSurface->layerSurface()), parentContext->output, popupConfig)
-      : (parentContext->xdgSurface != nullptr
-            ? m_surface->initializeAsChild(parentContext->xdgSurface, parentContext->output, popupConfig)
-            : m_surface->initialize(parentContext->attach, parentContext->output, popupConfig));
+  const bool initialized = parentContext->xdgSurface != nullptr
+      ? m_surface->initializeAsChild(parentContext->xdgSurface, parentContext->output, popupConfig)
+      : m_surface->initialize(parentContext->attach, parentContext->output, popupConfig);
   m_openInProgress = false;
   if (!initialized) {
     destroyPopup();
@@ -158,7 +155,6 @@ bool DialogPopupHost::openPopupAsChild(PopupSurfaceConfig config, const XdgPopup
 
   destroyPopup();
   m_parentSurface = parent.wlSurface;
-  const bool hasDim = createDimSurface(parent.output);
 
   auto surface = std::make_unique<PopupSurface>(*m_wayland);
   surface->setRenderContext(m_renderContext);
@@ -183,10 +179,12 @@ bool DialogPopupHost::openPopupAsChild(PopupSurfaceConfig config, const XdgPopup
   );
 
   m_surface = std::move(surface);
+  m_attachedToHost = m_popupHosts != nullptr;
+  if (m_attachedToHost) {
+    m_popupHosts->beginAttachedPopup(m_parentSurface);
+  }
   m_openInProgress = true;
-  const bool initialized = hasDim
-      ? m_surface->initialize(LayerShell::popupAttach(m_dimSurface->layerSurface()), parent.output, config)
-      : m_surface->initializeAsChild(parent.xdgSurface, parent.output, config);
+  const bool initialized = m_surface->initializeAsChild(parent.xdgSurface, parent.output, config);
   m_openInProgress = false;
   if (!initialized) {
     destroyPopup();
@@ -249,7 +247,7 @@ bool DialogPopupHost::createDimSurface(wl_output* output) {
 
   auto config = LayerSurfaceConfig{
       .nameSpace = "noctalia-dialog-dim",
-      .layer = LayerShellLayer::Overlay,
+      .layer = LayerShellLayer::Bottom,
       .anchor = LayerShellAnchor::Top | LayerShellAnchor::Bottom | LayerShellAnchor::Left | LayerShellAnchor::Right,
       .width = 0,
       .height = 0,

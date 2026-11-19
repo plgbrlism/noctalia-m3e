@@ -96,7 +96,7 @@ void LayerPopupHostRegistry::beginAttachedPopup(wl_surface* surface) const {
   }
 
   for (const Host& host : m_hosts) {
-    if (host.beginAttachedPopup) {
+    if (host.contextResolver && host.contextResolver(surface) && host.beginAttachedPopup) {
       host.beginAttachedPopup(surface);
     }
   }
@@ -108,7 +108,7 @@ void LayerPopupHostRegistry::endAttachedPopup(wl_surface* surface) const {
   }
 
   for (const Host& host : m_hosts) {
-    if (host.endAttachedPopup) {
+    if (host.contextResolver && host.contextResolver(surface) && host.endAttachedPopup) {
       host.endAttachedPopup(surface);
     }
   }

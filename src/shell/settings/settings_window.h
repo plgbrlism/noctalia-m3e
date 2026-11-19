@@ -100,6 +100,8 @@ public:
   bool ownsKeyboardSurface(wl_surface* surface) const noexcept;
   std::optional<LayerPopupParentContext> popupParentContextForSurface(wl_surface* surface) const;
   std::optional<LayerPopupParentContext> fallbackPopupParentContext() const;
+  void beginAttachedPopup();
+  void endAttachedPopup();
 
   bool onPointerEvent(const PointerEvent& event);
   void onKeyboardEvent(const KeyboardEvent& event);
@@ -302,6 +304,8 @@ private:
   std::unique_ptr<Node> m_sceneRoot;
   Flex* m_mainContainer = nullptr; // Outer Flex inside m_sceneRoot, sized to the window
   Box* m_panelBackground = nullptr;
+  Box* m_popupDim = nullptr;
+  std::size_t m_attachedPopupCount = 0;
   Node* m_headerRow = nullptr;
   Node* m_filterRow = nullptr;
   Button* m_actionsMenuButton = nullptr;

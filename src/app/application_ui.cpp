@@ -993,7 +993,9 @@ void Application::initBarDockAndLayout() {
       }
   );
   m_layerPopupHosts.registerHost(
-      [this](wl_surface* surface) { return m_settingsWindow.popupParentContextForSurface(surface); }, {}, {},
+      [this](wl_surface* surface) { return m_settingsWindow.popupParentContextForSurface(surface); },
+      [this](wl_surface*) { m_settingsWindow.beginAttachedPopup(); },
+      [this](wl_surface*) { m_settingsWindow.endAttachedPopup(); },
       [this] { return m_settingsWindow.fallbackPopupParentContext(); }
   );
 
