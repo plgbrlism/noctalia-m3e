@@ -27,8 +27,9 @@ public:
   void create() override;
   void onClose() override;
 
-  float preferredWidth() const override { return scaled(1100.0F); }
-  float preferredHeight() const override { return scaled(780.0F); }
+  float preferredWidth() const override { return 1100.0F * contentScale(); }
+  float preferredHeight() const override { return 780.0F * contentScale(); }
+  bool fillsHeight() const noexcept override { return true; }
 
 private:
   void doLayout(Renderer& renderer, float width, float height) override;
