@@ -52,8 +52,7 @@ namespace {
 
   ColorSpec shortcutColor(bool enabled, bool highlighted, bool destructive) {
     return colorSpecFromRole(
-        destructive ? ColorRole::Error : (highlighted ? ColorRole::OnHover : ColorRole::OnSurface),
-        highlighted ? 0.65F : (enabled ? 0.5F : 0.3F)
+        destructive ? ColorRole::Error : ColorRole::OnSurface, highlighted ? 0.65F : (enabled ? 0.5F : 0.3F)
     );
   }
 
@@ -541,13 +540,15 @@ void ContextMenuControl::rebuildRows(Renderer& renderer) {
     if (rowBgPtr != nullptr && labelPtr != nullptr) {
       visual.apply = [rowBgPtr, labelPtr, shortcutPtr, togglePtr, chevronPtr, interactive, separator,
                       header = entry.header, destructive = entry.destructive](bool highlighted) {
+        const ColorRole hoverRole =
+            Style::popupBordersEnabled() ? ColorRole::SurfaceContainerHighest : ColorRole::Surface;
         rowBgPtr->setFill(
             highlighted
-                ? colorSpecFromRole(destructive ? ColorRole::Error : ColorRole::Hover, destructive ? 0.16F : 1.0F)
+                ? colorSpecFromRole(destructive ? ColorRole::Error : hoverRole, destructive ? 0.16F : 1.0F)
                 : clearColorSpec()
         );
         const auto foreground = destructive ? (interactive ? enabledItemColor(true) : disabledItemColor(true))
-            : highlighted                   ? colorSpecFromRole(ColorRole::OnHover)
+            : highlighted                   ? colorSpecFromRole(ColorRole::OnSurface)
                                             : (interactive ? enabledItemColor() : disabledItemColor());
         if (separator || header) {
           labelPtr->setColor(colorSpecFromRole(ColorRole::OnSurfaceVariant));

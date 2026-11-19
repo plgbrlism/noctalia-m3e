@@ -146,7 +146,7 @@ int main() {
     require(literalLabels.front()->text() == literal, "literal label was altered");
     const auto& node = dynamic_cast<const TextNode&>(*literalLabels.front()->children().front());
     require(!node.useMarkup(), "filename label was interpreted as markup");
-    require(labels(menu, 1).front()->color() == colors.onHover, "neutral highlight changed its palette role");
+    require(labels(menu, 1).front()->color() == colors.onSurface, "neutral highlight changed its palette role");
     require(labels(menu, 5).front()->color() == colors.error, "destructive entry did not use the error role");
     menu.setHighlightedIndex(5);
     require(labels(menu, 5).front()->color() == colors.error, "destructive highlight lost its error foreground");
