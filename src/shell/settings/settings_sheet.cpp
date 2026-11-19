@@ -98,7 +98,8 @@ namespace settings {
               .configure = [scale = m_scale](Button& button) {
                 panel_button_style::configureHeaderIconButton(button, scale, 1.0F);
                 auto palette = Button::defaultPalette(ButtonVariant::Destructive);
-                palette.normal.bg = clearColorSpec();
+                palette.normal.bg = colorSpecFromRole(ColorRole::Error);
+                palette.normal.label = colorSpecFromRole(ColorRole::OnError);
                 palette.normal.border = clearColorSpec();
                 button.setCustomPalette(palette);
               },
