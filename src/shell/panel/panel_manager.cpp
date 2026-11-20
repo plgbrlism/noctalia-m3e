@@ -2349,15 +2349,22 @@ void PanelManager::applyAttachedReveal(float progress) {
   m_attachedRevealClipNode->setPosition(0.0F, 0.0F);
   m_attachedRevealClipNode->setFrameSize(w, h);
 
+  const auto dir = static_cast<reveal::RevealDirection>(m_attachedRevealDirection);
+  const auto t = reveal::chromeTransform(progress, variant, dir, /*attached=*/true);
+  const float originX = static_cast<float>(m_panelInsetX) + panelW / 2.0F;
+  const float originY = static_cast<float>(m_panelInsetY) + panelH / 2.0F;
+  const reveal::RevealTransform motion{t.scaleX, t.scaleY, contentX + t.offsetX, contentY + t.offsetY};
+  const auto visibleBody = reveal::transformBodyRect(
+      {static_cast<float>(m_panelInsetX), static_cast<float>(m_panelInsetY),
+       static_cast<float>(m_panelVisualWidth), static_cast<float>(m_panelVisualHeight)},
+      originX, originY, motion
+  );
+
   if (m_attachedRevealContentNode != nullptr) {
     m_attachedRevealContentNode->setFrameSize(w, h);
-    const auto dir = static_cast<reveal::RevealDirection>(m_attachedRevealDirection);
-    const auto t = reveal::chromeTransform(progress, variant, dir, /*attached=*/true);
-    m_attachedRevealContentNode->setTransformOrigin(
-        static_cast<float>(m_panelInsetX) + panelW / 2.0F,
-        static_cast<float>(m_panelInsetY) + panelH / 2.0F);
-    m_attachedRevealContentNode->setScale(t.scaleX, t.scaleY);
-    m_attachedRevealContentNode->setPosition(contentX + t.offsetX, contentY + t.offsetY);
+    m_attachedRevealContentNode->setTransformOrigin(originX, originY);
+    m_attachedRevealContentNode->setScale(motion.scaleX, motion.scaleY);
+    m_attachedRevealContentNode->setPosition(motion.offsetX, motion.offsetY);
     m_attachedRevealContentNode->setOpacity(1.0F);
   }
   if (m_panelShadowNode != nullptr) {
@@ -2368,10 +2375,9 @@ void PanelManager::applyAttachedReveal(float progress) {
   }
 
   publishAttachedPanelGeometry(m_attachedRevealProgress);
-  const int bodyX = m_panelInsetX + static_cast<int>(std::lround(contentX));
-  const int bodyY = m_panelInsetY + static_cast<int>(std::lround(contentY));
   applyPanelCompositorBlur(
-      bodyX, bodyY, static_cast<int>(m_panelVisualWidth), static_cast<int>(m_panelVisualHeight), 0, 0,
+      static_cast<int>(std::lround(visibleBody.x)), static_cast<int>(std::lround(visibleBody.y)),
+      static_cast<int>(std::lround(visibleBody.width)), static_cast<int>(std::lround(visibleBody.height)), 0, 0,
       static_cast<int>(std::lround(w)), static_cast<int>(std::lround(h))
   );
 }
@@ -2423,15 +2429,21 @@ void PanelManager::applyDetachedReveal(float progress) {
     }
   }
 
+  const auto dir = static_cast<reveal::RevealDirection>(m_detachedRevealDirection);
+  const auto t = reveal::chromeTransform(progress, variant, dir, /*attached=*/false);
+  const float originX = static_cast<float>(m_panelInsetX) + static_cast<float>(m_panelVisualWidth) / 2.0F;
+  const float originY = static_cast<float>(m_panelInsetY) + static_cast<float>(m_panelVisualHeight) / 2.0F;
+  const auto visibleBody = reveal::transformBodyRect(
+      {static_cast<float>(m_panelInsetX), static_cast<float>(m_panelInsetY),
+       static_cast<float>(m_panelVisualWidth), static_cast<float>(m_panelVisualHeight)},
+      originX, originY, t
+  );
+
   if (m_detachedRevealClipNode != nullptr && m_detachedRevealContentNode != nullptr) {
     m_detachedRevealClipNode->setPosition(clipX, clipY);
     m_detachedRevealClipNode->setFrameSize(clipW, clipH);
     m_detachedRevealContentNode->setFrameSize(surfaceW, surfaceH);
-    const auto dir = static_cast<reveal::RevealDirection>(m_detachedRevealDirection);
-    const auto t = reveal::chromeTransform(progress, variant, dir, /*attached=*/false);
-    m_detachedRevealContentNode->setTransformOrigin(
-        static_cast<float>(m_panelInsetX) + static_cast<float>(m_panelVisualWidth) / 2.0F,
-        static_cast<float>(m_panelInsetY) + static_cast<float>(m_panelVisualHeight) / 2.0F);
+    m_detachedRevealContentNode->setTransformOrigin(originX, originY);
     m_detachedRevealContentNode->setScale(t.scaleX, t.scaleY);
     m_detachedRevealContentNode->setPosition(-clipX + t.offsetX, -clipY + t.offsetY);
   }
@@ -2439,11 +2451,19 @@ void PanelManager::applyDetachedReveal(float progress) {
   if (m_contentNode != nullptr) {
     m_contentNode->setOpacity(panelRevealContentOpacity(m_detachedRevealProgress));
   }
-  applyPanelCompositorBlur(
-      m_panelInsetX, m_panelInsetY, static_cast<int>(m_panelVisualWidth), static_cast<int>(m_panelVisualHeight),
-      static_cast<int>(std::lround(clipX)), static_cast<int>(std::lround(clipY)), static_cast<int>(std::lround(clipW)),
-      static_cast<int>(std::lround(clipH))
-  );
+  if (directional) {
+    applyPanelCompositorBlur(
+        m_panelInsetX, m_panelInsetY, static_cast<int>(m_panelVisualWidth), static_cast<int>(m_panelVisualHeight),
+        static_cast<int>(std::lround(clipX)), static_cast<int>(std::lround(clipY)), static_cast<int>(std::lround(clipW)),
+        static_cast<int>(std::lround(clipH))
+    );
+  } else {
+    applyPanelCompositorBlur(
+        static_cast<int>(std::lround(visibleBody.x)), static_cast<int>(std::lround(visibleBody.y)),
+        static_cast<int>(std::lround(visibleBody.width)), static_cast<int>(std::lround(visibleBody.height)),
+        0, 0, static_cast<int>(std::lround(surfaceW)), static_cast<int>(std::lround(surfaceH))
+    );
+  }
 }
 
 void PanelManager::startAttachedOpenAnimation() {
@@ -2548,6 +2568,16 @@ void PanelManager::applyPanelCompositorBlur(
   // same body and clip rectangles used by the reveal animation so protocol state
   // cannot get ahead of scene rendering.
   if (m_surface == nullptr || m_activePanel == nullptr) {
+    return;
+  }
+
+  const float backgroundOpacity =
+      m_attachedToBar ? m_attachedBackgroundOpacity : activeDetachedBackgroundOpacity();
+  if (shell::panel_surface::cardOpacity(m_config, backgroundOpacity) >= 0.999F) {
+    if (blurTraceEnabled()) {
+      kLog.debug("blur-trace panel-blur-clear reason=opaque-card");
+    }
+    m_layerSurface->clearBlurRegion();
     return;
   }
 
