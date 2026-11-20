@@ -6,6 +6,7 @@
 #include "notification/notifications.h"
 #include "shell/settings/settings_content.h"
 #include "ui/builders.h"
+#include "ui/controls/button.h"
 #include "ui/controls/collapsible.h"
 #include "ui/controls/scroll_view.h"
 #include "ui/palette.h"
@@ -25,6 +26,27 @@ namespace settings {
     // partway toward Surface keeps the palette hue and still reads distinct from those controls.
     constexpr float kCardFillOpacity = 0.4F;
   } // namespace
+
+  void applySettingsGroupPillPalette(Button& button, bool expanded) {
+    if (!expanded) {
+      return;
+    }
+    Button::ButtonPalette palette;
+    palette.normal = {
+        colorSpecFromRole(ColorRole::Primary), clearColorSpec(), colorSpecFromRole(ColorRole::OnPrimary)
+    };
+    palette.hover = {
+        colorSpecFromRole(ColorRole::Tertiary), clearColorSpec(), colorSpecFromRole(ColorRole::OnTertiary)
+    };
+    palette.pressed = {
+        colorSpecFromRole(ColorRole::Primary), clearColorSpec(), colorSpecFromRole(ColorRole::OnPrimary)
+    };
+    palette.disabled = {
+        colorSpecFromRole(ColorRole::Primary, Style::disabledAlpha), clearColorSpec(),
+        colorSpecFromRole(ColorRole::OnPrimary)
+    };
+    button.setCustomPalette(palette);
+  }
 
   bool isMonitorOverrideSettingPath(const std::vector<std::string>& path) {
     if (path.size() >= 5 && path[0] == "bar" && path[2] == "monitor") {
@@ -268,12 +290,14 @@ namespace settings {
         if (expandedGroups->contains(group)) {
           expandedGroups->erase(group);
           pill->setVariant(ButtonVariant::Default);
+          applySettingsGroupPillPalette(*pill, false);
           collapsibleRaw->setExpanded(false);
           return;
         }
         expandedGroups->insert(group);
         pill->setVariant(ButtonVariant::Primary);
-        collapsibleRaw->setExpandedImmediate(true);
+        applySettingsGroupPillPalette(*pill, true);
+        collapsibleRaw->setExpanded(true);
         if (scrollToTop) {
           scrollToTop(*collapsibleRaw);
         }
@@ -287,6 +311,7 @@ namespace settings {
       }
       if (pill != nullptr) {
         pill->setVariant(expanded ? ButtonVariant::Primary : ButtonVariant::Default);
+        applySettingsGroupPillPalette(*pill, expanded);
       }
     });
     card->addChild(std::move(collapsible));

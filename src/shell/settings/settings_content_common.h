@@ -52,6 +52,8 @@ namespace settings {
     std::function<void(const Node&)> scrollToTop;
   };
 
+  void applySettingsGroupPillPalette(Button& button, bool expanded);
+
   Flex* addSettingsGroupCard(SettingsGroupCardProps props);
   // Same card as addSettingsGroupCard without the collapsible header, for transient groupings
   // (search results) that must never start hidden and hold no expanded state.
