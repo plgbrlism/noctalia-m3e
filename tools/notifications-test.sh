@@ -17,13 +17,13 @@ sleep 0.5
 notify-send "Notification #4" "This is test notification with a very long text that will probably break the layout or maybe not? Who knows? Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
 sleep 0.5
 
-notify-send "Notification #5" "A notification with a named icon, should resolve from theme (dialog-information)" -i dialog-information 
+notify-send "Notification #5" "A notification with a named icon, should resolve from theme (dialog-information)" -i dialog-information
 sleep 0.5
 
-notify-send "Notification #6" "A notification with an absolute path icon" -i "/usr/share/pixmaps/steam.png" 
+notify-send "Notification #6" "A notification with an absolute path icon" -i "/usr/share/pixmaps/steam.png"
 sleep 0.5
 
-notify-send "Notification #7" "A notification with an absolute file://path icon" -i "file:///usr/share/pixmaps/steam.png" 
+notify-send "Notification #7" "A notification with an absolute file://path icon" -i "file:///usr/share/pixmaps/steam.png"
 sleep 0.5
 
 # A test notification with actions
@@ -49,7 +49,7 @@ gdbus call --session \
           0 \
           "dialog-question" \
           "Notification #9 - Longer Body" \
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin lectus nibh, mollis eget pulvinar eget, aliquet vel enim. Sed quis tortor ut urna tincidunt porta. In non leo nunc. Aliquam vestibulum aliquet risus. Praesent cursus lacus vitae egestas ultrices. Ut eleifend, ligula id vulputate aliquam, lectus lacus lobortis nulla, nec ornare nisl lorem aliquam nulla. Sed fermentum, dolor ullamcorper pharetra condimentum, leo erat ultricies nibh, ac sagittis neque tellus vel lacus. Fusce volutpat sem est, vel vehicula sapien viverra sed. Integer varius justo ut lorem mattis fermentum. Mauris ac purus et turpis accumsan pulvinar. https://github.com/noctalia-dev/noctalia" \
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin lectus nibh, mollis eget pulvinar eget, aliquet vel enim. Sed quis tortor ut urna tincidunt porta. In non leo nunc. Aliquam vestibulum aliquet risus. Praesent cursus lacus vitae egestas ultrices. Ut eleifend, ligula id vulputate aliquam, lectus lacus lobortis nulla, nec ornare nisl lorem aliquam nulla. Sed fermentum, dolor ullamcorper pharetra condimentum, leo erat ultricies nibh, ac sagittis neque tellus vel lacus. Fusce volutpat sem est, vel vehicula sapien viverra sed. Integer varius justo ut lorem mattis fermentum. Mauris ac purus et turpis accumsan pulvinar. https://github.com/vespertine-dev/vespertine" \
           "['default', 'OK', 'cancel', 'Cancel', 'maybe', 'Maybe', 'undecided', 'Undecided', 'another', 'Another', 'bail', 'Bail', 'wontappear', 'Will not appear']" \
           "{}" \
           5000

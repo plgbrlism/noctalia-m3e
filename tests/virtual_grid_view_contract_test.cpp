@@ -28,7 +28,7 @@ namespace {
   public:
     ViewportRenderer() {
       m_text.initialize(nullptr, nullptr);
-      m_glyph.initialize(paths::libraryAssetPath("fonts/noctalia-tabler.ttf").string(), nullptr, nullptr);
+      m_glyph.initialize(paths::libraryAssetPath("fonts/vespertine-tabler.ttf").string(), nullptr, nullptr);
     }
 
     TextMetrics measureText(

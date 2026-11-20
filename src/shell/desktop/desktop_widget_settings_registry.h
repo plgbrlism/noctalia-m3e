@@ -36,7 +36,7 @@ namespace desktop_settings {
   std::vector<settings::WidgetSettingSpec> desktopWidgetSettingSpecs(std::string_view type);
   std::vector<settings::WidgetSettingSpec> commonDesktopWidgetSettingSpecs(std::string_view type = {});
   // Schema projection (per-type + common settings), consumed by `config validate`.
-  noctalia::config::schema::WidgetSettingSchema
+  vespertine::config::schema::WidgetSettingSchema
   desktopWidgetSettingSchema(std::string_view type, scripting::PluginRegistry* pluginRegistry = nullptr);
   void applyDesktopWidgetDefaultSettings(
       std::unordered_map<std::string, WidgetSettingValue>& settings, std::string_view type,

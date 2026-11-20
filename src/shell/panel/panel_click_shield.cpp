@@ -20,7 +20,7 @@ namespace {
   // Anonymous file backing for a tiny SHM pool. We use memfd_create so the fd
   // is never visible on the filesystem.
   int createAnonFd(std::size_t size) {
-    int fd = memfd_create("noctalia-click-shield", MFD_CLOEXEC);
+    int fd = memfd_create("vespertine-click-shield", MFD_CLOEXEC);
     if (fd < 0) {
       return -1;
     }
@@ -162,7 +162,7 @@ PanelClickShield::createShield(wl_output* output, LayerShellLayer layer, std::ve
 
   shield->layerSurface = zwlr_layer_shell_v1_get_layer_surface(
       m_wayland->extension<LayerShell>().manager(), shield->surface, output, static_cast<std::uint32_t>(layer),
-      "noctalia-panel-click-shield"
+      "vespertine-panel-click-shield"
   );
   if (shield->layerSurface == nullptr) {
     if (shield->viewport != nullptr) {

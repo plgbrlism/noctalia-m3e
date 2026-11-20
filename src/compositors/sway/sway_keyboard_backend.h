@@ -9,7 +9,7 @@
 #include <string>
 #include <string_view>
 
-// Layout switches made outside the bar (keybinds, `swaymsg`, `noctalia msg keyboard-layout-cycle`)
+// Layout switches made outside the bar (keybinds, `swaymsg`, `vespertine msg keyboard-layout-cycle`)
 // arrive as input events on the runtime's shared IPC connection and reach the change callback.
 class SwayKeyboardBackend : public compositors::sway::SwayEventHandler {
 public:

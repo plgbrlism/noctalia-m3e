@@ -26,7 +26,7 @@ namespace scripting {
   // Hosts headless [[service]] entries: one singleton runtime per service entry,
   // started at launch and ticked on its own interval. Services hold a plugin's
   // shared/background logic and publish to the per-plugin state store; the
-  // plugin's UI entries (widgets, panels) consume it via noctalia.state.
+  // plugin's UI entries (widgets, panels) consume it via vespertine.state.
   class PluginServiceHost {
   public:
     PluginServiceHost(
@@ -51,7 +51,7 @@ namespace scripting {
 
     // Notify every service that the set/geometry of connected outputs changed, so a
     // service can reconcile (e.g. relaunch a per-output child). The current output
-    // list is read via noctalia.outputs() inside the callback.
+    // list is read via vespertine.outputs() inside the callback.
     void onOutputChange();
 
     // Calls onSuspend() (sleeping) or onResume() on services declaring kSleepCallbacksPluginApiVersion.
@@ -59,7 +59,7 @@ namespace scripting {
 
   private:
     // A service is reachable by IPC via the `all` target (it is a singleton with no
-    // output): `noctalia msg plugin <author/plugin:entry> all <event> [payload]`.
+    // output): `vespertine msg plugin <author/plugin:entry> all <event> [payload]`.
     struct Service : public PluginIpcEndpoint {
       std::string entryId;
       std::filesystem::path sourcePath;

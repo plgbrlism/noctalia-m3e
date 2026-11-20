@@ -21,7 +21,7 @@ class ConfigService;
 class HttpClient;
 class IpcService;
 
-namespace noctalia::theme {
+namespace vespertine::theme {
 
   class ThemeService {
   public:
@@ -47,7 +47,7 @@ namespace noctalia::theme {
     void toggleLightDark();
     void cycleMode();
     ThemeMode configuredMode() const noexcept;
-    // Noctalia's own resolved mode ([theme].shell_mode, or [theme].mode when it follows).
+    // Vespertine's own resolved mode ([theme].shell_mode, or [theme].mode when it follows).
     bool isLightMode() const noexcept;
     std::string_view resolvedShellMode() const noexcept;
     // The resolved [theme].mode, which drives apps.
@@ -60,7 +60,7 @@ namespace noctalia::theme {
 
     void registerIpc(IpcService& ipc);
 
-    // Writes the current wallpaper-generated palette to ~/.config/noctalia/palettes/
+    // Writes the current wallpaper-generated palette to ~/.config/vespertine/palettes/
     // and switches palette source to custom.
     [[nodiscard]] bool saveWallpaperPaletteAsCustom(std::string* paletteNameOut, std::string* errorOut = nullptr);
 
@@ -144,4 +144,4 @@ namespace noctalia::theme {
     Timer m_autoTimer;
   };
 
-} // namespace noctalia::theme
+} // namespace vespertine::theme

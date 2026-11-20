@@ -1,6 +1,6 @@
 [Unit]
-Description=Noctalia Wayland shell
-Documentation=https://github.com/noctalia-dev/noctalia
+Description=Vespertine Wayland shell
+Documentation=https://github.com/vespertine-dev/vespertine
 PartOf=graphical-session.target
 Before=graphical-session.target
 
@@ -13,7 +13,7 @@ After=wayland-session-waitenv.service
 
 [Service]
 Type=notify
-ExecStart=@NOCTALIA_EXECUTABLE@
+ExecStart=@VESPERTINE_EXECUTABLE@
 Restart=on-failure
 
 [Install]

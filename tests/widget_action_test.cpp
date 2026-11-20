@@ -25,7 +25,7 @@ namespace {
     return nullptr;
   }
 
-  using namespace noctalia::bar;
+  using namespace vespertine::bar;
 
   void testGestureKeys() {
     TEST_CHECK(allGestures().size() == kGestureCount);

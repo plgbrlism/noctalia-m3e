@@ -21,7 +21,7 @@
 #include <variant>
 #include <vector>
 
-namespace noctalia::bar {
+namespace vespertine::bar {
 
   using WidgetSettingChoiceValue = std::variant<std::int64_t, std::string>;
 
@@ -606,4 +606,4 @@ namespace noctalia::bar {
     }
   };
 
-} // namespace noctalia::bar
+} // namespace vespertine::bar

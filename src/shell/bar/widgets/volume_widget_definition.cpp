@@ -2,17 +2,17 @@
 
 #include "shell/bar/glyph_value_definition.h"
 
-const noctalia::bar::WidgetDefinition<VolumeWidget::Options>& volumeWidgetDefinition() {
-  using noctalia::bar::field;
-  using noctalia::bar::glyphPositionField;
-  using noctalia::bar::peekDelayField;
-  using noctalia::bar::peekField;
-  using noctalia::bar::whenAllTrue;
+const vespertine::bar::WidgetDefinition<VolumeWidget::Options>& volumeWidgetDefinition() {
+  using vespertine::bar::field;
+  using vespertine::bar::glyphPositionField;
+  using vespertine::bar::peekDelayField;
+  using vespertine::bar::peekField;
+  using vespertine::bar::whenAllTrue;
   using Options = VolumeWidget::Options;
 
   static const settings::WidgetSettingVisibility showGlyph{"show_glyph", {"true"}};
 
-  static const noctalia::bar::WidgetDefinition<Options> definition{
+  static const vespertine::bar::WidgetDefinition<Options> definition{
       .type = "volume",
       .fields =
           {

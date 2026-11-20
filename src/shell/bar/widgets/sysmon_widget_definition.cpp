@@ -2,8 +2,8 @@
 
 #include "shell/bar/glyph_value_definition.h"
 
-const noctalia::bar::WidgetDefinition<SysmonWidget::Options, SysmonWidgetDefinitionContext>& sysmonWidgetDefinition() {
-  using noctalia::bar::field;
+const vespertine::bar::WidgetDefinition<SysmonWidget::Options, SysmonWidgetDefinitionContext>& sysmonWidgetDefinition() {
+  using vespertine::bar::field;
   using Options = SysmonWidget::Options;
 
   static const settings::WidgetSettingVisibility diskStat{
@@ -26,7 +26,7 @@ const noctalia::bar::WidgetDefinition<SysmonWidget::Options, SysmonWidgetDefinit
       {"visualization", {"gauge"}},
   };
 
-  static const noctalia::bar::WidgetDefinition<Options, SysmonWidgetDefinitionContext> definition{
+  static const vespertine::bar::WidgetDefinition<Options, SysmonWidgetDefinitionContext> definition{
       .type = "sysmon",
       .fields = {
           field<&Options::stat>({
@@ -263,11 +263,11 @@ const noctalia::bar::WidgetDefinition<SysmonWidget::Options, SysmonWidgetDefinit
                       .group = "content",
                   },
           }),
-          noctalia::bar::glyphPositionField<Options>(
+          vespertine::bar::glyphPositionField<Options>(
               glyphPosition, "content", "settings.widgets.settings.glyph-position.sysmon-description"
           ),
-          noctalia::bar::peekField<Options>(glyphPosition, "content"),
-          noctalia::bar::peekDelayField<Options>(glyphPosition, "content"),
+          vespertine::bar::peekField<Options>(glyphPosition, "content"),
+          vespertine::bar::peekDelayField<Options>(glyphPosition, "content"),
           field<&Options::highlightColor>({
               .key = "highlight_color",
               .presentation =

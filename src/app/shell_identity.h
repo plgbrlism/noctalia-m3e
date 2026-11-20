@@ -2,5 +2,5 @@
 
 #include "core/application_identity.h"
 
-// The shell's library identity: ~/.config/noctalia, noctalia.log, NOCTALIA_* environment variables.
-inline ApplicationIdentity shellApplicationIdentity() { return {.name = "noctalia", .envPrefix = "NOCTALIA"}; }
+// The shell's library identity: ~/.config/vespertine, vespertine.log, VESPERTINE_* environment variables.
+inline ApplicationIdentity shellApplicationIdentity() { return {.name = "vespertine", .envPrefix = "VESPERTINE"}; }

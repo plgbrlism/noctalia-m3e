@@ -11,9 +11,9 @@ from pathlib import Path
 from typing import Any
 
 
-COMMENT_MARKER = "<!-- noctalia-pr-template-enforcement -->"
+COMMENT_MARKER = "<!-- vespertine-pr-template-enforcement -->"
 TEMPLATE_URL = (
-    "https://github.com/noctalia-dev/noctalia/blob/main/.github/PULL_REQUEST_TEMPLATE.md"
+    "https://github.com/vespertine-dev/vespertine/blob/main/.github/PULL_REQUEST_TEMPLATE.md"
 )
 REQUIRED_HEADINGS = (
     "## Summary",
@@ -148,7 +148,7 @@ def github_request(
             "Accept": "application/vnd.github+json",
             "Authorization": f"Bearer {token}",
             "Content-Type": "application/json",
-            "User-Agent": "noctalia-pr-template-enforcement",
+            "User-Agent": "vespertine-pr-template-enforcement",
             "X-GitHub-Api-Version": "2022-11-28",
         },
     )
@@ -186,7 +186,7 @@ def convert_to_draft(pull_request_url: str, node_id: str, token: str) -> None:
 
 
 # The workflow's built-in token authors comments as this account. Marker comments left by
-# any other author (such as the Noctalia-CI machine account, whose comments GitHub hides)
+# any other author (such as the Vespertine-CI machine account, whose comments GitHub hides)
 # would stay invisible even if edited, so they are deleted and the comment posted afresh.
 COMMENT_AUTHOR = "github-actions[bot]"
 

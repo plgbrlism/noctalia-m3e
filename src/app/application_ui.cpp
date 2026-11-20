@@ -129,7 +129,7 @@ void Application::initUiRenderSurfacesAndSettings() {
     m_desktopWidgetsController.toggleEdit();
     if (!wasEditing && m_desktopWidgetsController.isEditing()) {
       notify::info(
-          "Noctalia", i18n::tr("notifications.internal.desktop-widgets-editor"),
+          "Vespertine", i18n::tr("notifications.internal.desktop-widgets-editor"),
           i18n::tr("notifications.internal.desktop-widgets-editor-enabled")
       );
     }
@@ -140,7 +140,7 @@ void Application::initUiRenderSurfacesAndSettings() {
     }
     if (m_lockScreen.isActive()) {
       notify::info(
-          "Noctalia", i18n::tr("notifications.internal.lockscreen-widgets-editor"),
+          "Vespertine", i18n::tr("notifications.internal.lockscreen-widgets-editor"),
           i18n::tr("notifications.internal.lockscreen-widgets-editor-blocked-locked")
       );
       return;
@@ -152,7 +152,7 @@ void Application::initUiRenderSurfacesAndSettings() {
     m_lockscreenWidgetsController.toggleEdit();
     if (!wasEditing && m_lockscreenWidgetsController.isEditing()) {
       notify::info(
-          "Noctalia", i18n::tr("notifications.internal.lockscreen-widgets-editor"),
+          "Vespertine", i18n::tr("notifications.internal.lockscreen-widgets-editor"),
           i18n::tr("notifications.internal.lockscreen-widgets-editor-enabled")
       );
     }
@@ -170,7 +170,7 @@ void Application::initUiRenderSurfacesAndSettings() {
     m_settingsWindow.onExternalOptionsChanged();
     m_settingsWindow.markSettingsWriteSuccess(true);
     notify::info(
-        "Noctalia", i18n::tr("notifications.internal.wallpaper-palette-export"),
+        "Vespertine", i18n::tr("notifications.internal.wallpaper-palette-export"),
         i18n::tr("notifications.internal.wallpaper-palette-export-success", "name", paletteName)
     );
   });
@@ -192,7 +192,7 @@ void Application::performGreeterSync(bool quiet) {
       if (success) {
         if (!quiet) {
           notify::info(
-              "Noctalia", i18n::tr("notifications.internal.greeter-sync"),
+              "Vespertine", i18n::tr("notifications.internal.greeter-sync"),
               i18n::tr("notifications.internal.greeter-sync-success")
           );
         }
@@ -200,7 +200,7 @@ void Application::performGreeterSync(bool quiet) {
       }
       if (quiet) {
         notify::error(
-            "Noctalia", i18n::tr("notifications.internal.greeter-sync"), i18n::tr("settings.errors.sync-greeter")
+            "Vespertine", i18n::tr("notifications.internal.greeter-sync"), i18n::tr("settings.errors.sync-greeter")
         );
       } else {
         m_settingsWindow.markSettingsWriteError(i18n::tr("settings.errors.sync-greeter"));
@@ -220,7 +220,7 @@ void Application::performGreeterSync(bool quiet) {
   if (launch == greeter::GreeterSyncLaunch::Failed) {
     if (quiet) {
       notify::error(
-          "Noctalia", i18n::tr("notifications.internal.greeter-sync"), i18n::tr("settings.errors.sync-greeter")
+          "Vespertine", i18n::tr("notifications.internal.greeter-sync"), i18n::tr("settings.errors.sync-greeter")
       );
     } else {
       m_settingsWindow.markSettingsWriteError(i18n::tr("settings.errors.sync-greeter"));
@@ -230,11 +230,11 @@ void Application::performGreeterSync(bool quiet) {
   if (launch == greeter::GreeterSyncLaunch::StagedOnly) {
     if (quiet) {
       notify::error(
-          "Noctalia", i18n::tr("notifications.internal.greeter-sync"), i18n::tr("settings.errors.sync-greeter")
+          "Vespertine", i18n::tr("notifications.internal.greeter-sync"), i18n::tr("settings.errors.sync-greeter")
       );
     } else {
       notify::info(
-          "Noctalia", i18n::tr("notifications.internal.greeter-sync"),
+          "Vespertine", i18n::tr("notifications.internal.greeter-sync"),
           i18n::tr("notifications.internal.greeter-sync-pending-manual")
       );
     }
@@ -253,7 +253,7 @@ void Application::performGreeterSync(bool quiet) {
     } else if (!legacySync && !customPrivilege && !polkitAgentActive) {
       pendingBodyKey = "notifications.internal.greeter-sync-pending-console";
     }
-    notify::info("Noctalia", i18n::tr("notifications.internal.greeter-sync"), i18n::tr(pendingBodyKey));
+    notify::info("Vespertine", i18n::tr("notifications.internal.greeter-sync"), i18n::tr(pendingBodyKey));
   }
 
   if (!quiet) {
@@ -267,7 +267,7 @@ void Application::performGreeterSync(bool quiet) {
           return;
         }
         notify::error(
-            "Noctalia", i18n::tr("notifications.internal.greeter-sync"),
+            "Vespertine", i18n::tr("notifications.internal.greeter-sync"),
             i18n::tr(
                 inSessionPolkit  ? "notifications.internal.greeter-sync-timeout"
                     : legacySync ? "notifications.internal.greeter-sync-timeout-manual"
@@ -682,14 +682,14 @@ void Application::initPanelManagerAndPanels() {
       m_launcherPanel->clearUsage();
     }
     notify::info(
-        "Noctalia", i18n::tr("notifications.internal.launcher-usage-reset"),
+        "Vespertine", i18n::tr("notifications.internal.launcher-usage-reset"),
         i18n::tr("notifications.internal.launcher-usage-reset-success")
     );
   });
   m_settingsWindow.setResetScreenTime([this] {
     m_screenTimeService.clearAll();
     notify::info(
-        "Noctalia", i18n::tr("notifications.internal.screen-time-reset"),
+        "Vespertine", i18n::tr("notifications.internal.screen-time-reset"),
         i18n::tr("notifications.internal.screen-time-reset-success")
     );
   });
@@ -815,7 +815,7 @@ void Application::initNotificationAndOsd() {
       },
       [this](bool userCancelled, bool willLockSession) {
         ++m_idleGraceOverlayGeneration;
-        // Keep the overlay only when handing off to Noctalia's lock screen (avoids a flash).
+        // Keep the overlay only when handing off to Vespertine's lock screen (avoids a flash).
         // External lockers never take ownership; deferred hide also races with suspend.
         const bool handoffToLockScreen = !userCancelled && willLockSession && m_configService.isLockScreenEnabled();
         if (!handoffToLockScreen) {

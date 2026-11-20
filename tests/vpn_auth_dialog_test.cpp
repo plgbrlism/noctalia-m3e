@@ -168,7 +168,7 @@ namespace {
 
   bool findsPluginByServiceOrAlias() {
     const auto now = std::chrono::steady_clock::now().time_since_epoch().count();
-    const auto root = std::filesystem::temp_directory_path() / ("noctalia-vpn-auth-dialog-test-" + std::to_string(now));
+    const auto root = std::filesystem::temp_directory_path() / ("vespertine-vpn-auth-dialog-test-" + std::to_string(now));
     const auto etc = root / "etc";
     const auto lib = root / "lib";
     std::filesystem::create_directories(etc);

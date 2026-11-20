@@ -4,35 +4,35 @@
   ...
 }:
 let
-  cfg = config.programs.noctalia;
+  cfg = config.programs.vespertine;
 in
 {
   # The module from this flake predates the module in nixpkgs.
   # To avoid conflicts, we disable the nixpkgs module.
-  disabledModules = [ "programs/wayland/noctalia.nix" ];
+  disabledModules = [ "programs/wayland/vespertine.nix" ];
 
-  options.programs.noctalia = {
-    enable = lib.mkEnableOption "Whether to enable noctalia, a lightweight Wayland shell and bar.";
+  options.programs.vespertine = {
+    enable = lib.mkEnableOption "Whether to enable vespertine, a lightweight Wayland shell and bar.";
 
     package = lib.mkOption {
       type = lib.types.nullOr lib.types.package;
       default = null;
-      description = "The noctalia package to install.";
+      description = "The vespertine package to install.";
     };
 
     systemd = {
-      enable = lib.mkEnableOption "Enables a systemd user service for noctalia.";
+      enable = lib.mkEnableOption "Enables a systemd user service for vespertine.";
 
       target = lib.mkOption {
         type = lib.types.str;
         default = "graphical-session.target";
         example = "hyprland-session.target";
-        description = "The systemd user target for the noctalia service.";
+        description = "The systemd user target for the vespertine service.";
       };
     };
 
     recommendedServices.enable = lib.mkEnableOption ''
-      NixOS services used by Noctalia v5 integrations, including NetworkManager,
+      NixOS services used by Vespertine v5 integrations, including NetworkManager,
       Bluetooth, UPower, and a power profile service.
     '';
   };
@@ -44,9 +44,9 @@ in
 
         environment.systemPackages = lib.optional (cfg.package != null) cfg.package;
 
-        systemd.user.services.noctalia = lib.mkIf cfg.systemd.enable {
-          description = "Noctalia - A lightweight Wayland shell and bar";
-          documentation = [ "https://docs.noctalia.dev/noctalia/" ];
+        systemd.user.services.vespertine = lib.mkIf cfg.systemd.enable {
+          description = "Vespertine - A lightweight Wayland shell and bar";
+          documentation = [ "https://docs.vespertine.dev/vespertine/" ];
           partOf = [ cfg.systemd.target ];
           after = [ cfg.systemd.target ];
           before = lib.remove cfg.systemd.target [ "graphical-session.target" ];
@@ -65,7 +65,7 @@ in
         assertions = [
           {
             assertion = !cfg.systemd.enable || cfg.package != null;
-            message = "programs.noctalia.package cannot be null when programs.noctalia.systemd.enable is true";
+            message = "programs.vespertine.package cannot be null when programs.vespertine.systemd.enable is true";
           }
         ];
       }

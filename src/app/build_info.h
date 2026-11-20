@@ -3,7 +3,7 @@
 #include <string>
 #include <string_view>
 
-namespace noctalia::build_info {
+namespace vespertine::build_info {
 
   std::string_view version() noexcept;
 
@@ -11,4 +11,4 @@ namespace noctalia::build_info {
 
   std::string displayVersion();
 
-} // namespace noctalia::build_info
+} // namespace vespertine::build_info

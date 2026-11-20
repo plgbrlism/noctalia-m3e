@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-// The opt-in codec pack (noctalia_ui_codecs_dep): Wuffs (PNG, JPEG, GIF, BMP, ...), ICO, WebP, JPEG XL,
+// The opt-in codec pack (vespertine_ui_codecs_dep): Wuffs (PNG, JPEG, GIF, BMP, ...), ICO, WebP, JPEG XL,
 // SVG through librsvg, and HEIF/AVIF through a runtime-loaded libheif.
 namespace codecs {
 

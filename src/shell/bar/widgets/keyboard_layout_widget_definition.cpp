@@ -10,15 +10,15 @@ namespace {
 
 } // namespace
 
-const noctalia::bar::WidgetDefinition<KeyboardLayoutWidget::Options>& keyboardLayoutWidgetDefinition() {
-  using noctalia::bar::field;
+const vespertine::bar::WidgetDefinition<KeyboardLayoutWidget::Options>& keyboardLayoutWidgetDefinition() {
+  using vespertine::bar::field;
   using Options = KeyboardLayoutWidget::Options;
-  using noctalia::bar::glyphPositionField;
-  using noctalia::bar::peekDelayField;
-  using noctalia::bar::peekField;
-  using noctalia::bar::whenAllTrue;
+  using vespertine::bar::glyphPositionField;
+  using vespertine::bar::peekDelayField;
+  using vespertine::bar::peekField;
+  using vespertine::bar::whenAllTrue;
 
-  static const noctalia::bar::WidgetDefinition<Options> definition{
+  static const vespertine::bar::WidgetDefinition<Options> definition{
       .type = "keyboard_layout",
       .fields =
           {

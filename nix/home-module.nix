@@ -5,7 +5,7 @@
   ...
 }:
 let
-  cfg = config.programs.noctalia;
+  cfg = config.programs.vespertine;
   jsonFormat = pkgs.formats.json { };
   tomlFormat = pkgs.formats.toml { };
 
@@ -18,7 +18,7 @@ let
         paths = [ cfg.package ];
         nativeBuildInputs = [ pkgs.makeWrapper ];
         postBuild = ''
-          wrapProgram $out/bin/noctalia \
+          wrapProgram $out/bin/vespertine \
             --prefix PATH : ${lib.makeBinPath cfg.extraPackages}
         '';
         meta = cfg.package.meta;
@@ -40,32 +40,32 @@ in
   # Disable the home-manager module to avoid conflicts
   # The module got turned into a folder on 2026-09-30. Disable both old and new.
   disabledModules = [
-    "programs/noctalia.nix"
-    "programs/noctalia"
+    "programs/vespertine.nix"
+    "programs/vespertine"
   ];
 
   imports = [
     (lib.mkRenamedOptionModule
-      [ "programs" "noctalia" "validateConfig" ]
-      [ "programs" "noctalia" "checkConfig" ]
+      [ "programs" "vespertine" "validateConfig" ]
+      [ "programs" "vespertine" "checkConfig" ]
     )
   ];
 
-  options.programs.noctalia = {
-    enable = lib.mkEnableOption "noctalia, a lightweight Wayland shell and bar";
+  options.programs.vespertine = {
+    enable = lib.mkEnableOption "vespertine, a lightweight Wayland shell and bar";
 
-    systemd.enable = lib.mkEnableOption "a systemd user service for noctalia";
+    systemd.enable = lib.mkEnableOption "a systemd user service for vespertine";
 
-    package = lib.mkPackageOption pkgs "noctalia" { nullable = true; };
+    package = lib.mkPackageOption pkgs "vespertine" { nullable = true; };
 
     extraPackages = lib.mkOption {
       type = lib.types.listOf lib.types.package;
       default = [ ];
       example = lib.literalExpression "[ pkgs.gpu-screen-recorder pkgs.slurp ]";
       description = ''
-        Packages added to Noctalia's PATH, for example commands used by plugins.
-        The module wraps the selected package without rebuilding Noctalia.
-        Requires programs.noctalia.package to be non-null.
+        Packages added to Vespertine's PATH, for example commands used by plugins.
+        The module wraps the selected package without rebuilding Vespertine.
+        Requires programs.vespertine.package to be non-null.
       '';
     };
 
@@ -85,12 +85,12 @@ in
         ];
       default = { };
       description = ''
-        Default settings for noctalia, Can be written as:
+        Default settings for vespertine, Can be written as:
           - A Nix attrset (converted to TOML via nixpkgs' tomlFormat)
           - A raw TOML string
           - A path to a `.toml` file
 
-        See <https://docs.noctalia.dev/noctalia/configuration/> for more information and examples.
+        See <https://docs.vespertine.dev/vespertine/configuration/> for more information and examples.
 
         Note: these settings can still be overwritten at runtime via the settings menu.
       '';
@@ -120,23 +120,23 @@ in
       description = ''
         Custom color pallete options.
 
-        See <https://docs.noctalia.dev/noctalia/theming/palette/#custom-palette-files>.
+        See <https://docs.vespertine.dev/vespertine/theming/palette/#custom-palette-files>.
       '';
     };
   };
 
   config = lib.mkIf cfg.enable {
-    systemd.user.services.noctalia = lib.mkIf cfg.systemd.enable {
+    systemd.user.services.vespertine = lib.mkIf cfg.systemd.enable {
       Unit = {
-        Description = "Noctalia - A lightweight Wayland shell and bar";
-        Documentation = "https://docs.noctalia.dev/noctalia/";
+        Description = "Vespertine - A lightweight Wayland shell and bar";
+        Documentation = "https://docs.vespertine.dev/vespertine/";
         PartOf = [ config.wayland.systemd.target ];
         After = [ config.wayland.systemd.target ];
         Before = lib.remove config.wayland.systemd.target [ "graphical-session.target" ];
         X-Restart-Triggers =
-          lib.optional (cfg.settings != { }) "${config.xdg.configFile."noctalia/config.toml".source}"
+          lib.optional (cfg.settings != { }) "${config.xdg.configFile."vespertine/config.toml".source}"
           ++ lib.mapAttrsToList (
-            name: _: "${config.xdg.configFile."noctalia/palettes/${name}.json".source}"
+            name: _: "${config.xdg.configFile."vespertine/palettes/${name}.json".source}"
           ) cfg.customPalettes;
       };
 
@@ -154,12 +154,12 @@ in
     xdg = {
       configFile = lib.mkMerge [
         (lib.mkIf (cfg.settings != { }) {
-          "noctalia/config.toml".source =
+          "vespertine/config.toml".source =
             let
               rawConfig = generateToml "config.toml" cfg.settings;
             in
             if cfg.checkConfig && cfg.package != null then
-              pkgs.runCommand "noctalia-config.toml" { } ''
+              pkgs.runCommand "vespertine-config.toml" { } ''
                 ${lib.getExe finalPackage} config validate ${rawConfig}
                 cp ${rawConfig} $out
               ''
@@ -168,7 +168,7 @@ in
         })
         (lib.mapAttrs' (
           name: palette:
-          lib.nameValuePair "noctalia/palettes/${name}.json" {
+          lib.nameValuePair "vespertine/palettes/${name}.json" {
             source = generateJson "${name}-palette.json" palette;
           }
         ) cfg.customPalettes)
@@ -178,11 +178,11 @@ in
     assertions = [
       {
         assertion = cfg.extraPackages == [ ] || cfg.package != null;
-        message = "programs.noctalia.package cannot be null when programs.noctalia.extraPackages is non-empty";
+        message = "programs.vespertine.package cannot be null when programs.vespertine.extraPackages is non-empty";
       }
       {
         assertion = !cfg.systemd.enable || cfg.package != null;
-        message = "programs.noctalia.package cannot be null when programs.noctalia.systemd.enable is true";
+        message = "programs.vespertine.package cannot be null when programs.vespertine.systemd.enable is true";
       }
     ];
   };

@@ -76,7 +76,7 @@ int main() {
            {"fr#holiday@group.v.calendar.google.com"}
        )
       && ok;
-  // Unticking in Noctalia starts from Google's ticks, not from every listed calendar.
+  // Unticking in Vespertine starts from Google's ticks, not from every listed calendar.
   ok = expectIds(
            calendar::setCalendarSourceChecked(google, {}, "team@group.calendar.google.com", false), {"me@example.com"}
        )

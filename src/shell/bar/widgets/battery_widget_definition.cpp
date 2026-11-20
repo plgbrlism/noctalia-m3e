@@ -3,13 +3,13 @@
 #include "shell/bar/glyph_value_definition.h"
 #include "system/battery_warning_monitor.h"
 
-const noctalia::bar::WidgetDefinition<BatteryWidget::Options, BatteryWidgetDefinitionContext>&
+const vespertine::bar::WidgetDefinition<BatteryWidget::Options, BatteryWidgetDefinitionContext>&
 batteryWidgetDefinition() {
-  using noctalia::bar::field;
+  using vespertine::bar::field;
   using Options = BatteryWidget::Options;
-  using noctalia::bar::glyphPositionField;
-  using noctalia::bar::peekDelayField;
-  using noctalia::bar::peekField;
+  using vespertine::bar::glyphPositionField;
+  using vespertine::bar::peekDelayField;
+  using vespertine::bar::peekField;
 
   settings::WidgetSettingVisibility glyphAndLabel;
   glyphAndLabel.all = {
@@ -17,7 +17,7 @@ batteryWidgetDefinition() {
       {.key = "show_label", .values = {"true"}},
   };
 
-  static const noctalia::bar::WidgetDefinition<Options, BatteryWidgetDefinitionContext> definition{
+  static const vespertine::bar::WidgetDefinition<Options, BatteryWidgetDefinitionContext> definition{
       .type = "battery",
       .fields =
           {

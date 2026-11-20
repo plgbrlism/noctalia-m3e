@@ -22,7 +22,7 @@ RANGES = [
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Generate Noctalia launcher Unicode character data.")
+    parser = argparse.ArgumentParser(description="Generate Vespertine launcher Unicode character data.")
     parser.add_argument("--emoji", required=True, help="Path to assets/emoji.json (its characters are skipped)")
     parser.add_argument("--output", required=True, help="Path to write unicode.json")
     return parser.parse_args()

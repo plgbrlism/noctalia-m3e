@@ -19,18 +19,18 @@ rewrite_config() {
 }
 
 rewrite_config "$config_dir/hyprland.conf" '
-    /#[[:space:]]*For Noctalia Color templates/ { pending = $0; next }
-    /^[[:space:]]*source[[:space:]]*=.*noctalia\.conf/ { pending = ""; next }
+    /#[[:space:]]*For Vespertine Color templates/ { pending = $0; next }
+    /^[[:space:]]*source[[:space:]]*=.*vespertine\.conf/ { pending = ""; next }
     pending != "" { print pending; pending = "" }
     { print }
     END { if (pending != "") print pending }
 '
 rewrite_config "$config_dir/hyprland.lua" '
-    /--[[:space:]]*For Noctalia Color templates/ { pending = $0; next }
-    /require\("noctalia"\)\.apply_theme\(\)/ { pending = ""; next }
+    /--[[:space:]]*For Vespertine Color templates/ { pending = $0; next }
+    /require\("vespertine"\)\.apply_theme\(\)/ { pending = ""; next }
     pending != "" { print pending; pending = "" }
     { print }
     END { if (pending != "") print pending }
 '
 
-rm -f -- "$config_dir/noctalia.conf" "$config_dir/noctalia.lua"
+rm -f -- "$config_dir/vespertine.conf" "$config_dir/vespertine.lua"

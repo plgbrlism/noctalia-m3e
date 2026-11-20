@@ -33,11 +33,11 @@ namespace {
 
 } // namespace
 
-const noctalia::bar::WidgetDefinition<TaskbarWidgetOptions>& taskbarWidgetDefinition() {
-  using noctalia::bar::field;
+const vespertine::bar::WidgetDefinition<TaskbarWidgetOptions>& taskbarWidgetDefinition() {
+  using vespertine::bar::field;
   using Options = TaskbarWidgetOptions;
 
-  static const noctalia::bar::
+  static const vespertine::bar::
       WidgetDefinition<Options>
           definition{
               .type = "taskbar",

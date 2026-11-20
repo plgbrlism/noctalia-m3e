@@ -20,14 +20,14 @@
 #include <system_error>
 #include <utility>
 
-namespace noctalia::theme {
+namespace vespertine::theme {
 
   namespace {
 
     constexpr Logger kLog("community_palettes");
     // Requests name the newest palette format this build reads; the API converts newer palettes down for older builds.
-    constexpr std::string_view kCatalogUrl = "https://api.noctalia.dev/palettes";
-    constexpr std::string_view kPaletteUrlBase = "https://api.noctalia.dev/palette";
+    constexpr std::string_view kCatalogUrl = "https://api.vespertine.dev/palettes";
+    constexpr std::string_view kPaletteUrlBase = "https://api.vespertine.dev/palette";
 
     std::filesystem::path catalogCachePath() { return communityPaletteCacheDir() / ".catalog" / "palettes.json"; }
 
@@ -168,7 +168,7 @@ namespace noctalia::theme {
     if (!state.empty()) {
       return std::filesystem::path(state) / "community-palettes";
     }
-    return std::filesystem::path("/tmp") / "noctalia" / "community-palettes";
+    return std::filesystem::path("/tmp") / "vespertine" / "community-palettes";
   }
 
   std::filesystem::path communityPaletteCachePath(std::string_view name) {
@@ -179,4 +179,4 @@ namespace noctalia::theme {
     return std::format("{}/{}?version={}", kPaletteUrlBase, StringUtils::urlEncode(name), kPaletteFormatVersion);
   }
 
-} // namespace noctalia::theme
+} // namespace vespertine::theme

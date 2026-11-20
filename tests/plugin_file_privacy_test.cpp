@@ -34,16 +34,16 @@ namespace {
 
 int main() {
   ::umask(022);
-  char templ[] = "/tmp/noctalia_plugin_file_privacy_XXXXXX";
+  char templ[] = "/tmp/vespertine_plugin_file_privacy_XXXXXX";
   const char* made = ::mkdtemp(templ);
   if (!expect(made != nullptr, "mkdtemp")) {
     return 1;
   }
   const fs::path root(made);
-  ::setenv("NOCTALIA_STATE_HOME", root.c_str(), 1);
+  ::setenv("VESPERTINE_STATE_HOME", root.c_str(), 1);
 
   // A data dir left world-readable by an older release must be tightened.
-  const fs::path dataDir = root / "noctalia" / "plugins" / "data" / "test" / "plugin";
+  const fs::path dataDir = root / "vespertine" / "plugins" / "data" / "test" / "plugin";
   fs::create_directories(dataDir);
   fs::permissions(dataDir, fs::perms(0755), fs::perm_options::replace);
   const fs::path shared = root / "shared.txt";
@@ -58,9 +58,9 @@ int main() {
   LuauHost host(api, "test/plugin:service");
 
   const std::string source = R"(
-local dir = assert(noctalia.pluginDataDir())
-assert(noctalia.writeFile(dir .. "/history.json", "private"))
-assert(noctalia.writeFile(")"
+local dir = assert(vespertine.pluginDataDir())
+assert(vespertine.writeFile(dir .. "/history.json", "private"))
+assert(vespertine.writeFile(")"
       + shared.string()
       + R"(", "shared"))
 )";

@@ -2,12 +2,12 @@
 
 #include "shell/bar/glyph_button_definition.h"
 
-const noctalia::bar::WidgetDefinition<SessionWidget::Options>& sessionWidgetDefinition() {
+const vespertine::bar::WidgetDefinition<SessionWidget::Options>& sessionWidgetDefinition() {
   using Options = SessionWidget::Options;
 
-  static const noctalia::bar::WidgetDefinition<Options> definition{
+  static const vespertine::bar::WidgetDefinition<Options> definition{
       .type = "session",
-      .fields = noctalia::bar::glyphButtonFields<Options>(),
+      .fields = vespertine::bar::glyphButtonFields<Options>(),
       .glyph = [](const Options& options) { return options.glyph; },
   };
   return definition;

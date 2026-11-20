@@ -1,6 +1,6 @@
 """Exercise the native HTTP/state paths against isolated HTTPS and registry fixtures.
 
-The proxy terminates TLS for api.noctalia.dev locally; its CA is trusted only by the
+The proxy terminates TLS for api.vespertine.dev locally; its CA is trusted only by the
 child process. The client keeps its production URL, and no public vote is submitted.
 Run: python3 tests/plugin_recommendations_http_test.py build-debug/plugin_recommendations_test
 """
@@ -21,12 +21,12 @@ import threading
 
 
 def run(binary):
-    with tempfile.TemporaryDirectory(prefix="noctalia-recommendations-") as directory:
+    with tempfile.TemporaryDirectory(prefix="vespertine-recommendations-") as directory:
         root = Path(directory)
         api = int(subprocess.check_output([str(Path(binary).resolve()), "--api"]))
         names = ["CasePlugin", "Hidden", "Lost", "Conflict", "Limited", "Unavailable", "Proxy", "Uninstalled", "Deprecated", "Delisted"]
-        state_root = root / "state/noctalia"
-        config_dir = root / "config/noctalia"
+        state_root = root / "state/vespertine"
+        config_dir = root / "config/vespertine"
         config_dir.mkdir(parents=True)
         (config_dir / "config.toml").write_text("[shell]\ntelemetry_enabled = false\nsetup_wizard_enabled = false\n")
         for source in ["official", "community"]:
@@ -48,7 +48,7 @@ def run(binary):
 
         key = root / "key.pem"
         cert = root / "cert.pem"
-        subprocess.run(["openssl", "req", "-x509", "-newkey", "rsa:2048", "-nodes", "-keyout", str(key), "-out", str(cert), "-days", "1", "-subj", "/CN=api.noctalia.dev", "-addext", "subjectAltName=DNS:api.noctalia.dev", "-addext", "basicConstraints=critical,CA:TRUE"], check=True, capture_output=True)
+        subprocess.run(["openssl", "req", "-x509", "-newkey", "rsa:2048", "-nodes", "-keyout", str(key), "-out", str(cert), "-days", "1", "-subj", "/CN=api.vespertine.dev", "-addext", "subjectAltName=DNS:api.vespertine.dev", "-addext", "basicConstraints=critical,CA:TRUE"], check=True, capture_output=True)
         context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
         context.load_cert_chain(cert, key)
         database = sqlite3.connect(":memory:", check_same_thread=False)
@@ -140,7 +140,7 @@ def run(binary):
                 pass
 
             def do_CONNECT(self):
-                if self.path != "api.noctalia.dev:443":
+                if self.path != "api.vespertine.dev:443":
                     violations.append("unexpected proxy destination")
                     self.send_error(403)
                     return
@@ -159,7 +159,7 @@ def run(binary):
         env = dict(os.environ)
         for name in ["HTTP_PROXY", "HTTPS_PROXY", "ALL_PROXY", "http_proxy", "https_proxy", "all_proxy", "NO_PROXY", "no_proxy"]:
             env.pop(name, None)
-        env.update(NOCTALIA_RECOMMENDATION_FIXTURE="1", NOCTALIA_CONFIG_HOME=str(root / "config"), NOCTALIA_STATE_HOME=str(root / "state"), NOCTALIA_DATA_HOME=str(root / "data"), HTTPS_PROXY=f"http://127.0.0.1:{server.server_port}", NOCTALIA_APP_ASSETS_DIR=str(Path("assets").resolve()))
+        env.update(VESPERTINE_RECOMMENDATION_FIXTURE="1", VESPERTINE_CONFIG_HOME=str(root / "config"), VESPERTINE_STATE_HOME=str(root / "state"), VESPERTINE_DATA_HOME=str(root / "data"), HTTPS_PROXY=f"http://127.0.0.1:{server.server_port}", VESPERTINE_APP_ASSETS_DIR=str(Path("assets").resolve()))
         try:
             subprocess.run([str(Path(binary).resolve()), "--http", str(cert)], env=env, check=True, timeout=60)
             if violations:

@@ -18,7 +18,7 @@ void setApplicationIdentity(ApplicationIdentity identity) {
 
 const ApplicationIdentity& applicationIdentity() {
   if (!gIdentitySet) {
-    std::fputs("noctalia-ui: setApplicationIdentity() must be called before using the library\n", stderr);
+    std::fputs("vespertine-ui: setApplicationIdentity() must be called before using the library\n", stderr);
     std::abort();
   }
   return gIdentity;

@@ -26,8 +26,8 @@ class NotificationManager;
 // Diagnostics a caller already computed for an override mutation, so validation does not merge
 // and validate the same tables again. Null members are computed on demand.
 struct OverrideDiagnostics {
-  const noctalia::config::schema::Diagnostics* baseline = nullptr;  // for the persisted overrides
-  const noctalia::config::schema::Diagnostics* candidate = nullptr; // for the candidate table
+  const vespertine::config::schema::Diagnostics* baseline = nullptr;  // for the persisted overrides
+  const vespertine::config::schema::Diagnostics* candidate = nullptr; // for the candidate table
 };
 
 class ConfigService {
@@ -66,15 +66,15 @@ public:
   bool matchesKeybind(KeybindAction action, std::uint32_t sym, std::uint32_t modifiers) const;
   int watchFd() const noexcept { return m_inotify.fd(); }
   std::string buildSupportReport() const;
-  std::string buildMergedUserConfig(noctalia::config::CredentialExportMode credentials) const;
-  std::string buildEffectiveConfig(noctalia::config::CredentialExportMode credentials) const;
+  std::string buildMergedUserConfig(vespertine::config::CredentialExportMode credentials) const;
+  std::string buildEffectiveConfig(vespertine::config::CredentialExportMode credentials) const;
   static std::string buildMergedUserConfigFromSources(
       std::string_view configDir, std::string_view settingsPath, std::string* error = nullptr,
-      noctalia::config::CredentialExportMode credentials = noctalia::config::CredentialExportMode::Keep
+      vespertine::config::CredentialExportMode credentials = vespertine::config::CredentialExportMode::Keep
   );
   static std::string buildEffectiveConfigFromSources(
       std::string_view configDir, std::string_view settingsPath, std::string* error = nullptr,
-      noctalia::config::CredentialExportMode credentials = noctalia::config::CredentialExportMode::Keep
+      vespertine::config::CredentialExportMode credentials = vespertine::config::CredentialExportMode::Keep
   );
   bool shouldRunSetupWizard() const;
   std::optional<bool> stateBool(std::string_view owner, std::string_view key) const;
@@ -84,9 +84,9 @@ public:
   std::optional<std::vector<std::string>> stateStringArray(std::string_view owner, std::string_view key) const;
   bool setStateStringArray(std::string_view owner, std::string_view key, const std::vector<std::string>& value);
   std::optional<std::string> stateString(std::string_view owner, std::string_view key) const;
-  const noctalia::config::LegacyConfigIssues& legacyConfigIssues() const noexcept { return m_legacyConfigIssues; }
+  const vespertine::config::LegacyConfigIssues& legacyConfigIssues() const noexcept { return m_legacyConfigIssues; }
 
-  // The optional label is used only for opt-in reload profiling (NOCTALIA_PROFILE);
+  // The optional label is used only for opt-in reload profiling (VESPERTINE_PROFILE);
   // unlabeled subscribers are reported by registration index.
   void addReloadCallback(ReloadCallback callback, std::string_view label = {});
   void setNotificationManager(NotificationManager* manager);
@@ -205,7 +205,7 @@ private:
   static void
   parseConfigTable(const toml::table& tbl, Config& config, bool logSummary, bool logSchemaDiagnostics = true);
   std::optional<Config> configForOverrides(const toml::table& overrides) const;
-  noctalia::config::schema::Diagnostics diagnosticsForOverrides(const toml::table& overrides) const;
+  vespertine::config::schema::Diagnostics diagnosticsForOverrides(const toml::table& overrides) const;
   // Rejects a candidate that adds errors compared to the persisted overrides.
   bool validateOverrideMutation(const toml::table& candidateOverrides, const OverrideDiagnostics& known = {});
   bool overridePathEffectiveInTable(
@@ -229,19 +229,19 @@ private:
   // the on-screen notification puts the location in its title and the text in
   // its body. `message` is "<dotted.path>: <problem>" and never carries a location.
   struct ConfigProblem {
-    noctalia::config::schema::SourceOrigin origin;
+    vespertine::config::schema::SourceOrigin origin;
     std::string message;
 
     bool empty() const { return message.empty(); }
     // Single-line form for logs and the settings status banner.
     std::string flatten(std::string_view baseDir) const { return origin.prefixedShort(baseDir, message); }
-    static ConfigProblem from(const noctalia::config::schema::Diagnostics::Entry& entry) {
+    static ConfigProblem from(const vespertine::config::schema::Diagnostics::Entry& entry) {
       return ConfigProblem{entry.origin, entry.path + ": " + entry.message};
     }
   };
 
   void setConfigParseError(ConfigProblem problem);
-  void updateLegacyConfigIssues(noctalia::config::LegacyConfigIssues issues);
+  void updateLegacyConfigIssues(vespertine::config::LegacyConfigIssues issues);
   void notifyLegacyConfigIssues();
   // Validates m_overridesTable against the persisted table and writes it; restores the persisted
   // table on failure.
@@ -284,7 +284,7 @@ private:
   ConfigProblem m_overridesParseError;
   ConfigProblem m_pendingError;             // parse error from initial load, notified once the manager is wired up
   uint32_t m_configErrorNotificationId = 0; // ID of the active config-error notification, 0 if none
-  noctalia::config::LegacyConfigIssues m_legacyConfigIssues;
+  vespertine::config::LegacyConfigIssues m_legacyConfigIssues;
   std::string m_loggedLegacyIssueFingerprint;
   bool m_legacyReminderPending = false;
   Timer m_legacyReminderTimer;

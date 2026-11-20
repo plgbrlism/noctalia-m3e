@@ -180,7 +180,7 @@ namespace {
 } // namespace
 
 SoundPlayer::SoundPlayer() {
-  m_threadLoop = pw_thread_loop_new("noctalia-sound", nullptr);
+  m_threadLoop = pw_thread_loop_new("vespertine-sound", nullptr);
   if (m_threadLoop == nullptr) {
     kLog.warn("failed to create sound playback loop");
     return;
@@ -375,9 +375,9 @@ void SoundPlayer::playBuffer(const std::string& name, const std::shared_ptr<cons
   // pw_stream_new_simple() creates a private context from a copy of these properties.
   pw_properties* props = pw_properties_new(
       PW_KEY_MEDIA_TYPE, "Audio", PW_KEY_MEDIA_CATEGORY, "Playback", PW_KEY_MEDIA_ROLE, "Notification", PW_KEY_APP_NAME,
-      "Noctalia", noctalia::pipewire::kContextRtModuleKey, noctalia::pipewire::kContextRtModuleDisabled, nullptr
+      "Vespertine", vespertine::pipewire::kContextRtModuleKey, vespertine::pipewire::kContextRtModuleDisabled, nullptr
   );
-  active->stream = pw_stream_new_simple(m_loop, "noctalia-sound", props, &kStreamEvents, active.get());
+  active->stream = pw_stream_new_simple(m_loop, "vespertine-sound", props, &kStreamEvents, active.get());
   if (active->stream == nullptr) {
     kLog.warn("failed to create stream for sound \"{}\"", name);
     return;

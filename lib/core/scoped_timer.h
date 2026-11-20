@@ -9,9 +9,9 @@
 #include <utility>
 
 // Lightweight, opt-in wall-clock profiling. Output is gated behind the
-// <envPrefix>_PROFILE env var (NOCTALIA_PROFILE in the shell) so normal runs stay
+// <envPrefix>_PROFILE env var (VESPERTINE_PROFILE in the shell) so normal runs stay
 // silent; set it to any non-empty value to surface timing lines.
-namespace noctalia::profiling {
+namespace vespertine::profiling {
 
   // Evaluated once on first use.
   inline bool enabled() {
@@ -56,4 +56,4 @@ namespace noctalia::profiling {
     StopWatch m_watch;
   };
 
-} // namespace noctalia::profiling
+} // namespace vespertine::profiling

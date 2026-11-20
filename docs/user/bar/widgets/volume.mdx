@@ -18,8 +18,8 @@ Shows PipeWire output (speaker) or input (microphone) volume and mute state.
 | `custom_image_colorize`  | bool   | `false`    | When `true`, tint the custom image with the same color the glyph would use, including `mute_color` while muted |
 | `show_label`             | bool   | `true`     | Show the volume percentage next to the glyph (horizontal and vertical bars)                                    |
 | `hide_label_when_muted`  | bool   | `false`    | Hide the percentage while the device is muted, leaving only the mute glyph. Requires `show_glyph = true`       |
-| `glyph_position`         | string | `"before"` | Place the glyph `"before"` or `"after"` the percentage. See [Peek](/noctalia/bar/widgets/#peek)                |
-| `peek`                   | bool   | `false`    | Show only the glyph and reveal the percentage on hover. See [Peek](/noctalia/bar/widgets/#peek)                |
+| `glyph_position`         | string | `"before"` | Place the glyph `"before"` or `"after"` the percentage. See [Peek](/vespertine/bar/widgets/#peek)                |
+| `peek`                   | bool   | `false`    | Show only the glyph and reveal the percentage on hover. See [Peek](/vespertine/bar/widgets/#peek)                |
 | `peek_delay_ms`          | int    | `100`      | Hover time before the percentage reveals, from `0` to `2000` ms                                                |
 | `mute_color`             | string | `"error"`  | Color role or hex color for the icon and label when muted                                                      |
 | `hide_when_inactive`     | bool   | `false`    | *(Input only)* Hide the microphone widget while no application is capturing audio                              |
@@ -50,18 +50,18 @@ device = "output"
 
 ```sh
 # Output (speaker)
-noctalia msg volume-set 65
-noctalia msg volume-up
-noctalia msg volume-up 10
-noctalia msg volume-down
-noctalia msg volume-mute
+vespertine msg volume-set 65
+vespertine msg volume-up
+vespertine msg volume-up 10
+vespertine msg volume-down
+vespertine msg volume-mute
 
 # Input (microphone)
-noctalia msg mic-volume-set 0.5
-noctalia msg mic-volume-up
-noctalia msg mic-volume-up 5%
-noctalia msg mic-volume-down
-noctalia msg mic-mute
+vespertine msg mic-volume-set 0.5
+vespertine msg mic-volume-up
+vespertine msg mic-volume-up 5%
+vespertine msg mic-volume-down
+vespertine msg mic-mute
 ```
 
 Volume and mic IPC use a default step of 5% when no explicit step is provided. Values and steps accept normalized (`0.0`–`1.0`) or percentage-style values (`65`, `65%`, `5%`). Rule of thumb: if you include a decimal and the value is `<= 1.0`, it is treated as normalized; otherwise it is treated as a percentage.

@@ -3,7 +3,7 @@
 #include <span>
 #include <string_view>
 
-namespace noctalia::cli {
+namespace vespertine::cli {
 
   struct Flag {
     std::string_view longName;
@@ -91,4 +91,4 @@ namespace noctalia::cli {
     return true;
   }
 
-} // namespace noctalia::cli
+} // namespace vespertine::cli

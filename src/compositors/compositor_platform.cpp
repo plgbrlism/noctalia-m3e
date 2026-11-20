@@ -90,7 +90,7 @@ namespace {
   }
 
   // Whether wlr-foreign-toplevel handles give the minimized state and take set_minimized and activation by wlr
-  // identity: on labwc and on compositors Noctalia doesn't recognize.
+  // identity: on labwc and on compositors Vespertine doesn't recognize.
   bool usesWlrToplevelState() {
     const auto kind = compositors::detect();
     return kind == compositors::CompositorKind::Labwc || kind == compositors::CompositorKind::Unknown;
@@ -1805,7 +1805,7 @@ bool CompositorPlatform::requestSessionExit() const {
     }
     break;
   case compositors::CompositorKind::Umbriel:
-    // noctalia's session menu is its own confirmation, so bypass umbriel's.
+    // vespertine's session menu is its own confirmation, so bypass umbriel's.
     if (m_runtimeRegistry->umbriel().requestAction("session-quit", {{"skip_confirmation", true}})) {
       return true;
     }

@@ -537,7 +537,7 @@ namespace security {
 
   SecretStoreAttributes secretStoreAttributes(const SecretId& id) {
     return {
-        .application = "noctalia",
+        .application = "vespertine",
         .scope = id.scope,
         .owner = id.owner,
         .name = id.name,

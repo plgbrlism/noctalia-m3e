@@ -3,7 +3,7 @@ set -euo pipefail
 
 config_dir="${XDG_CONFIG_HOME:-$HOME/.config}/umbriel"
 config_file="$config_dir/config.toml"
-theme_file="$config_dir/noctalia.toml"
+theme_file="$config_dir/vespertine.toml"
 
 if [ -f "$config_file" ]; then
     tmp_file="$(mktemp "${config_file}.tmp.XXXXXX")"
@@ -11,10 +11,10 @@ if [ -f "$config_file" ]; then
     awk '
         {
             original = $0
-            gsub(/"noctalia\.toml"[[:space:]]*,[[:space:]]*/, "")
-            gsub(/,[[:space:]]*"noctalia\.toml"/, "")
-            gsub(/"noctalia\.toml"/, "")
-            # Drop a line that held only the noctalia entry (multi-line arrays).
+            gsub(/"vespertine\.toml"[[:space:]]*,[[:space:]]*/, "")
+            gsub(/,[[:space:]]*"vespertine\.toml"/, "")
+            gsub(/"vespertine\.toml"/, "")
+            # Drop a line that held only the vespertine entry (multi-line arrays).
             if ($0 != original && $0 ~ /^[[:space:]]*$/)
                 next
             print

@@ -1,6 +1,6 @@
-# Packaging Noctalia
+# Packaging Vespertine
 
-Notes for distribution packagers. End-user install docs live in the [README](README.md) and at [docs.noctalia.dev](https://docs.noctalia.dev/noctalia/getting-started/installation/).
+Notes for distribution packagers. End-user install docs live in the [README](README.md) and at [docs.vespertine.dev](https://docs.vespertine.dev/vespertine/getting-started/installation/).
 
 ## Package description
 
@@ -8,7 +8,7 @@ Use this exact short description for package metadata (`pkgdesc`, `Summary`, App
 
 > A sleek, customizable desktop shell crafted for Wayland.
 
-Do not substitute shorter or alternate blurbs (“lightweight Wayland bar”, “status bar”, ...). Noctalia is a full desktop shell (bars, dock, launcher, notifications, lock screen, wallpaper, settings, ...), not a bar-only tool.
+Do not substitute shorter or alternate blurbs (“lightweight Wayland bar”, “status bar”, ...). Vespertine is a full desktop shell (bars, dock, launcher, notifications, lock screen, wallpaper, settings, ...), not a bar-only tool.
 
 ## Packaged distributions
 
@@ -23,20 +23,20 @@ v5 is already packaged for:
 - GNU Guix
 - Debian (including Ubuntu)
 
-[Repology](https://repology.org/project/noctalia/versions) is a useful at-a-glance check, but it only covers repositories it indexes (and may still list v4 as `noctalia-shell`). It is not a complete inventory of community packaging.
+[Repology](https://repology.org/project/vespertine/versions) is a useful at-a-glance check, but it only covers repositories it indexes (and may still list v4 as `vespertine-shell`). It is not a complete inventory of community packaging.
 
 ## Identity
 
 |                 |                                                                                                                |
 | --------------- | -------------------------------------------------------------------------------------------------------------- |
-| Name            | `noctalia`                                                                                                     |
-| Homepage        | <https://github.com/noctalia-dev/noctalia>                                                                     |
-| Docs            | <https://docs.noctalia.dev>                                                                                    |
+| Name            | `vespertine`                                                                                                     |
+| Homepage        | <https://github.com/vespertine-dev/vespertine>                                                                     |
+| Docs            | <https://docs.vespertine.dev>                                                                                    |
 | License         | MIT ([LICENSE](LICENSE)); also see vendored licenses under `third_party/` for SPDX completeness                |
 | Version         | [`VERSION`](VERSION), read by Meson `project(... version: files('VERSION'))`                                   |
-| Binary          | `noctalia`                                                                                                     |
-| Desktop entries | `dev.noctalia.Noctalia.desktop`; `dev.noctalia.Noctalia.Annotator.desktop` (hidden, image "Open With" handler) |
-| Icon            | `noctalia` (`share/icons/hicolor/scalable/apps/noctalia.svg`)                                                  |
+| Binary          | `vespertine`                                                                                                     |
+| Desktop entries | `dev.vespertine.Vespertine.desktop`; `dev.vespertine.Vespertine.Annotator.desktop` (hidden, image "Open With" handler) |
+| Icon            | `vespertine` (`share/icons/hicolor/scalable/apps/vespertine.svg`)                                                  |
 
 ## Maintenance Policy
 
@@ -75,22 +75,22 @@ No special linker is required. The default linker from the compiler driver is fi
 - Tests: `-Dtests=disabled` (or leave `auto`, which skips tests for release).
 - `jemalloc`: recommended on glibc; Meson feature option `-Djemalloc=auto|enabled|disabled`. Only used on glibc builds.
 - `system_libraries`: `-Dsystem_libraries=true` links system copies of the vendored libraries instead of building `third_party/`. See [Vendored](#vendored-no-system-package) for the expected layout.
-- `pam_service`: PAM service the lock screen authenticates against, `login` by default. A different service (for example `-Dpam_service=noctalia`) needs a matching `/etc/pam.d/<service>` shipped by the package.
+- `pam_service`: PAM service the lock screen authenticates against, `login` by default. A different service (for example `-Dpam_service=vespertine`) needs a matching `/etc/pam.d/<service>` shipped by the package.
 
-Prefix/datadir are baked into the binary via `NOCTALIA_INSTALL_PREFIX` / `NOCTALIA_INSTALL_DATADIR`, and the PAM helper path (from libexecdir) via `NOCTALIA_PAM_HELPER`. Install with the same prefix you configured.
+Prefix/datadir are baked into the binary via `VESPERTINE_INSTALL_PREFIX` / `VESPERTINE_INSTALL_DATADIR`, and the PAM helper path (from libexecdir) via `VESPERTINE_PAM_HELPER`. Install with the same prefix you configured.
 
 ### Installed layout
 
 ```text
-<prefix>/bin/noctalia
-<prefix>/libexec/noctalia/noctalia-pam-helper
-<prefix>/share/noctalia/assets/...
-<prefix>/share/applications/dev.noctalia.Noctalia.desktop
-<prefix>/share/applications/dev.noctalia.Noctalia.Annotator.desktop
-<prefix>/share/icons/hicolor/scalable/apps/noctalia.svg
+<prefix>/bin/vespertine
+<prefix>/libexec/vespertine/vespertine-pam-helper
+<prefix>/share/vespertine/assets/...
+<prefix>/share/applications/dev.vespertine.Vespertine.desktop
+<prefix>/share/applications/dev.vespertine.Vespertine.Annotator.desktop
+<prefix>/share/icons/hicolor/scalable/apps/vespertine.svg
 ```
 
-The shipped `assets/` tree is **required at runtime**. Shipping only the binary breaks fonts, translations, templates, glyphs, and sounds. The lock screen also needs `noctalia-pam-helper`.
+The shipped `assets/` tree is **required at runtime**. Shipping only the binary breaks fonts, translations, templates, glyphs, and sounds. The lock screen also needs `vespertine-pam-helper`.
 
 ### Runtime asset lookup
 
@@ -98,40 +98,40 @@ Besides the prefix layout above, portable bundle layouts are supported:
 
 ```text
 bundle/
-  noctalia
-  noctalia-pam-helper
+  vespertine
+  vespertine-pam-helper
   assets/
 ```
 
 ```text
 bundle/
-  bin/noctalia
-  bin/noctalia-pam-helper
-  share/noctalia/assets/
+  bin/vespertine
+  bin/vespertine-pam-helper
+  share/vespertine/assets/
 ```
 
-Noctalia resolves the asset root in this order:
+Vespertine resolves the asset root in this order:
 
-1. `NOCTALIA_APP_ASSETS_DIR` (a warning is logged if it is set but invalid)
+1. `VESPERTINE_APP_ASSETS_DIR` (a warning is logged if it is set but invalid)
 2. `assets/` next to the executable
 3. `assets/` one level above the executable (this is how a `build-debug/` binary finds the source tree's `assets/`)
-4. `../<datadir>/noctalia/assets` relative to the executable, when the configured Meson `datadir` is relative
-5. `../share/noctalia/assets` relative to the executable
-6. the compiled install path from Meson (`<prefix>/<datadir>/noctalia/assets`)
+4. `../<datadir>/vespertine/assets` relative to the executable, when the configured Meson `datadir` is relative
+5. `../share/vespertine/assets` relative to the executable
+6. the compiled install path from Meson (`<prefix>/<datadir>/vespertine/assets`)
 
-A candidate is only accepted if it contains `translations/en.json`. If none qualifies, Noctalia logs a warning and uses the compiled install path.
+A candidate is only accepted if it contains `translations/en.json`. If none qualifies, Vespertine logs a warning and uses the compiled install path.
 
 The shared UI library's own assets (the glyph font and its metadata, `lib/assets/` in the source tree) are resolved separately, in this order:
 
-1. `NOCTALIA_LIBRARY_ASSETS_DIR` (a warning is logged if it is set but invalid)
-2. the asset root resolved above; the library assets are installed into the same `share/noctalia/assets/` directory, so a bundle that copies the installed asset directory carries them
+1. `VESPERTINE_LIBRARY_ASSETS_DIR` (a warning is logged if it is set but invalid)
+2. the asset root resolved above; the library assets are installed into the same `share/vespertine/assets/` directory, so a bundle that copies the installed asset directory carries them
 3. `lib/assets/` one level above the executable (this is how a `build-debug/` binary finds the source tree's `lib/assets/`)
 
-A candidate is only accepted if it contains `fonts/noctalia-tabler.ttf` and `fonts/tabler.json`. If none qualifies, Noctalia exits with an error.
+A candidate is only accepted if it contains `fonts/vespertine-tabler.ttf` and `fonts/tabler.json`. If none qualifies, Vespertine exits with an error.
 
-To run tests from an out-of-tree build directory, set both `NOCTALIA_APP_ASSETS_DIR=<src>/assets` and `NOCTALIA_LIBRARY_ASSETS_DIR=<src>/lib/assets`.
+To run tests from an out-of-tree build directory, set both `VESPERTINE_APP_ASSETS_DIR=<src>/assets` and `VESPERTINE_LIBRARY_ASSETS_DIR=<src>/lib/assets`.
 
-`noctalia-pam-helper` is looked up next to the executable first, then at the compiled install path (`<prefix>/<libexecdir>/noctalia/noctalia-pam-helper`). `NOCTALIA_PAM_HELPER_PATH`, when set, must be the absolute path of the helper and replaces both lookups; a value that is not executable is an error, not a fallback.
+`vespertine-pam-helper` is looked up next to the executable first, then at the compiled install path (`<prefix>/<libexecdir>/vespertine/vespertine-pam-helper`). `VESPERTINE_PAM_HELPER_PATH`, when set, must be the absolute path of the helper and replaces both lookups; a value that is not executable is an error, not a fallback.
 
 Not shipped (don’t look for them in the install): AppStream / metainfo XML, man pages, systemd units.
 
@@ -140,9 +140,9 @@ Not shipped (don’t look for them in the install): AppStream / metainfo XML, ma
 Static completion files are not shipped. Generate them from the freshly built binary and install them in the distribution's completion directories:
 
 ```text
-./build-<mode>/noctalia completions bash  → share/bash-completion/completions/noctalia
-./build-<mode>/noctalia completions zsh   → share/zsh/site-functions/_noctalia
-./build-<mode>/noctalia completions fish  → share/fish/vendor_completions.d/noctalia.fish
+./build-<mode>/vespertine completions bash  → share/bash-completion/completions/vespertine
+./build-<mode>/vespertine completions zsh   → share/zsh/site-functions/_vespertine
+./build-<mode>/vespertine completions fish  → share/fish/vendor_completions.d/vespertine.fish
 ```
 
 This is intentionally a packaging step rather than a Meson install rule: executing the target binary during installation would break cross-compilation.
@@ -168,7 +168,7 @@ With `-Dsystem_libraries=true`, Meson uses system copies of all four instead; th
 
 | Library                  | Libraries                                                                             | Headers                          |
 | ------------------------ | ------------------------------------------------------------------------------------- | -------------------------------- |
-| Wuffs                    | none (single-file release, compiled into Noctalia)                                    | `wuffs-v0.4.c`                   |
+| Wuffs                    | none (single-file release, compiled into Vespertine)                                    | `wuffs-v0.4.c`                   |
 | fzy                      | `libfzy` (built from `src/match.c`)                                                   | `fzy/match.h`                    |
 | Material Color Utilities | `libmaterial-color-utilities` (C++ implementation)                                    | `cpp/...` (upstream layout)      |
 | Luau                     | `libLuau.Compiler`, `libLuau.Bytecode`, `libLuau.Ast`, `libLuau.VM`, `libLuau.Common` | `lua.h`, `lualib.h`, `luacode.h` |
@@ -180,7 +180,7 @@ Vendored versions: Wuffs 0.4.0-alpha.9, Luau 0.742 (0.724 also builds), fzy 1.1,
 | Dependency                                         | Role                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | PipeWire **daemon** (+ WirePlumber 0.5)            | Audio, volume OSD, privacy indicators, spectrum. Libraries alone are not enough; without a running daemon those features stay off.                                                                                                                                                                                                                                                                                                                                                                                  |
-| PAM (`login` service by default, `-Dpam_service=`) | Lock screen authentication, via `noctalia-pam-helper`                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| PAM (`login` service by default, `-Dpam_service=`) | Lock screen authentication, via `vespertine-pam-helper`                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | Fontconfig / fonts                                 | Text rendering (users still need usable fonts installed)                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | `git`                                              | Plugin git sources / auto-update invoke `git` on `PATH`                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 | `upower`                                           | Optional: battery / power devices                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
@@ -190,53 +190,53 @@ Vendored versions: Wuffs 0.4.0-alpha.9, Luau 0.742 (0.724 also builds), fzy 1.1,
 | `sound-theme-freedesktop`                          | Shell sounds                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | `libheif` (`libheif.so.1`)                         | Optional but recommended: HEIC, HEIF, and AVIF decoding for wallpapers, thumbnails, clipboard previews, and notification images. Loaded with `dlopen` on first use, so it is neither a build dependency nor a link dependency; declare it as a weak dependency (Arch `optdepends`, Debian/Fedora `Recommends`). AVIF needs libheif's dav1d or aom decoder plugin; HEIC needs an HEVC decoder plugin such as libde265. Fedora's main `libheif` lacks the HEVC decoder; RPM Fusion's `libheif-freeworld` provides it. |
 
-The lock screen runs PAM in `noctalia-pam-helper`, a small executable that links only libpam. If unprivileged password checks on your distribution need extra privileges, grant them to this helper, never to the `noctalia` binary.
+The lock screen runs PAM in `vespertine-pam-helper`, a small executable that links only libpam. If unprivileged password checks on your distribution need extra privileges, grant them to this helper, never to the `vespertine` binary.
 
-A shell built on one system can use a helper built on another: the helper loads the host's PAM stack from `/etc/pam.d`. The shell still links libpam to translate PAM error codes, but does not load PAM modules. A Nix-built Noctalia on a non-NixOS host, whose own helper links nixpkgs' libpam and cannot use the host's PAM stack, works with a helper built natively (`meson compile -C build noctalia-pam-helper`) and `NOCTALIA_PAM_HELPER_PATH` pointing at it. Shell and helper check a shared protocol version on every run, so build the helper from the same Noctalia version.
+A shell built on one system can use a helper built on another: the helper loads the host's PAM stack from `/etc/pam.d`. The shell still links libpam to translate PAM error codes, but does not load PAM modules. A Nix-built Vespertine on a non-NixOS host, whose own helper links nixpkgs' libpam and cannot use the host's PAM stack, works with a helper built natively (`meson compile -C build vespertine-pam-helper`) and `VESPERTINE_PAM_HELPER_PATH` pointing at it. Shell and helper check a shared protocol version on every run, so build the helper from the same Vespertine version.
 
 ## Startup and IPC
 
-Typical startup is compositor autostart or the desktop entry (`noctalia --daemon`). Control a running instance with `noctalia msg ...` (Unix socket under `XDG_RUNTIME_DIR`).
+Typical startup is compositor autostart or the desktop entry (`vespertine --daemon`). Control a running instance with `vespertine msg ...` (Unix socket under `XDG_RUNTIME_DIR`).
 
 Keep the `.desktop` daemon Exec unless you intentionally package a different session integration. Prefer the canonical description above for `Comment=` / AppStream summary as well.
 
-An experimental systemd user service is provided in `<prefix>/share/noctalia/assets/noctalia.service`. See `docs/user/compositor-settings/systemd-service.mdx` for details.
+An experimental systemd user service is provided in `<prefix>/share/vespertine/assets/vespertine.service`. See `docs/user/compositor-settings/systemd-service.mdx` for details.
 
 ## Session conflicts
 
-On non-Plasma sessions Noctalia provides and registers:
+On non-Plasma sessions Vespertine provides and registers:
 
 - `org.freedesktop.Notifications`
 - `org.kde.StatusNotifierWatcher` (system tray host)
 
-Do not run it alongside another notification daemon or StatusNotifier host (mako, dunst, swaync, waybar-as-host, ...) unless those are disabled. On Plasma, Noctalia integrates with Plasma's notification / tray paths instead of claiming the freedesktop Notifications name.
+Do not run it alongside another notification daemon or StatusNotifier host (mako, dunst, swaync, waybar-as-host, ...) unless those are disabled. On Plasma, Vespertine integrates with Plasma's notification / tray paths instead of claiming the freedesktop Notifications name.
 
 ## User data paths
 
 | Kind   | Default                                                                              |
 | ------ | ------------------------------------------------------------------------------------ |
-| Config | `$XDG_CONFIG_HOME/noctalia` (`~/.config/noctalia`), e.g. `config.toml`               |
-| State  | `$XDG_STATE_HOME/noctalia` (`~/.local/state/noctalia`), e.g. `settings.toml`, caches |
-| Data   | `$XDG_DATA_HOME/noctalia` (`~/.local/share/noctalia`)                                |
-| Logs   | `$XDG_CACHE_HOME/noctalia` (`~/.cache/noctalia`)                                     |
+| Config | `$XDG_CONFIG_HOME/vespertine` (`~/.config/vespertine`), e.g. `config.toml`               |
+| State  | `$XDG_STATE_HOME/vespertine` (`~/.local/state/vespertine`), e.g. `settings.toml`, caches |
+| Data   | `$XDG_DATA_HOME/vespertine` (`~/.local/share/vespertine`)                                |
+| Logs   | `$XDG_CACHE_HOME/vespertine` (`~/.cache/vespertine`)                                     |
 
-Override bases with `NOCTALIA_CONFIG_HOME`, `NOCTALIA_STATE_HOME`, `NOCTALIA_DATA_HOME` (each still appends `/noctalia`).
+Override bases with `VESPERTINE_CONFIG_HOME`, `VESPERTINE_STATE_HOME`, `VESPERTINE_DATA_HOME` (each still appends `/vespertine`).
 
 ## Distribution defaults
 
-To change Noctalia's defaults for every user on a system, install `*.toml` files into `/etc/xdg/noctalia/` (more precisely, `noctalia/` under each directory in `$XDG_CONFIG_DIRS`). They use the same format as the user config and load before it, so user files and `settings.toml` take precedence. Only set the keys you want to change. Anything left out keeps the built-in default, including the default bar, idle behaviors, and session actions.
+To change Vespertine's defaults for every user on a system, install `*.toml` files into `/etc/xdg/vespertine/` (more precisely, `vespertine/` under each directory in `$XDG_CONFIG_DIRS`). They use the same format as the user config and load before it, so user files and `settings.toml` take precedence. Only set the keys you want to change. Anything left out keeps the built-in default, including the default bar, idle behaviors, and session actions.
 
 ```toml
-# /etc/xdg/noctalia/10-distro.toml
+# /etc/xdg/vespertine/10-distro.toml
 [wallpaper.default]
 path = "/usr/share/backgrounds/distro/default.png"
 ```
 
-## What Noctalia is not
+## What Vespertine is not
 
-- Not a compositor, display manager, or greeter. Greeter support is [noctalia-greeter](https://github.com/noctalia-dev/noctalia-greeter).
+- Not a compositor, display manager, or greeter. Greeter support is [vespertine-greeter](https://github.com/vespertine-dev/vespertine-greeter).
 - Not a replacement for file managers, screen casting, or drive mounting.
-- Compositor support varies (protocols / IPC). See the compositor docs for [Niri](https://docs.noctalia.dev/noctalia/compositor-settings/niri/), [Hyprland](https://docs.noctalia.dev/noctalia/compositor-settings/hyprland/), [Sway / Scroll](https://docs.noctalia.dev/noctalia/compositor-settings/sway-scroll/), [Mango](https://docs.noctalia.dev/noctalia/compositor-settings/mango/), [Labwc](https://docs.noctalia.dev/noctalia/compositor-settings/labwc/), and [KDE Plasma](https://docs.noctalia.dev/noctalia/compositor-settings/kde/).
+- Compositor support varies (protocols / IPC). See the compositor docs for [Niri](https://docs.vespertine.dev/vespertine/compositor-settings/niri/), [Hyprland](https://docs.vespertine.dev/vespertine/compositor-settings/hyprland/), [Sway / Scroll](https://docs.vespertine.dev/vespertine/compositor-settings/sway-scroll/), [Mango](https://docs.vespertine.dev/vespertine/compositor-settings/mango/), [Labwc](https://docs.vespertine.dev/vespertine/compositor-settings/labwc/), and [KDE Plasma](https://docs.vespertine.dev/vespertine/compositor-settings/kde/).
 
 ## Versioning
 
@@ -244,5 +244,5 @@ Prefer packaging **tagged releases** rather than random `main` snapshots unless 
 
 ## Contact
 
-- Issues: <https://github.com/noctalia-dev/noctalia/issues>
-- Discord: <https://discord.noctalia.dev>
+- Issues: <https://github.com/vespertine-dev/vespertine/issues>
+- Discord: <https://discord.vespertine.dev>

@@ -151,7 +151,7 @@ namespace {
     return text;
   }
 
-  // Noctalia extension: "%~a", "%~A", "%~b", "%~B" and "%~h" render the localized name with its
+  // Vespertine extension: "%~a", "%~A", "%~b", "%~B" and "%~h" render the localized name with its
   // first letter capitalized. Like substituteTzAbbrev, the result is interpolated into the spec.
   std::string substituteCapitalizedNames(std::string_view fmt, const std::tm& tm) {
     if (!fmt.contains("%~")) {

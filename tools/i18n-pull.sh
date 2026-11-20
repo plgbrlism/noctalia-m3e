@@ -1,14 +1,14 @@
 #!/usr/bin/env -S bash
 
-# Pull translations from Noctalia Translate API
+# Pull translations from Vespertine Translate API
 # Usage: ./i18n-pull.sh <project-slug> <output-dir>
-# Example: ./i18n-pull.sh noctalia ./assets/translations
+# Example: ./i18n-pull.sh vespertine ./assets/translations
 
 set -e
 
 # Configuration
-API_BASE="${I18N_API_BASE:-https://i18n.noctalia.dev}"
-PROJECT_SLUG="${1:-noctalia}"
+API_BASE="${I18N_API_BASE:-https://i18n.vespertine.dev}"
+PROJECT_SLUG="${1:-vespertine}"
 OUTPUT_DIR="${2:-./assets/translations}"
 
 # Colors for output

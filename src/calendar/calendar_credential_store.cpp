@@ -144,11 +144,11 @@ namespace calendar {
   std::string_view CalendarCredentialStore::label(CredentialKind kind) {
     switch (kind) {
     case CredentialKind::Password:
-      return "Noctalia calendar password";
+      return "Vespertine calendar password";
     case CredentialKind::RefreshToken:
-      return "Noctalia calendar refresh token";
+      return "Vespertine calendar refresh token";
     }
-    return "Noctalia calendar credential";
+    return "Vespertine calendar credential";
   }
 
   CredentialState CalendarCredentialStore::stateForStatus(security::SecretStoreStatus status) {

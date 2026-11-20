@@ -119,7 +119,7 @@ namespace {
 } // namespace
 
 int main() {
-  char tempDir[] = "/tmp/noctalia-icon-resolver-cache-test-XXXXXX";
+  char tempDir[] = "/tmp/vespertine-icon-resolver-cache-test-XXXXXX";
   TEST_CHECK(mkdtemp(tempDir) != nullptr);
 
   const fs::path root(tempDir);

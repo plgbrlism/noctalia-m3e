@@ -1,10 +1,10 @@
 #include "shell/bar/widgets/lock_keys_widget_definition.h"
 
-const noctalia::bar::WidgetDefinition<LockKeysWidget::Options>& lockKeysWidgetDefinition() {
-  using noctalia::bar::field;
+const vespertine::bar::WidgetDefinition<LockKeysWidget::Options>& lockKeysWidgetDefinition() {
+  using vespertine::bar::field;
   using Options = LockKeysWidget::Options;
 
-  static const noctalia::bar::WidgetDefinition<Options> definition{
+  static const vespertine::bar::WidgetDefinition<Options> definition{
       .type = "lock_keys",
       .fields = {
           field<&Options::showCapsLock>({

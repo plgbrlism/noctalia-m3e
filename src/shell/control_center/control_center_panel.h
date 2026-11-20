@@ -56,7 +56,7 @@ class Wallpaper;
 class WeatherService;
 class ClipboardService;
 
-namespace noctalia::theme {
+namespace vespertine::theme {
   class ThemeService;
 }
 namespace scripting {

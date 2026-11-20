@@ -32,11 +32,11 @@ namespace {
 
   constexpr Logger kLog("weather_tab");
 
-  // NOCTALIA_WEATHER_EFFECT=sun|snow|rain|cloud|fog|stars forces that effect regardless of the
+  // VESPERTINE_WEATHER_EFFECT=sun|snow|rain|cloud|fog|stars forces that effect regardless of the
   // current weather and the effects setting, for testing the shaders.
   std::optional<WeatherEffectType> weatherEffectOverride() {
     static const std::optional<WeatherEffectType> value = [] -> std::optional<WeatherEffectType> {
-      const char* env = std::getenv("NOCTALIA_WEATHER_EFFECT");
+      const char* env = std::getenv("VESPERTINE_WEATHER_EFFECT");
       if (env == nullptr || env[0] == '\0') {
         return std::nullopt;
       }
@@ -54,7 +54,7 @@ namespace {
           return type;
         }
       }
-      kLog.warn("ignoring NOCTALIA_WEATHER_EFFECT={}: expected sun, snow, rain, cloud, fog, or stars", name);
+      kLog.warn("ignoring VESPERTINE_WEATHER_EFFECT={}: expected sun, snow, rain, cloud, fog, or stars", name);
       return std::nullopt;
     }();
     return value;

@@ -285,7 +285,7 @@ namespace {
 
 int main() {
   std::array<char, 64> directory{};
-  constexpr std::string_view pattern = "/tmp/noctalia-pipewire-route-test.XXXXXX";
+  constexpr std::string_view pattern = "/tmp/vespertine-pipewire-route-test.XXXXXX";
   std::ranges::copy(pattern, directory.begin());
   TEST_CHECK(mkdtemp(directory.data()) != nullptr);
   {

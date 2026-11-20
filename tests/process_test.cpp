@@ -105,17 +105,17 @@ namespace {
   }
 
   void syncAppliesEnvOverrides() {
-    ::setenv("NOCTALIA_PROCESS_UNSET_TEST", "parent", 1);
+    ::setenv("VESPERTINE_PROCESS_UNSET_TEST", "parent", 1);
 
     process::RunOptions options;
-    options.env.push_back({"NOCTALIA_PROCESS_SET_TEST", "child"});
-    options.env.push_back({"NOCTALIA_PROCESS_UNSET_TEST", std::nullopt});
+    options.env.push_back({"VESPERTINE_PROCESS_SET_TEST", "child"});
+    options.env.push_back({"VESPERTINE_PROCESS_UNSET_TEST", std::nullopt});
 
     const auto result = process::runSync(
-        {"/bin/sh", "-lc", R"(printf '%s/%s' "$NOCTALIA_PROCESS_SET_TEST" "${NOCTALIA_PROCESS_UNSET_TEST-unset}")"},
+        {"/bin/sh", "-lc", R"(printf '%s/%s' "$VESPERTINE_PROCESS_SET_TEST" "${VESPERTINE_PROCESS_UNSET_TEST-unset}")"},
         options
     );
-    ::unsetenv("NOCTALIA_PROCESS_UNSET_TEST");
+    ::unsetenv("VESPERTINE_PROCESS_UNSET_TEST");
 
     TEST_CHECK(result.exitCode == 0);
     TEST_CHECK(result.out == "child/unset");
@@ -145,32 +145,32 @@ namespace {
 
   void detachedAsyncInheritsLaunchEnvironment() {
     const std::filesystem::path outPath =
-        std::filesystem::temp_directory_path() / ("noctalia_process_env_test_" + std::to_string(::getpid()));
+        std::filesystem::temp_directory_path() / ("vespertine_process_env_test_" + std::to_string(::getpid()));
     std::error_code ec;
     std::filesystem::remove(outPath, ec);
 
-    ::setenv("NOCTALIA_WALLPAPER_PATH", "/tmp/noctalia test/wallpaper.png", 1);
-    ::setenv("NOCTALIA_WALLPAPER_CONNECTOR", "DP-1", 1);
+    ::setenv("VESPERTINE_WALLPAPER_PATH", "/tmp/vespertine test/wallpaper.png", 1);
+    ::setenv("VESPERTINE_WALLPAPER_CONNECTOR", "DP-1", 1);
 
-    const std::string command = R"(printf '%s\n%s' "$NOCTALIA_WALLPAPER_PATH" "$NOCTALIA_WALLPAPER_CONNECTOR" > )"
+    const std::string command = R"(printf '%s\n%s' "$VESPERTINE_WALLPAPER_PATH" "$VESPERTINE_WALLPAPER_CONNECTOR" > )"
         + shellQuote(outPath.string());
     const bool launched = process::runAsync(command);
-    ::unsetenv("NOCTALIA_WALLPAPER_PATH");
-    ::unsetenv("NOCTALIA_WALLPAPER_CONNECTOR");
+    ::unsetenv("VESPERTINE_WALLPAPER_PATH");
+    ::unsetenv("VESPERTINE_WALLPAPER_CONNECTOR");
     TEST_CHECK(launched);
 
     std::string contents;
     for (int i = 0; i < 50; ++i) {
       std::ifstream in(outPath);
       contents.assign(std::istreambuf_iterator<char>(in), std::istreambuf_iterator<char>());
-      if (contents == "/tmp/noctalia test/wallpaper.png\nDP-1") {
+      if (contents == "/tmp/vespertine test/wallpaper.png\nDP-1") {
         break;
       }
       std::this_thread::sleep_for(std::chrono::milliseconds(20));
     }
 
     std::filesystem::remove(outPath, ec);
-    TEST_CHECK(contents == "/tmp/noctalia test/wallpaper.png\nDP-1");
+    TEST_CHECK(contents == "/tmp/vespertine test/wallpaper.png\nDP-1");
   }
 
   void commandExistsRejectsDirectories() {
@@ -188,31 +188,31 @@ namespace {
             "0::/user.slice/user-1000.slice/user@1000.service/session.slice/wayland-wm@niri.service\n", 1000
         )
     );
-    // Noctalia user service.
+    // Vespertine user service.
     TEST_CHECK(
         process::cgroupIndicatesSystemdUserManager(
-            "0::/user.slice/user-1000.slice/user@1000.service/app.slice/noctalia.service\n", 1000
+            "0::/user.slice/user-1000.slice/user@1000.service/app.slice/vespertine.service\n", 1000
         )
     );
     // Login session scope.
     TEST_CHECK(
-        !process::cgroupIndicatesSystemdUserManager("0::/user.slice/user-1000.slice/session-2.scope/noctalia\n", 1000)
+        !process::cgroupIndicatesSystemdUserManager("0::/user.slice/user-1000.slice/session-2.scope/vespertine\n", 1000)
     );
     // Another user's manager.
     TEST_CHECK(!process::cgroupIndicatesSystemdUserManager(
-        "0::/user.slice/user-1001.slice/user@1001.service/app.slice/noctalia.service\n", 1000
+        "0::/user.slice/user-1001.slice/user@1001.service/app.slice/vespertine.service\n", 1000
     ));
     // Legacy cgroup v1 dump.
     TEST_CHECK(
         process::cgroupIndicatesSystemdUserManager(
-            "1:name=systemd:/user.slice/user-1000.slice/user@1000.service/app.slice/noctalia.service\n", 1000
+            "1:name=systemd:/user.slice/user-1000.slice/user@1000.service/app.slice/vespertine.service\n", 1000
         )
     );
     TEST_CHECK(!process::cgroupIndicatesSystemdUserManager("", 1000));
   }
 
   void detachedMissingBinaryReturnsFalse() {
-    TEST_CHECK(!process::runAsync(std::vector<std::string>{"/nonexistent/noctalia-missing-binary-xyz"}));
+    TEST_CHECK(!process::runAsync(std::vector<std::string>{"/nonexistent/vespertine-missing-binary-xyz"}));
   }
 
   class NotifyListener {
@@ -257,7 +257,7 @@ namespace {
   };
 
   void notifyServiceReadySendsToPathSocket() {
-    std::string dir = (std::filesystem::temp_directory_path() / "noctalia-notify-XXXXXX").string();
+    std::string dir = (std::filesystem::temp_directory_path() / "vespertine-notify-XXXXXX").string();
     TEST_CHECK(::mkdtemp(dir.data()) != nullptr);
     const std::string socketPath = dir + "/notify.sock";
     std::optional<std::string> received;
@@ -277,7 +277,7 @@ namespace {
   }
 
   void notifyServiceReadySendsToAbstractSocket() {
-    const std::string address = "@noctalia-notify-test-" + std::to_string(::getpid());
+    const std::string address = "@vespertine-notify-test-" + std::to_string(::getpid());
     NotifyListener listener(address);
     TEST_CHECK(listener.bound());
     TEST_CHECK(process::notifyServiceReady(address));
@@ -298,7 +298,7 @@ namespace {
 
     // A socket nobody listens on fails and reports why.
     errno = 0;
-    TEST_CHECK(!process::notifyServiceReady("/nonexistent-noctalia-notify/notify.sock"));
+    TEST_CHECK(!process::notifyServiceReady("/nonexistent-vespertine-notify/notify.sock"));
     TEST_CHECK(errno == ENOENT);
   }
 

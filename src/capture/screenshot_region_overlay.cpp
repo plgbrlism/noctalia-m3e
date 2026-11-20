@@ -433,7 +433,7 @@ namespace capture {
       inst->output = output.output;
 
       auto config = LayerSurfaceConfig{
-          .nameSpace = "noctalia-screenshot-region",
+          .nameSpace = "vespertine-screenshot-region",
           .layer = LayerShellLayer::Overlay,
           .anchor = LayerShellAnchor::Top | LayerShellAnchor::Bottom | LayerShellAnchor::Left | LayerShellAnchor::Right,
           .width = 0,
@@ -945,7 +945,7 @@ namespace capture {
       return;
     }
 
-    // Whichever Noctalia surface holds the keyboard: on niri an older exclusive panel such as the
+    // Whichever Vespertine surface holds the keyboard: on niri an older exclusive panel such as the
     // launcher keeps it under the overlay, and the keys must still act here, not there (#4641).
     if (KeybindMatcher::matches(KeybindAction::Cancel, event.sym, event.modifiers)) {
       cancelSelection();

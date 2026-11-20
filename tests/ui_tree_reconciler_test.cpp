@@ -1372,7 +1372,7 @@ int main() {
           background != zone->children().end() ? dynamic_cast<const RectNode*>(background->get()) : nullptr;
       ok = expect(
                rect != nullptr && rect->style().radius == Style::scaledRadius(8.0F),
-               "DropZone radius follows Noctalia corner roundness"
+               "DropZone radius follows Vespertine corner roundness"
            )
           && ok;
       zone->setDragOver(false);

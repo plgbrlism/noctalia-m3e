@@ -4,4 +4,4 @@
 
 #include <variant>
 
-const noctalia::bar::WidgetDefinition<std::monostate>& themeModeWidgetDefinition();
+const vespertine::bar::WidgetDefinition<std::monostate>& themeModeWidgetDefinition();

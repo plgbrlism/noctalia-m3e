@@ -22,7 +22,7 @@ class SystemMonitorService;
 
 namespace scripting {
 
-  // A connected output as exposed to plugin scripts via noctalia.outputs().
+  // A connected output as exposed to plugin scripts via vespertine.outputs().
   struct ScriptOutputInfo {
     std::string name; // DRM connector name, e.g. "DP-1"
     std::string description;
@@ -34,7 +34,7 @@ namespace scripting {
     bool focused = false;
   };
 
-  // A calendar event as exposed to plugin scripts via noctalia.calendarEvents().
+  // A calendar event as exposed to plugin scripts via vespertine.calendarEvents().
   // Mirrors CalendarEvent, but with wall-clock milliseconds instead of a chrono time_point so the
   // scripting layer stays off the calendar layer's headers.
   struct ScriptCalendarEvent {
@@ -49,7 +49,7 @@ namespace scripting {
     bool allDay = false;
   };
 
-  // The shell's active MPRIS player as exposed to plugin scripts via noctalia.mediaPlayer().
+  // The shell's active MPRIS player as exposed to plugin scripts via vespertine.mediaPlayer().
   // `positionMs` is the position at `sampledAt`; the binding projects it to call time while playing.
   struct ScriptMediaPlayer {
     std::string busName;
@@ -211,7 +211,7 @@ namespace scripting {
       return m_mediaPlayer;
     }
 
-    // Shell [shell].time_format / date_format — mirrored for noctalia.timeFormat() / dateFormat().
+    // Shell [shell].time_format / date_format — mirrored for vespertine.timeFormat() / dateFormat().
     void setTimeFormat(std::string format) {
       std::scoped_lock lock(m_mutex);
       m_timeFormat = std::move(format);
@@ -323,7 +323,7 @@ namespace scripting {
 
     UnloadPluginSoundsHook unloadPluginSoundsHook() const { return m_unloadPluginSoundsHook; }
 
-    // noctalia.idle.watch()/unwatch(). Wired to PluginIdleWatches in Application; invoked only on
+    // vespertine.idle.watch()/unwatch(). Wired to PluginIdleWatches in Application; invoked only on
     // the main thread (from dispatchSideEffects). The release hook runs when a Luau host dies.
     void setIdleWatchHook(IdleWatchHook hook) { m_idleWatchHook = std::move(hook); }
 
@@ -347,7 +347,7 @@ namespace scripting {
 
     ReleaseIdleWatchesHook releaseIdleWatchesHook() const { return m_releaseIdleWatchesHook; }
 
-    // noctalia.compositor.subscribe()/unsubscribe(). Wired to CompositorEventSubscriptions in Application; invoked
+    // vespertine.compositor.subscribe()/unsubscribe(). Wired to CompositorEventSubscriptions in Application; invoked
     // only on the main thread (from dispatchSideEffects). The release hook runs when a Luau host dies.
     void setCompositorSubscribeHook(CompositorSubscribeHook hook) { m_compositorSubscribeHook = std::move(hook); }
 
@@ -375,7 +375,7 @@ namespace scripting {
       return m_releaseCompositorSubscriptionsHook;
     }
 
-    // noctalia.nightlight.state()/setEnabled()/toggle()/setForce()/toggleForce()/watch().
+    // vespertine.nightlight.state()/setEnabled()/toggle()/setForce()/toggleForce()/watch().
     // The snapshot is published from GammaService on the main thread; actions are queued as side
     // effects so they run through the same runtime overrides as the bar widget and IPC.
     void setNightLightState(ScriptNightLightState state) {
@@ -451,7 +451,7 @@ namespace scripting {
       }
     }
 
-    // noctalia.layer.show()/hide()/configure(). Wired to PluginLayerHost in Application; main thread
+    // vespertine.layer.show()/hide()/configure(). Wired to PluginLayerHost in Application; main thread
     // only (from dispatchSideEffects).
     void setLayerCommandHook(LayerCommandHook hook) { m_layerCommandHook = std::move(hook); }
 

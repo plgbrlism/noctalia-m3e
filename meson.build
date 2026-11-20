@@ -1,4 +1,4 @@
-project('noctalia', ['c', 'cpp'],
+project('vespertine', ['c', 'cpp'],
   version: files('VERSION'),
   meson_version: '>=1.1',
   default_options: [
@@ -105,7 +105,7 @@ if is_glibc
   jemalloc_dep = dependency('jemalloc', required: jemalloc_option)
   if jemalloc_dep.found()
     jemalloc_deps += [jemalloc_dep]
-    jemalloc_cpp_args += ['-DNOCTALIA_USE_JEMALLOC=1']
+    jemalloc_cpp_args += ['-DVESPERTINE_USE_JEMALLOC=1']
   endif
 endif
 
@@ -303,11 +303,11 @@ if pam_service == '' or pam_service.contains('/') or pam_service.contains('"') o
   error('pam_service must be a plain PAM service name, got "@0@"'.format(pam_service))
 endif
 
-_noctalia_compile_definitions = [
-  '-DNOCTALIA_INSTALL_PREFIX="' + get_option('prefix') + '"',
-  '-DNOCTALIA_INSTALL_DATADIR="' + get_option('datadir') + '"',
-  '-DNOCTALIA_PAM_HELPER="' + (get_option('prefix') / get_option('libexecdir') / 'noctalia' / 'noctalia-pam-helper') + '"',
-  '-DNOCTALIA_VERSION="' + meson.project_version() + '"',
+_vespertine_compile_definitions = [
+  '-DVESPERTINE_INSTALL_PREFIX="' + get_option('prefix') + '"',
+  '-DVESPERTINE_INSTALL_DATADIR="' + get_option('datadir') + '"',
+  '-DVESPERTINE_PAM_HELPER="' + (get_option('prefix') / get_option('libexecdir') / 'vespertine' / 'vespertine-pam-helper') + '"',
+  '-DVESPERTINE_VERSION="' + meson.project_version() + '"',
 ] + jemalloc_cpp_args
 
 # PipeWire's pkg-config adds -fno-strict-aliasing and -fno-strict-overflow to
@@ -315,16 +315,16 @@ _noctalia_compile_definitions = [
 # them here and compile under the same rules.
 # GCC's -Wconversion omits sign conversions in C++ while Clang's includes them;
 # -Wsign-conversion makes both compilers report the same set.
-_noctalia_cpp_args = [
+_vespertine_cpp_args = [
   '-Wall', '-Wextra', '-Wno-missing-field-initializers', '-Wpedantic', '-Wconversion', '-Wsign-conversion',
   '-Wshadow',
   '-fno-strict-aliasing', '-fno-strict-overflow',
-] + _noctalia_compile_definitions
+] + _vespertine_compile_definitions
 
 # ── UI library ────────────────────────────────────────────────────────────────
 # Self-contained; see lib/meson.build for its outputs.
-noctalia_ui_build_codecs = true
-noctalia_ui_system_wuffs = get_option('system_libraries')
+vespertine_ui_build_codecs = true
+vespertine_ui_system_wuffs = get_option('system_libraries')
 subdir('lib')
 
 # ── Shell Wayland protocols ───────────────────────────────────────────────────
@@ -421,7 +421,7 @@ _protocol_sources += _wlr_ls_c
 _protocol_headers += _wlr_ls_h
 
 # ── Main sources ──────────────────────────────────────────────────────────────
-_noctalia_sources = files(
+_vespertine_sources = files(
   'src/app/application.cpp',
   'src/app/application_events.cpp',
   'src/app/application_ipc.cpp',
@@ -971,7 +971,7 @@ git_program = find_program('git', required: false)
 if git_program.found()
   _git_revision_h = vcs_tag(
     input: 'src/app/git_revision.h.in',
-    output: 'noctalia_git_revision.h',
+    output: 'vespertine_git_revision.h',
     command: [git_program, 'describe', '--tags', '--always', '--dirty=-dirty', '--abbrev=12'],
     fallback: 'unknown',
   )
@@ -980,19 +980,19 @@ else
   _git_revision_config.set('VCS_TAG', 'unknown')
   _git_revision_h = configure_file(
     input: 'src/app/git_revision.h.in',
-    output: 'noctalia_git_revision.h',
+    output: 'vespertine_git_revision.h',
     configuration: _git_revision_config,
   )
 endif
 
 # Headers clang-tidy needs before any compile has run (see `just lint`).
-_generated_headers = noctalia_ui_protocol_headers + _protocol_headers
+_generated_headers = vespertine_ui_protocol_headers + _protocol_headers
 if git_program.found()
   _generated_headers += _git_revision_h
 endif
 
 # ── Include directories ────────────────────────────────────────────────────────
-_noctalia_inc = [
+_vespertine_inc = [
   include_directories('src'),
   # '.' adds both the source root and the corresponding build-dir root, so
   # generated protocol headers (written to the build root) are found by #include.
@@ -1000,7 +1000,7 @@ _noctalia_inc = [
 ]
 
 # ── Application library and executable ────────────────────────────────────────
-_noctalia_system_dependencies = [
+_vespertine_system_dependencies = [
   sdbus_cpp_dep,
   wayland_client_dep,
   cairo_dep,
@@ -1028,95 +1028,95 @@ _noctalia_system_dependencies = [
   sndfile_dep,
 ] + jemalloc_deps + (dl_dep.found() ? [dl_dep] : [])
 
-_noctalia_dependencies = _noctalia_system_dependencies + [
+_vespertine_dependencies = _vespertine_system_dependencies + [
   fzy_dep,
   mcu_dep,
   luau_dep,
 ]
 
-_noctalia_test_dependencies = _noctalia_system_dependencies + [
+_vespertine_test_dependencies = _vespertine_system_dependencies + [
   _fzy_selective_dep,
   _mcu_selective_dep,
   _luau_selective_dep,
-  noctalia_ui_codecs_dep,
+  vespertine_ui_codecs_dep,
 ]
 
 # Production sources and generated protocols compile once. The shell links both
 # archives whole; tests link them normally so only the objects they exercise
 # enter each test executable.
-noctalia_core_lib = static_library('noctalia_core',
-  sources: _noctalia_sources + _protocol_sources + _protocol_headers + [_git_revision_h],
-  dependencies: _noctalia_dependencies + [noctalia_ui_codecs_dep],
-  include_directories: _noctalia_inc,
-  cpp_args: _noctalia_cpp_args,
+vespertine_core_lib = static_library('vespertine_core',
+  sources: _vespertine_sources + _protocol_sources + _protocol_headers + [_git_revision_h],
+  dependencies: _vespertine_dependencies + [vespertine_ui_codecs_dep],
+  include_directories: _vespertine_inc,
+  cpp_args: _vespertine_cpp_args,
 )
 
-noctalia_core_dep = declare_dependency(
-  link_with: noctalia_core_lib,
-  dependencies: _noctalia_test_dependencies,
-  include_directories: _noctalia_inc,
-  compile_args: _noctalia_compile_definitions,
+vespertine_core_dep = declare_dependency(
+  link_with: vespertine_core_lib,
+  dependencies: _vespertine_test_dependencies,
+  include_directories: _vespertine_inc,
+  compile_args: _vespertine_compile_definitions,
   sources: _protocol_headers,
 )
 
-noctalia_exe = executable('noctalia',
+vespertine_exe = executable('vespertine',
   sources: files('src/main.cpp') + _protocol_headers,
-  dependencies: _noctalia_dependencies + [noctalia_ui_codecs_dep],
-  include_directories: _noctalia_inc,
-  cpp_args: _noctalia_cpp_args,
+  dependencies: _vespertine_dependencies + [vespertine_ui_codecs_dep],
+  include_directories: _vespertine_inc,
+  cpp_args: _vespertine_cpp_args,
   objects: [
-    noctalia_core_lib.extract_all_objects(recursive: false),
-    noctalia_ui_lib.extract_all_objects(recursive: false),
-    noctalia_ui_codecs_lib.extract_all_objects(recursive: false),
+    vespertine_core_lib.extract_all_objects(recursive: false),
+    vespertine_ui_lib.extract_all_objects(recursive: false),
+    vespertine_ui_codecs_lib.extract_all_objects(recursive: false),
   ],
   install: true,
 )
 
-noctalia_session_config = configuration_data()
-noctalia_session_config.set(
-  'NOCTALIA_EXECUTABLE',
-  get_option('prefix') / get_option('bindir') / 'noctalia',
+vespertine_session_config = configuration_data()
+vespertine_session_config.set(
+  'VESPERTINE_EXECUTABLE',
+  get_option('prefix') / get_option('bindir') / 'vespertine',
 )
 configure_file(
-  input: 'assets/noctalia.service.in',
-  output: 'noctalia.service',
-  configuration: noctalia_session_config,
-  install_dir: get_option('datadir') / 'noctalia' / 'assets',
+  input: 'assets/vespertine.service.in',
+  output: 'vespertine.service',
+  configuration: vespertine_session_config,
+  install_dir: get_option('datadir') / 'vespertine' / 'assets',
 )
 
 # The library's own assets (glyph font) install beside the shell's.
 install_subdir('lib/assets',
-  install_dir: get_option('datadir') / 'noctalia',
+  install_dir: get_option('datadir') / 'vespertine',
 )
 
 # PAM runs in its own small executable so distributions can grant it the
 # privileges their PAM stack needs (e.g. setgid for a password-check helper)
 # without extending them to the shell. Keep its dependencies to libpam.
-executable('noctalia-pam-helper',
+executable('vespertine-pam-helper',
   sources: files('src/auth/pam_helper_main.cpp'),
   dependencies: [pam_dep],
   include_directories: include_directories('src'),
   cpp_args: [
     '-Wall', '-Wextra', '-Wno-missing-field-initializers', '-Wpedantic', '-Wconversion', '-Wshadow',
-    '-DNOCTALIA_PAM_SERVICE="' + pam_service + '"',
+    '-DVESPERTINE_PAM_SERVICE="' + pam_service + '"',
   ],
   install: true,
-  install_dir: get_option('libexecdir') / 'noctalia',
+  install_dir: get_option('libexecdir') / 'vespertine',
 )
 
 install_subdir('assets',
-  install_dir: get_option('datadir') / 'noctalia',
-  exclude_files: ['dev.noctalia.Noctalia.desktop', 'dev.noctalia.Noctalia.Annotator.desktop', 'noctalia.service.in'],
+  install_dir: get_option('datadir') / 'vespertine',
+  exclude_files: ['dev.vespertine.Vespertine.desktop', 'dev.vespertine.Vespertine.Annotator.desktop', 'vespertine.service.in'],
 )
 
 install_data(
-  'assets/dev.noctalia.Noctalia.desktop',
-  'assets/dev.noctalia.Noctalia.Annotator.desktop',
+  'assets/dev.vespertine.Vespertine.desktop',
+  'assets/dev.vespertine.Vespertine.Annotator.desktop',
   install_dir: get_option('datadir') / 'applications',
 )
 
 install_data(
-  'assets/noctalia.svg',
+  'assets/vespertine.svg',
   install_dir: get_option('datadir') / 'icons' / 'hicolor' / 'scalable' / 'apps',
 )
 
@@ -1130,16 +1130,16 @@ if build_tests
     link_whole: static_library('test_identity',
       'tests/test_identity.cpp',
       include_directories: include_directories('src'),
-      dependencies: noctalia_ui_dep,
+      dependencies: vespertine_ui_dep,
     ),
   )
-  _ui_test_dep = declare_dependency(dependencies: [noctalia_ui_dep, _test_identity_dep])
-  _ui_codecs_test_dep = declare_dependency(dependencies: [noctalia_ui_codecs_dep, _test_identity_dep])
-  noctalia_core_dep = declare_dependency(
-    dependencies: noctalia_core_dep,
+  _ui_test_dep = declare_dependency(dependencies: [vespertine_ui_dep, _test_identity_dep])
+  _ui_codecs_test_dep = declare_dependency(dependencies: [vespertine_ui_codecs_dep, _test_identity_dep])
+  vespertine_core_dep = declare_dependency(
+    dependencies: vespertine_core_dep,
     link_whole: static_library('test_shell_library',
       'tests/test_shell_library.cpp',
-      dependencies: noctalia_core_dep,
+      dependencies: vespertine_core_dep,
     ),
   )
 
@@ -1369,7 +1369,7 @@ if build_tests
   foreach _test_group : [
     [_ui_test_names, _ui_test_dep],
     [_ui_codecs_test_names, _ui_codecs_test_dep],
-    [_cpp_test_names, noctalia_core_dep],
+    [_cpp_test_names, vespertine_core_dep],
   ]
     _test_dep = _test_group[1]
     foreach test_name : _test_group[0]
@@ -1413,55 +1413,55 @@ if build_tests
 
   screencopy_connection_isolation_exe = executable('screencopy_connection_isolation_test',
     sources: files('tests/screencopy_connection_isolation_test.cpp') + [_wlr_screencopy_test_server_h],
-    dependencies: [noctalia_core_dep, wayland_server_dep],
+    dependencies: [vespertine_core_dep, wayland_server_dep],
     override_options: ['b_ndebug=false'],
   )
   test('screencopy_connection_isolation', screencopy_connection_isolation_exe)
 
   idle_manager_exe = executable('idle_manager_test',
     sources: files('tests/idle_manager_test.cpp') + [_idle_test_server_h],
-    dependencies: [noctalia_core_dep, wayland_server_dep],
+    dependencies: [vespertine_core_dep, wayland_server_dep],
     override_options: ['b_ndebug=false'],
   )
   test('idle_manager', idle_manager_exe)
 
   brightness_service_exe = executable('brightness_service_test',
     sources: files('tests/brightness_service_test.cpp'),
-    dependencies: [noctalia_core_dep, wayland_server_dep],
+    dependencies: [vespertine_core_dep, wayland_server_dep],
     override_options: ['b_ndebug=false'],
   )
   test('brightness_service', brightness_service_exe, timeout: 60)
 
   upower_integration_exe = executable('upower_charge_limit_integration_test',
     sources: files('tests/upower_charge_limit_integration_test.cpp'),
-    dependencies: noctalia_core_dep,
+    dependencies: vespertine_core_dep,
     override_options: ['b_ndebug=false'],
   )
   secret_collection_probe_integration_exe = executable('secret_collection_probe_integration_test',
     sources: files('tests/secret_collection_probe_integration_test.cpp'),
-    dependencies: noctalia_core_dep,
+    dependencies: vespertine_core_dep,
     override_options: ['b_ndebug=false'],
   )
   tray_registration_integration_exe = executable('tray_registration_integration_test',
     sources: files('tests/tray_registration_integration_test.cpp'),
-    dependencies: noctalia_core_dep,
+    dependencies: vespertine_core_dep,
     override_options: ['b_ndebug=false'],
   )
   tray_signal_sender_integration_exe = executable('tray_signal_sender_integration_test',
     sources: files('tests/tray_signal_sender_integration_test.cpp'),
-    dependencies: noctalia_core_dep,
+    dependencies: vespertine_core_dep,
     override_options: ['b_ndebug=false'],
   )
   fingerprint_integration_exe = executable('fingerprint_authenticator_integration_test',
     sources: files('tests/fingerprint_authenticator_integration_test.cpp'),
-    dependencies: noctalia_core_dep,
+    dependencies: vespertine_core_dep,
     override_options: ['b_ndebug=false'],
   )
   dbus_run_session = find_program('dbus-run-session', required: false)
   if dbus_run_session.found()
     url_open_test_exe = executable('url_open_test',
       sources: files('tests/url_open_test.cpp'),
-      dependencies: noctalia_core_dep,
+      dependencies: vespertine_core_dep,
       override_options: ['b_ndebug=false'],
     )
     test('url_open', dbus_run_session, args: ['--', url_open_test_exe])
@@ -1508,7 +1508,7 @@ if build_tests
 
   bluetooth_property_integration_exe = executable('bluetooth_property_integration_test',
     sources: files('tests/bluetooth_property_integration_test.cpp'),
-    dependencies: noctalia_core_dep,
+    dependencies: vespertine_core_dep,
     override_options: ['b_ndebug=false'],
   )
   if dbus_run_session.found()
@@ -1525,7 +1525,7 @@ if build_tests
 
   bluetooth_connect_pass_integration_exe = executable('bluetooth_connect_pass_integration_test',
     sources: files('tests/bluetooth_connect_pass_integration_test.cpp'),
-    dependencies: noctalia_core_dep,
+    dependencies: vespertine_core_dep,
     override_options: ['b_ndebug=false'],
   )
   if dbus_run_session.found()
@@ -1543,7 +1543,7 @@ if build_tests
 
   notification_reply_integration_exe = executable('notification_reply_integration_test',
     sources: files('tests/notification_reply_integration_test.cpp'),
-    dependencies: noctalia_core_dep,
+    dependencies: vespertine_core_dep,
     override_options: ['b_ndebug=false'],
   )
   if dbus_run_session.found()
@@ -1555,15 +1555,15 @@ if build_tests
   endif
 
   config_validate_env = environment()
-  config_validate_env.set('NOCTALIA_CONFIG_HOME', meson.current_source_dir() / 'tests/config_validate/config-home')
-  config_validate_env.set('NOCTALIA_STATE_HOME', meson.current_source_dir() / 'tests/config_validate/state-home')
-  config_validate_env.set('NOCTALIA_DATA_HOME', meson.current_source_dir() / 'tests/config_validate/data-home')
+  config_validate_env.set('VESPERTINE_CONFIG_HOME', meson.current_source_dir() / 'tests/config_validate/config-home')
+  config_validate_env.set('VESPERTINE_STATE_HOME', meson.current_source_dir() / 'tests/config_validate/state-home')
+  config_validate_env.set('VESPERTINE_DATA_HOME', meson.current_source_dir() / 'tests/config_validate/data-home')
 
   sh_program = find_program('sh')
   test('config_validate_cli',
     sh_program,
-    args: ['tests/config_validate_cli_test.sh', noctalia_exe.full_path()],
-    depends: noctalia_exe,
+    args: ['tests/config_validate_cli_test.sh', vespertine_exe.full_path()],
+    depends: vespertine_exe,
     workdir: meson.current_source_dir(),
     env: config_validate_env,
   )

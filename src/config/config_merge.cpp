@@ -13,7 +13,7 @@
 #include <system_error>
 #include <utility>
 
-namespace noctalia::config {
+namespace vespertine::config {
 
   namespace {
 
@@ -228,4 +228,4 @@ namespace noctalia::config {
     return out;
   }
 
-} // namespace noctalia::config
+} // namespace vespertine::config

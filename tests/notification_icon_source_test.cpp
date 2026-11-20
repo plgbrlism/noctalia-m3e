@@ -28,7 +28,7 @@ int main() {
   TEST_CHECK(manager.findHistoryEntry(id) != nullptr);
   TEST_CHECK(manager.findHistoryEntry(id)->notification.iconIsAppIcon);
 
-  char directory[] = "/tmp/noctalia-icon-source-XXXXXX";
+  char directory[] = "/tmp/vespertine-icon-source-XXXXXX";
   TEST_CHECK(mkdtemp(directory) != nullptr);
   const auto path = std::filesystem::path(directory) / "history.enc";
   const auto key = notificationHistoryTestKey();

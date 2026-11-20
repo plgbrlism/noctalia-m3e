@@ -17,7 +17,7 @@
 
 namespace {
 
-  namespace cpu_stat = noctalia::system::cpu_stat;
+  namespace cpu_stat = vespertine::system::cpu_stat;
   using cpu_stat::Totals;
 
   int g_failures = 0;
@@ -32,7 +32,7 @@ namespace {
   }
 
   std::filesystem::path makeTempDir() {
-    std::string pattern = (std::filesystem::temp_directory_path() / "noctalia-cpu-stat-XXXXXX").string();
+    std::string pattern = (std::filesystem::temp_directory_path() / "vespertine-cpu-stat-XXXXXX").string();
     std::vector<char> writable(pattern.begin(), pattern.end());
     writable.push_back('\0');
     const char* result = ::mkdtemp(writable.data());

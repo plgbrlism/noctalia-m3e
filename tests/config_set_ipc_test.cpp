@@ -1,4 +1,4 @@
-// Locks how `noctalia msg config-set` splits its "<path> <value>" arguments. Both halves are TOML,
+// Locks how `vespertine msg config-set` splits its "<path> <value>" arguments. Both halves are TOML,
 // so a quoted key segment, which a plugin id ("author/plugin") always needs, must reach the
 // parser with its quotes, and the value must start right after the path.
 
@@ -32,11 +32,11 @@ namespace {
 
 int main() {
   const std::filesystem::path root =
-      std::filesystem::temp_directory_path() / ("noctalia-config-set-ipc-" + std::to_string(::getpid()));
+      std::filesystem::temp_directory_path() / ("vespertine-config-set-ipc-" + std::to_string(::getpid()));
   std::filesystem::remove_all(root);
-  writeFile(root / "config" / "noctalia" / "config.toml", "[plugins]\nenabled = [\"me/demo\"]\n");
+  writeFile(root / "config" / "vespertine" / "config.toml", "[plugins]\nenabled = [\"me/demo\"]\n");
   writeFile(
-      root / "data" / "noctalia" / "plugins" / "demo" / "plugin.toml",
+      root / "data" / "vespertine" / "plugins" / "demo" / "plugin.toml",
       "id = \"me/demo\"\n"
       "name = \"Demo\"\n"
       "version = \"1.0.0\"\n"
@@ -55,10 +55,10 @@ int main() {
       "id = \"main\"\n"
       "entry = \"main.luau\"\n"
   );
-  ::setenv("NOCTALIA_CONFIG_HOME", (root / "config").c_str(), 1);
-  ::setenv("NOCTALIA_DATA_HOME", (root / "data").c_str(), 1);
+  ::setenv("VESPERTINE_CONFIG_HOME", (root / "config").c_str(), 1);
+  ::setenv("VESPERTINE_DATA_HOME", (root / "data").c_str(), 1);
   ::setenv("XDG_STATE_HOME", (root / "state").c_str(), 1);
-  const std::filesystem::path overridesPath = root / "state" / "noctalia" / "settings.toml";
+  const std::filesystem::path overridesPath = root / "state" / "vespertine" / "settings.toml";
 
   {
     ConfigService config;

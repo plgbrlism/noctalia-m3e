@@ -356,8 +356,8 @@ void Widget::applyCommonOptions(
   m_customLabelText = options.customLabel;
   m_showGlyph = options.showGlyph;
 
-  m_scrollRepeatMode = noctalia::bar::ScrollRepeatMode::Auto;
-  if (const auto mode = noctalia::bar::parseScrollRepeatMode(options.scrollRepeat); mode.has_value()) {
+  m_scrollRepeatMode = vespertine::bar::ScrollRepeatMode::Auto;
+  if (const auto mode = vespertine::bar::parseScrollRepeatMode(options.scrollRepeat); mode.has_value()) {
     m_scrollRepeatMode = *mode;
   } else {
     kLog.error("{}.scroll_repeat: unknown mode \"{}\"", logContext, options.scrollRepeat);
@@ -366,21 +366,21 @@ void Widget::applyCommonOptions(
 
 void Widget::resolveGestureBindings(
     std::string_view widgetType, const WidgetConfig* widgetConfig,
-    const noctalia::bar::WidgetActionBindings::ActionTable* barActions, std::string_view barContext,
-    const noctalia::bar::WidgetActionDispatcher* dispatcher
+    const vespertine::bar::WidgetActionBindings::ActionTable* barActions, std::string_view barContext,
+    const vespertine::bar::WidgetActionDispatcher* dispatcher
 ) {
   m_actionDispatcher = dispatcher;
 
   const std::string widgetContext = std::format("widget.{}", m_configName);
   // Named, not inlined: the span in Inputs borrows from it.
-  const auto typeDefaults = noctalia::bar::gestureDefaultsForType(widgetType, widgetConfig);
+  const auto typeDefaults = vespertine::bar::gestureDefaultsForType(widgetType, widgetConfig);
   m_gestureBindings.resolve(
-      noctalia::bar::WidgetActionBindings::Inputs{
-          .builtinDefaults = noctalia::bar::builtinGestureDefaults(),
+      vespertine::bar::WidgetActionBindings::Inputs{
+          .builtinDefaults = vespertine::bar::builtinGestureDefaults(),
           .widgetDefaults = typeDefaults,
           .barActions = barActions,
-          .widgetActions = noctalia::bar::findActionTable(widgetConfig),
-          .reserved = noctalia::bar::reservedGesturesForType(widgetType),
+          .widgetActions = vespertine::bar::findActionTable(widgetConfig),
+          .reserved = vespertine::bar::reservedGesturesForType(widgetType),
           .widgetContext = widgetContext,
           .barContext = barContext,
           .widgetName = m_configName,
@@ -400,14 +400,14 @@ void Widget::installGestureHandlers() {
 
   std::uint32_t mask = 0;
   std::uint32_t scrollMask = 0;
-  for (const auto gesture : noctalia::bar::allGestures()) {
+  for (const auto gesture : vespertine::bar::allGestures()) {
     if (!bound.contains(gesture)) {
       continue;
     }
-    for (const auto button : noctalia::bar::buttonsForGesture(gesture)) {
+    for (const auto button : vespertine::bar::buttonsForGesture(gesture)) {
       mask |= InputArea::buttonMask(button);
     }
-    if (const auto direction = noctalia::bar::scrollDirectionForGesture(gesture); direction.has_value()) {
+    if (const auto direction = vespertine::bar::scrollDirectionForGesture(gesture); direction.has_value()) {
       scrollMask |= InputArea::scrollDirectionMask(*direction);
     }
   }
@@ -429,7 +429,7 @@ void Widget::installGestureHandlers() {
   // Runs once per widget per reload; the resolved set is the first thing to check when a binding
   // does not fire.
   std::string summary;
-  for (const auto gesture : noctalia::bar::allGestures()) {
+  for (const auto gesture : vespertine::bar::allGestures()) {
     const auto* action = m_gestureBindings.find(gesture);
     if (action == nullptr) {
       continue;
@@ -439,7 +439,7 @@ void Widget::installGestureHandlers() {
     }
     summary += std::format(
         "{}={}", gestureConfigKey(gesture),
-        action->kind == noctalia::bar::WidgetAction::Kind::Exec ? std::format("exec {}", action->args)
+        action->kind == vespertine::bar::WidgetAction::Kind::Exec ? std::format("exec {}", action->args)
                                                                 : action->commandLine()
     );
   }
@@ -447,19 +447,19 @@ void Widget::installGestureHandlers() {
 
   if (mask != 0) {
     m_gestureArea->setOnClick([this](const InputArea::PointerData& data) {
-      if (const auto gesture = noctalia::bar::gestureForButton(data.button)) {
+      if (const auto gesture = vespertine::bar::gestureForButton(data.button)) {
         dispatchGesture(*gesture);
       }
     });
   }
 
   m_gestureArea->setOnAxisHandler([this](const InputArea::PointerData& data) {
-    const auto gesture = noctalia::bar::gestureForScroll(data.axis, data.scrollSteps());
+    const auto gesture = vespertine::bar::gestureForScroll(data.axis, data.scrollSteps());
     if (!gesture.has_value()) {
       // Report a scroll gesture we own as consumed even between detents, so a partly accumulated
       // flick does not leak to an ancestor mid-gesture.
-      return m_gestureBindings.find(noctalia::bar::Gesture::ScrollUp) != nullptr
-          || m_gestureBindings.find(noctalia::bar::Gesture::ScrollDown) != nullptr;
+      return m_gestureBindings.find(vespertine::bar::Gesture::ScrollUp) != nullptr
+          || m_gestureBindings.find(vespertine::bar::Gesture::ScrollDown) != nullptr;
     }
     if (!data.scrollStepStartsGesture() && !bindingRepeatsEveryScrollStep(*gesture)) {
       return true;
@@ -468,13 +468,13 @@ void Widget::installGestureHandlers() {
   });
 }
 
-bool Widget::bindingRepeatsEveryScrollStep(noctalia::bar::Gesture gesture) const {
+bool Widget::bindingRepeatsEveryScrollStep(vespertine::bar::Gesture gesture) const {
   const auto* action = m_gestureBindings.find(gesture);
   const bool actionCycles = action != nullptr && m_actionDispatcher != nullptr && m_actionDispatcher->cycles(*action);
-  return noctalia::bar::scrollRepeatsEveryStep(m_scrollRepeatMode, actionCycles);
+  return vespertine::bar::scrollRepeatsEveryStep(m_scrollRepeatMode, actionCycles);
 }
 
-bool Widget::dispatchGesture(noctalia::bar::Gesture gesture) {
+bool Widget::dispatchGesture(vespertine::bar::Gesture gesture) {
   const auto* action = m_gestureBindings.find(gesture);
   if (action == nullptr) {
     return false;
@@ -484,8 +484,8 @@ bool Widget::dispatchGesture(noctalia::bar::Gesture gesture) {
 
   // Panel actions re-enter through the bar's panel callback so the panel anchors at this widget
   // rather than at the compositor's focused output.
-  if (action->kind == noctalia::bar::WidgetAction::Kind::Ipc && noctalia::bar::isAnchoredPanelVerb(action->verb)) {
-    const auto args = noctalia::bar::parsePanelVerbArgs(action->args);
+  if (action->kind == vespertine::bar::WidgetAction::Kind::Ipc && vespertine::bar::isAnchoredPanelVerb(action->verb)) {
+    const auto args = vespertine::bar::parsePanelVerbArgs(action->args);
     if (args.panelId.empty()) {
       kLog.error(
           "widget.{}.actions.{}: \"{}\" needs a panel id", m_configName, gestureConfigKey(gesture), action->verb

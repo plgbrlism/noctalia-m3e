@@ -1,6 +1,6 @@
 ---
 title: Bar
-description: Add and customize Noctalia bars, choose their widgets, and adjust them per monitor.
+description: Add and customize Vespertine bars, choose their widgets, and adjust them per monitor.
 sidebar:
   order: 2
 ---
@@ -85,7 +85,7 @@ For an inset bar (`margin_ends > 0`), the two corners touching the screen edge b
 
 Multiple `[bar.*]` entries are supported - each is independently configured and rendered on all monitors.
 
-`[bar].order` controls the order Noctalia creates bar layer-shell surfaces. This matters only for bars with `reserve_space = true`, and the compositor still owns the final exclusive-zone arrangement. Names omitted from `order` are appended after the listed names.
+`[bar].order` controls the order Vespertine creates bar layer-shell surfaces. This matters only for bars with `reserve_space = true`, and the compositor still owns the final exclusive-zone arrangement. Names omitted from `order` are appended after the listed names.
 
 ### Dead zone actions
 
@@ -101,7 +101,7 @@ back = "media previous"
 forward = "media next"
 ```
 
-All nine gestures are available, and an action is an IPC command, `exec <command line>`, or `none` - see [Widget Actions](/noctalia/bar/actions/) for the full vocabulary. Panel actions anchor at the pointer, since there is no widget to anchor to.
+All nine gestures are available, and an action is an IPC command, `exec <command line>`, or `none` - see [Widget Actions](/vespertine/bar/actions/) for the full vocabulary. Panel actions anchor at the pointer, since there is no widget to anchor to.
 
 Right-click opens Control Center unless you bind `right` to something else. While an attached panel is open, right-click anywhere on the bar still toggles Control Center unless the click lands in the dead zone and `right` is bound.
 
@@ -191,7 +191,7 @@ Set `auto_hide_reserve_space = true` (**Reserve Space While Visible** in bar set
 
 Set auto-hide to **Smart** in bar settings (or `smart_auto_hide = true` with `auto_hide = false` in config). The bar stays visible while the active workspace on that monitor is empty and hides when the workspace has windows. Window presence is detected from per-workspace window assignments when the compositor provides them, otherwise from the workspace `occupied` flag.
 
-Windows reported as minimised by Umbriel, KDE Plasma, labwc, or compositors without dedicated Noctalia support that implement `wlr-foreign-toplevel-management` do not hide the bar. Minimising the last visible window keeps the bar visible; workspace occupancy and window counts still include minimised windows.
+Windows reported as minimised by Umbriel, KDE Plasma, labwc, or compositors without dedicated Vespertine support that implement `wlr-foreign-toplevel-management` do not hide the bar. Minimising the last visible window keeps the bar visible; workspace occupancy and window counts still include minimised windows.
 
 On labwc, workspace occupancy is inferred from focus because the compositor does not report each window's workspace (see the [workspaces widget](widgets/workspaces)).
 
@@ -208,8 +208,8 @@ The IPC `bar-layer-set <top|overlay> [bar-name] [monitor-selector]` switches the
 
 ```kdl
 binds {
-    Mod+B { spawn-sh "noctalia msg bar-layer-set overlay"; }
-    Mod+Shift+B { spawn-sh "noctalia msg bar-layer-set top"; }
+    Mod+B { spawn-sh "vespertine msg bar-layer-set overlay"; }
+    Mod+Shift+B { spawn-sh "vespertine msg bar-layer-set top"; }
 }
 ```
 

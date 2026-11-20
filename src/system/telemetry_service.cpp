@@ -117,7 +117,7 @@ void TelemetryService::maybeSend(
 
   nlohmann::json payload = {
       {"instanceId", instanceId},
-      {"version", std::string("v") + NOCTALIA_VERSION},
+      {"version", std::string("v") + VESPERTINE_VERSION},
       {"compositor", compositorLabel()},
       {"os", distroLabel()},
       {"ramGb", memoryTotalGb()},
@@ -126,7 +126,7 @@ void TelemetryService::maybeSend(
   };
 
   kLog.info("sending anonymous ping");
-  httpClient.post("https://api.noctalia.dev/ping", payload.dump(), "application/json", [](bool success) {
+  httpClient.post("https://api.vespertine.dev/ping", payload.dump(), "application/json", [](bool success) {
     if (success) {
       kLog.debug("ping sent");
     } else {

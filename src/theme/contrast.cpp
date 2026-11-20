@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <cmath>
 
-namespace noctalia::theme {
+namespace vespertine::theme {
 
   namespace {
 
@@ -190,4 +190,4 @@ namespace noctalia::theme {
     return best;
   }
 
-} // namespace noctalia::theme
+} // namespace vespertine::theme

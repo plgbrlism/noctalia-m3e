@@ -9,10 +9,10 @@
 
 namespace {
 
-  using noctalia::config::schema::Diagnostics;
-  using noctalia::config::schema::readInto;
-  using noctalia::config::schema::shellSchema;
-  using noctalia::config::schema::writeTable;
+  using vespertine::config::schema::Diagnostics;
+  using vespertine::config::schema::readInto;
+  using vespertine::config::schema::shellSchema;
+  using vespertine::config::schema::writeTable;
 
   constexpr std::string_view kParent = "shell";
 

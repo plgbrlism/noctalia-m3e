@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <cstdint>
 
-namespace noctalia::shell::panel::reveal {
+namespace vespertine::shell::panel::reveal {
   // Order matches AttachedRevealDirection (Down, Up, Right, Left) so
   // static_cast is safe. Do not reorder without updating panel_manager.cpp.
   enum class RevealDirection : std::uint8_t { Down, Up, Right, Left };
@@ -60,4 +60,4 @@ namespace noctalia::shell::panel::reveal {
     }
     return t;
   }
-} // namespace noctalia::shell::panel::reveal
+} // namespace vespertine::shell::panel::reveal

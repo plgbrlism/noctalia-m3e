@@ -57,9 +57,9 @@ namespace {
   void checkCircularAvatarMigration(const std::filesystem::path& root) {
     const auto configHome = root / "config";
     const auto stateHome = root / "state";
-    const auto configPath = configHome / "noctalia" / "config.toml";
+    const auto configPath = configHome / "vespertine" / "config.toml";
     const auto includePath = configHome / "shared" / "avatar.toml";
-    const auto settingsPath = stateHome / "noctalia" / "settings.toml";
+    const auto settingsPath = stateHome / "vespertine" / "settings.toml";
     constexpr std::string_view configText =
         "[include]\nfiles = [\"../shared/avatar.toml\"]\nautoload = false\n[shell]\ncircular_avatar = true\n";
     constexpr std::string_view includeText = "[control_center]\ncircular_avatar = true\n";
@@ -68,7 +68,7 @@ namespace {
     writeFile(
         settingsPath, "config_version = 19\n[control_center]\ncircular_avatar = false\nshow_avatar_border = false\n"
     );
-    TEST_CHECK(::setenv("NOCTALIA_CONFIG_HOME", configHome.c_str(), 1) == 0);
+    TEST_CHECK(::setenv("VESPERTINE_CONFIG_HOME", configHome.c_str(), 1) == 0);
     TEST_CHECK(::setenv("XDG_STATE_HOME", stateHome.c_str(), 1) == 0);
     {
       ConfigService config;
@@ -79,7 +79,7 @@ namespace {
     }
     const std::string migratedText = readFile(settingsPath);
     const toml::table migrated = toml::parse(migratedText);
-    TEST_CHECK(migrated["config_version"].value<std::int64_t>() == noctalia::config::currentConfigVersion());
+    TEST_CHECK(migrated["config_version"].value<std::int64_t>() == vespertine::config::currentConfigVersion());
     TEST_CHECK(migrated["shell"]["circular_avatar"].value<bool>() == false);
     TEST_CHECK(!migrated["control_center"]["circular_avatar"]);
     TEST_CHECK(migrated["control_center"]["show_avatar_border"].value<bool>() == false);
@@ -99,11 +99,11 @@ namespace {
 
 int main() {
   const std::filesystem::path root =
-      std::filesystem::temp_directory_path() / ("noctalia-override-mutation-" + std::to_string(::getpid()));
+      std::filesystem::temp_directory_path() / ("vespertine-override-mutation-" + std::to_string(::getpid()));
   std::filesystem::remove_all(root);
-  writeFile(root / "config" / "noctalia" / "config.toml", "[dock]\nenabled = true\nmonitors = [\"legacy\"]\n");
+  writeFile(root / "config" / "vespertine" / "config.toml", "[dock]\nenabled = true\nmonitors = [\"legacy\"]\n");
 
-  ::setenv("NOCTALIA_CONFIG_HOME", (root / "config").c_str(), 1);
+  ::setenv("VESPERTINE_CONFIG_HOME", (root / "config").c_str(), 1);
   ::setenv("XDG_STATE_HOME", (root / "state").c_str(), 1);
 
   const std::vector<std::string> typePath{"calendar", "account", "feed", "type"};
@@ -134,7 +134,7 @@ int main() {
     // `path` is required, so both edits belong to the same commit.
     std::vector<std::pair<std::vector<std::string>, ConfigOverrideValue>> switchToVdir;
     switchToVdir.emplace_back(typePath, std::string("vdir"));
-    switchToVdir.emplace_back(vdirPath, std::string("/tmp/noctalia-vdir-mutation-test"));
+    switchToVdir.emplace_back(vdirPath, std::string("/tmp/vespertine-vdir-mutation-test"));
     expect(config.mutateOverrides(switchToVdir, {serverUrlPath}, nullptr), "provider switch writes");
 
     expect(reloads == 1, "provider switch reaches the config exactly once");
@@ -146,7 +146,7 @@ int main() {
     expect(account != nullptr, "account survives the switch");
     if (account != nullptr) {
       expect(account->type == "vdir", "account type is vdir");
-      expect(account->path == "/tmp/noctalia-vdir-mutation-test", "account path is set");
+      expect(account->path == "/tmp/vespertine-vdir-mutation-test", "account path is set");
       expect(account->serverUrl.empty(), "account server_url is cleared");
     }
 
@@ -180,11 +180,11 @@ int main() {
   }
 
   const std::filesystem::path overlayRoot = root / "overlay-case";
-  writeFile(overlayRoot / "config" / "noctalia" / "config.toml", "[dock]\nenabled = true\n");
+  writeFile(overlayRoot / "config" / "vespertine" / "config.toml", "[dock]\nenabled = true\n");
   writeFile(
-      overlayRoot / "state" / "noctalia" / "settings.toml", "config_version = 14\n[dock]\nmonitors = [\"DP-1\"]\n"
+      overlayRoot / "state" / "vespertine" / "settings.toml", "config_version = 14\n[dock]\nmonitors = [\"DP-1\"]\n"
   );
-  ::setenv("NOCTALIA_CONFIG_HOME", (overlayRoot / "config").c_str(), 1);
+  ::setenv("VESPERTINE_CONFIG_HOME", (overlayRoot / "config").c_str(), 1);
   ::setenv("XDG_STATE_HOME", (overlayRoot / "state").c_str(), 1);
   {
     ConfigService config;
@@ -204,11 +204,11 @@ int main() {
   // widget schema default is a real override and must survive the no-op override pruning.
   const std::filesystem::path inheritRoot = root / "bar-inherit-case";
   writeFile(
-      inheritRoot / "config" / "noctalia" / "config.toml",
+      inheritRoot / "config" / "vespertine" / "config.toml",
       "[bar.default]\nshow_tooltip = false\n\n[widget.clock]\ntype = \"clock\"\n\n[widget.tray]\ndrawer = "
       "true\ndetached_panel = true\n"
   );
-  ::setenv("NOCTALIA_CONFIG_HOME", (inheritRoot / "config").c_str(), 1);
+  ::setenv("VESPERTINE_CONFIG_HOME", (inheritRoot / "config").c_str(), 1);
   ::setenv("XDG_STATE_HOME", (inheritRoot / "state").c_str(), 1);
   {
     ConfigService config;
@@ -237,8 +237,8 @@ int main() {
   // shell.panel_anchor_bar names a bar: renaming that bar in Settings must carry the key along, or every
   // panel open without a source bar (IPC, shortcuts) fails on the stale name. Deleting it clears the key.
   const std::filesystem::path anchorRoot = root / "anchor-bar-case";
-  writeFile(anchorRoot / "config" / "noctalia" / "config.toml", "");
-  ::setenv("NOCTALIA_CONFIG_HOME", (anchorRoot / "config").c_str(), 1);
+  writeFile(anchorRoot / "config" / "vespertine" / "config.toml", "");
+  ::setenv("VESPERTINE_CONFIG_HOME", (anchorRoot / "config").c_str(), 1);
   ::setenv("XDG_STATE_HOME", (anchorRoot / "state").c_str(), 1);
   {
     ConfigService config;
@@ -258,10 +258,10 @@ int main() {
   // drops the key again and the legacy-config warning will be back.
   const std::filesystem::path customScheduleRoot = root / "custom-schedule-case";
   writeFile(
-      customScheduleRoot / "config" / "noctalia" / "config.toml",
+      customScheduleRoot / "config" / "vespertine" / "config.toml",
       "[location]\nsunset = \"20:30\"\nsunrise = \"07:30\"\n"
   );
-  ::setenv("NOCTALIA_CONFIG_HOME", (customScheduleRoot / "config").c_str(), 1);
+  ::setenv("VESPERTINE_CONFIG_HOME", (customScheduleRoot / "config").c_str(), 1);
   ::setenv("XDG_STATE_HOME", (customScheduleRoot / "state").c_str(), 1);
   {
     ConfigService config;

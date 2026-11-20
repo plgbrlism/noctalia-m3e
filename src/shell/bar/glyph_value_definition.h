@@ -7,7 +7,7 @@
 #include <string>
 #include <utility>
 
-namespace noctalia::bar {
+namespace vespertine::bar {
 
   // Shared fields for widgets that draw a glyph beside a value (`glyph_position`, `peek`, `peek_delay_ms`).
   // `Options` must declare `glyphPosition`, `peek` and `peekDelayMs` as its own members: a common base struct
@@ -78,4 +78,4 @@ namespace noctalia::bar {
     });
   }
 
-} // namespace noctalia::bar
+} // namespace vespertine::bar

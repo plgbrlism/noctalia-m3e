@@ -23,10 +23,10 @@ namespace compositors {
     std::variant<std::monostate, nlohmann::json, std::string> value;
   };
 
-  // True when noctalia.compositor.subscribe() can open an event stream on `kind`: Umbriel, niri, and Hyprland.
+  // True when vespertine.compositor.subscribe() can open an event stream on `kind`: Umbriel, niri, and Hyprland.
   [[nodiscard]] bool supportsEventSubscriptions(CompositorKind kind) noexcept;
 
-  // Event-stream connections requested by plugin scripts through noctalia.compositor.subscribe(). Each subscription
+  // Event-stream connections requested by plugin scripts through vespertine.compositor.subscribe(). Each subscription
   // owns its own nonblocking socket to the session compositor, separate from the runtimes' shared stream, performs
   // the compositor's handshake, and forwards every message untouched. Nothing is cached or replayed: the compositor's
   // own initial snapshot after each handshake is what a subscriber sees first.

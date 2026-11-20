@@ -6,7 +6,7 @@
 #include <cstdio>
 #include <nlohmann/json.hpp>
 
-namespace noctalia::theme {
+namespace vespertine::theme {
 
   namespace {
 
@@ -45,4 +45,4 @@ namespace noctalia::theme {
     return root.dump(2);
   }
 
-} // namespace noctalia::theme
+} // namespace vespertine::theme

@@ -14,7 +14,7 @@ namespace {
   class TempDir {
   public:
     TempDir() {
-      std::string pattern = (std::filesystem::temp_directory_path() / "noctalia-firefox-manifest-XXXXXX").string();
+      std::string pattern = (std::filesystem::temp_directory_path() / "vespertine-firefox-manifest-XXXXXX").string();
       std::array<char, 4096> buffer{};
       TEST_CHECK(pattern.size() < buffer.size());
       std::ranges::copy(pattern, buffer.begin());
@@ -55,19 +55,19 @@ namespace {
 } // namespace
 
 int main() {
-  namespace manifest = noctalia::theme::firefox_theme::manifest;
+  namespace manifest = vespertine::theme::firefox_theme::manifest;
 
   TempDir temp;
   const auto manifestPath = temp.path() / "pywalfox.json";
   TEST_CHECK(manifest::inspect(manifestPath).ownership == manifest::Ownership::Missing);
 
-  const std::filesystem::path staleNixHost = "/nix/store/old-noctalia-5.1.0/bin/.noctalia-wrapped";
+  const std::filesystem::path staleNixHost = "/nix/store/old-vespertine-5.1.0/bin/.vespertine-wrapped";
   writeManifest(manifestPath, manifest::kDescription, staleNixHost);
   auto inspection = manifest::inspect(manifestPath);
-  TEST_CHECK(inspection.ownership == manifest::Ownership::Noctalia);
+  TEST_CHECK(inspection.ownership == manifest::Ownership::Vespertine);
   TEST_CHECK(inspection.hostPath == staleNixHost);
 
-  const auto currentNixHost = temp.path() / ".noctalia-wrapped";
+  const auto currentNixHost = temp.path() / ".vespertine-wrapped";
   {
     std::ofstream out(currentNixHost);
     TEST_CHECK(out.good());
@@ -75,11 +75,11 @@ int main() {
   std::string error;
   TEST_CHECK(manifest::install(manifestPath, currentNixHost, &error));
   inspection = manifest::inspect(manifestPath);
-  TEST_CHECK(inspection.ownership == manifest::Ownership::Noctalia);
+  TEST_CHECK(inspection.ownership == manifest::Ownership::Vespertine);
   TEST_CHECK(inspection.hostPath == std::filesystem::weakly_canonical(currentNixHost));
 
-  writeManifest(manifestPath, "Noctalia Pywalfox native messaging host", "/usr/bin/noctalia-pywalfox");
-  TEST_CHECK(manifest::inspect(manifestPath).ownership == manifest::Ownership::Noctalia);
+  writeManifest(manifestPath, "Vespertine Pywalfox native messaging host", "/usr/bin/vespertine-pywalfox");
+  TEST_CHECK(manifest::inspect(manifestPath).ownership == manifest::Ownership::Vespertine);
 
   writeManifest(manifestPath, "Automatically theme Firefox with Pywal", "/usr/bin/pywalfox");
   inspection = manifest::inspect(manifestPath);

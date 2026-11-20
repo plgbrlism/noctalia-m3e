@@ -131,7 +131,7 @@ void ScreenCorners::ensureSurfaces() {
     bool ok = true;
     for (int i = 0; i < 4; ++i) {
       auto surfaceConfig = LayerSurfaceConfig{
-          .nameSpace = "noctalia-screen-corner",
+          .nameSpace = "vespertine-screen-corner",
           .layer = LayerShellLayer::Top,
           .anchor = kCornerAnchors[i],
           .width = size,

@@ -1,9 +1,9 @@
 {
   pkgs,
-  noctalia,
+  vespertine,
 }:
 pkgs.mkShell {
-  inputsFrom = [ noctalia ];
+  inputsFrom = [ vespertine ];
 
   nativeBuildInputs = with pkgs; [
     # Workflow & Hooks
@@ -30,9 +30,9 @@ pkgs.mkShell {
 
   shellHook = ''
     # Point to local assets so binaries find resources without installation
-    export NOCTALIA_APP_ASSETS_DIR="$PWD/assets"
-    export NOCTALIA_LIBRARY_ASSETS_DIR="$PWD/lib/assets"
+    export VESPERTINE_APP_ASSETS_DIR="$PWD/assets"
+    export VESPERTINE_LIBRARY_ASSETS_DIR="$PWD/lib/assets"
 
-    echo " Noctalia dev-shell | 'just --list' to see available tasks"
+    echo " Vespertine dev-shell | 'just --list' to see available tasks"
   '';
 }

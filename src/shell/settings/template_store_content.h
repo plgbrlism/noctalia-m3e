@@ -40,7 +40,7 @@ namespace settings {
   class TemplateStoreContent {
   public:
     TemplateStoreContent(
-        std::vector<noctalia::theme::AvailableTemplate> catalog, std::unordered_set<std::string> selectedIds,
+        std::vector<vespertine::theme::AvailableTemplate> catalog, std::unordered_set<std::string> selectedIds,
         ConfigService* config, TemplateStoreCallbacks callbacks
     );
     ~TemplateStoreContent();
@@ -62,7 +62,7 @@ namespace settings {
     static const char* sortModeTooltipKey(TemplateSortMode mode);
     void commitSelection();
 
-    std::vector<noctalia::theme::AvailableTemplate> m_catalog;
+    std::vector<vespertine::theme::AvailableTemplate> m_catalog;
     std::unordered_set<std::string> m_selectedIds;
     std::vector<std::size_t> m_filteredIndices;
     std::vector<std::size_t> m_sortedIndices;

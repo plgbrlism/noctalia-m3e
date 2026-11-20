@@ -4,7 +4,7 @@
 
 #include <string>
 
-namespace noctalia::cli {
+namespace vespertine::cli {
 
   std::string generateBash(const Command& root);
   std::string generateZsh(const Command& root);
@@ -12,4 +12,4 @@ namespace noctalia::cli {
 
   int runCompletionsCli(int argc, char* argv[]);
 
-} // namespace noctalia::cli
+} // namespace vespertine::cli

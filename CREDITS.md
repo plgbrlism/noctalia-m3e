@@ -1,11 +1,11 @@
 # Credits
 
-Noctalia is made possible by the incredible work of many open-source projects and contributors.
+Vespertine is made possible by the incredible work of many open-source projects and contributors.
 
 ## Design & Branding
 
-- **MrDowntempo** — Creator of the Noctalia Owl and moon logo
-- **[SaberJ2X](https://www.reddit.com/user/SaberJ64/)** — Creator of Talia, the Noctalia mascot
+- **MrDowntempo** — Creator of the Vespertine Owl and moon logo
+- **[SaberJ2X](https://www.reddit.com/user/SaberJ64/)** — Creator of Talia, the Vespertine mascot
 - **[Tabler Icons](https://tabler.io/icons)** — Icon set used throughout the shell
 - **[Riyan Resdian on Noun Project](https://thenounproject.com/creator/yaicon/)** — Plug icon
 
@@ -54,7 +54,7 @@ Bundled in `third_party/` and built from source:
 
 ## System Integration
 
-External tools Noctalia integrates with at runtime when present:
+External tools Vespertine integrates with at runtime when present:
 
 - **[ddcutil](https://www.ddcutil.com/)** — External display brightness control
 
@@ -62,10 +62,10 @@ External tools Noctalia integrates with at runtime when present:
 
 - The **Wayland** community for building the future of Linux desktop graphics
 - The **Niri**, **Hyprland**, **Sway**, **Labwc**, and **MangoWC** teams for their excellent Wayland compositors
-- All the contributors and users who have helped make Noctalia better
+- All the contributors and users who have helped make Vespertine better
 
 ## License
 
-Noctalia is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+Vespertine is licensed under the MIT License. See [LICENSE](LICENSE) for details.
 
 Each dependency listed above is governed by its own respective license. Please refer to their individual projects for licensing information.

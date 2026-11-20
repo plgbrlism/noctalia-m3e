@@ -1,6 +1,6 @@
 ---
 title: Hyprland
-description: Configure Hyprland for the best experience with Noctalia.
+description: Configure Hyprland for the best experience with Vespertine.
 sidebar:
   order: 5
 ---
@@ -10,13 +10,13 @@ import blur1 from '../../assets/hyprland-blur/hyprland-blur-1-v5.png';
 
 Add the following settings to your Hyprland Lua configuration file (usually found at `~/.config/hypr/hyprland.lua`).
 
-## Autostart Noctalia
+## Autostart Vespertine
 
 Add this to your `hyprland.start` event hook:
 
 ```lua
 hl.on("hyprland.start", function()
-  hl.exec_cmd("noctalia")
+  hl.exec_cmd("vespertine")
 end)
 ```
 
@@ -55,7 +55,7 @@ hl.config({
 
 ## Persistent Workspaces
 
-For the best workspace indicator behavior, make your regular Hyprland workspaces persistent. This keeps empty workspaces visible in Noctalia instead of only showing workspaces that currently contain windows.
+For the best workspace indicator behavior, make your regular Hyprland workspaces persistent. This keeps empty workspaces visible in Vespertine instead of only showing workspaces that currently contain windows.
 
 Update the monitor name and workspace list to match your setup. You can find more syntax and examples in the official [Workspace Rules](https://wiki.hypr.land/Configuring/Basics/Workspace-Rules/) documentation.
 
@@ -73,7 +73,7 @@ Add these binds to your `hyprland.lua`:
 
 ```lua
 local mainMod = "SUPER"
-local ipc = "noctalia msg "
+local ipc = "vespertine msg "
 
 -- Core binds
 hl.bind(mainMod .. "+Space", hl.dsp.exec_cmd(ipc .. "panel-toggle launcher"))
@@ -89,9 +89,9 @@ hl.bind("XF86AudioMute", hl.dsp.exec_cmd(ipc .. "volume-mute"))
 hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd(ipc .. "brightness-up"))
 hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd(ipc .. "brightness-down"))
 
--- Noctalia Settings
+-- Vespertine Settings
 hl.window_rule({
-    match = { class = "dev.noctalia.Noctalia" },
+    match = { class = "dev.vespertine.Vespertine" },
     float = true,
     size = "monitor_w*0.5625 monitor_h*0.85",
 })
@@ -99,13 +99,13 @@ hl.window_rule({
 
 ## Layer Animations
 
-Disable Hyprland's built-in layer animations for Noctalia. Noctalia animates its own surfaces; Hyprland's `layersIn`/`layersOut` animations run on top of them and cause visual glitches, such as a panel tearing when it is reopened while still closing. Add this rule even if you do not use blur.
+Disable Hyprland's built-in layer animations for Vespertine. Vespertine animates its own surfaces; Hyprland's `layersIn`/`layersOut` animations run on top of them and cause visual glitches, such as a panel tearing when it is reopened while still closing. Add this rule even if you do not use blur.
 
 ```lua
 hl.layer_rule({
-  name = "noctalia-no-anim",
+  name = "vespertine-no-anim",
   match = {
-    namespace = "^noctalia-(bar-.+|notification|dock|panel|attached-panel|osd|window-switcher)$",
+    namespace = "^vespertine-(bar-.+|notification|dock|panel|attached-panel|osd|window-switcher)$",
   },
   no_anim = true,
 })
@@ -113,15 +113,15 @@ hl.layer_rule({
 
 ## Blur
 
-Enable blur for Noctalia's bar, panels, dock, and notifications.
+Enable blur for Vespertine's bar, panels, dock, and notifications.
 
-<ImageLightbox src={blur1} alt="Blurred Noctalia surfaces" />
+<ImageLightbox src={blur1} alt="Blurred Vespertine surfaces" />
 
 ```lua
 hl.layer_rule({
-  name = "noctalia-blur",
+  name = "vespertine-blur",
   match = {
-    namespace = "^noctalia-(bar-.+|notification|dock|panel|attached-panel|osd|window-switcher)$",
+    namespace = "^vespertine-(bar-.+|notification|dock|panel|attached-panel|osd|window-switcher)$",
   },
   ignore_alpha = 0.5,
   blur = true,
@@ -131,10 +131,10 @@ hl.layer_rule({
 
 ## Permissions
 
-If you use Hyprland's [permission system](https://wiki.hypr.land/configuring/core/advanced-configuration/permissions/) (`ecosystem.enforce_permissions = true`), allow Noctalia to capture the screen and to connect its virtual keyboard. Without these rules, Hyprland asks for permission or denies access, depending on your other rules.
+If you use Hyprland's [permission system](https://wiki.hypr.land/configuring/core/advanced-configuration/permissions/) (`ecosystem.enforce_permissions = true`), allow Vespertine to capture the screen and to connect its virtual keyboard. Without these rules, Hyprland asks for permission or denies access, depending on your other rules.
 
 - `screencopy` is used for screenshots and lock screen desktop capture.
-- `keyboard` is used for clipboard and launcher auto-paste. Hyprland names Noctalia's virtual keyboard `hl-virtual-keyboard-noctalia`.
+- `keyboard` is used for clipboard and launcher auto-paste. Hyprland names Vespertine's virtual keyboard `hl-virtual-keyboard-vespertine`.
 
 ```lua
 hl.config({
@@ -143,10 +143,10 @@ hl.config({
   },
 })
 
-hl.permission("^/usr/bin/noctalia$", "screencopy", "allow")
-hl.permission("^hl-virtual-keyboard-noctalia$", "keyboard", "allow")
+hl.permission("^/usr/bin/vespertine$", "screencopy", "allow")
+hl.permission("^hl-virtual-keyboard-vespertine$", "keyboard", "allow")
 ```
 
-If Noctalia is installed somewhere else, for example `/usr/local/bin/noctalia`, change the binary path to match. Run `readlink -f "$(command -v noctalia)"` to find the path. If you have a catch-all `keyboard` rule such as `hl.permission(".*", "keyboard", "deny")`, keep it after the Noctalia rule.
+If Vespertine is installed somewhere else, for example `/usr/local/bin/vespertine`, change the binary path to match. Run `readlink -f "$(command -v vespertine)"` to find the path. If you have a catch-all `keyboard` rule such as `hl.permission(".*", "keyboard", "deny")`, keep it after the Vespertine rule.
 
 Hyprland does not reload permission rules on config reload. Restart Hyprland after you change them.

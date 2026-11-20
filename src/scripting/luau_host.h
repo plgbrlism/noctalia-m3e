@@ -59,7 +59,7 @@ public:
   // `error` is nullopt when Umbriel accepted the action.
   using UmbrielActionResultHandler =
       std::function<void(std::uint64_t hostId, int callbackRef, std::optional<std::string> error)>;
-  // Registers a `noctalia.state.watch` callback with the shared store (the runtime
+  // Registers a `vespertine.state.watch` callback with the shared store (the runtime
   // owns the token + delivery, so registration is delegated back to it).
   using StateWatchHandler = std::function<void(std::string key, int callbackRef)>;
 
@@ -114,7 +114,7 @@ public:
   const std::string& pluginId() const noexcept { return m_pluginId; }
   const std::string& runtimeName() const noexcept { return m_runtimeName; }
   void setStateWatchHandler(StateWatchHandler handler) { m_stateWatchHandler = std::move(handler); }
-  // Called with every path noctalia.getSetting reads, so the owning runtime can react when
+  // Called with every path vespertine.getSetting reads, so the owning runtime can react when
   // that part of the shell config changes.
   using SettingReadRecorder = std::function<void(std::string_view path)>;
   void setSettingReadRecorder(SettingReadRecorder recorder) { m_settingReadRecorder = std::move(recorder); }
@@ -124,14 +124,14 @@ public:
     }
   }
 
-  // noctalia.state.* — host-mediated per-plugin shared data.
+  // vespertine.state.* — host-mediated per-plugin shared data.
   void stateSet(const std::string& key, const std::string& json);
   std::optional<std::string> stateGet(const std::string& key) const;
   void stateWatch(std::string key, int callbackRef);
   bool callStateWatchCallback(int callbackRef, const std::string& json, std::chrono::milliseconds budget);
   bool hasStateWatchCallback(int callbackRef) const;
 
-  // noctalia.runStream — run a long-lived process and deliver each stdout line to a
+  // vespertine.runStream — run a long-lived process and deliver each stdout line to a
   // Lua callback. Cancellable: every active stream's process is terminated when the
   // host is destroyed (reload / runtime stop), so editing the script or removing the
   // widget kills the subprocess instead of leaking it.
@@ -141,7 +141,7 @@ public:
   bool callStreamCallback(int callbackRef, const std::string& line, std::chrono::milliseconds budget);
   bool hasStreamCallback(int callbackRef) const;
 
-  // noctalia.httpStream — long-lived streaming HTTP request through the main-thread
+  // vespertine.httpStream — long-lived streaming HTTP request through the main-thread
   // HttpClient. Each received line goes to the line callback; the close callback fires
   // exactly once when the transfer ends (unless the stream was stopped). Streams are
   // cancelled on host destruction. `streamKey` identifies the stream (the line ref).
@@ -222,7 +222,7 @@ public:
   void recordBudgetCrossing(std::string_view binding, std::string_view detail);
   void scriptLog(std::string message);
   // Request the runtime tick rate (how often update() fires). A runtime concern, so
-  // it lives on noctalia.* and works for every entry type, including headless services.
+  // it lives on vespertine.* and works for every entry type, including headless services.
   void scriptSetUpdateInterval(int ms);
   [[nodiscard]] bool scriptLoadSound(std::string name, std::string path, int callbackRef);
   void scriptPlaySound(std::string name);
@@ -240,14 +240,14 @@ public:
   void scriptTogglePanel(std::string panelId);
   // Open the settings window at this plugin's own settings. Queued, applied on the main thread.
   void scriptOpenSettings();
-  // noctalia.idle.watch()/unwatch(): compositor idle notifications. The Wayland objects live on
+  // vespertine.idle.watch()/unwatch(): compositor idle notifications. The Wayland objects live on
   // the main thread, so both are queued as side effects; watches are released with the host.
   // The callback ref doubles as the watch id returned to the script.
   [[nodiscard]] bool scriptIdleWatch(std::uint32_t timeoutMs, bool ignoreInhibitors, int callbackRef);
   [[nodiscard]] bool scriptIdleUnwatch(int watchId);
   bool callIdleWatchCallback(int callbackRef, bool idle, std::chrono::milliseconds budget);
   bool hasIdleWatchCallback(int callbackRef) const;
-  // noctalia.compositor.subscribe()/unsubscribe(): the session compositor's event stream over a connection the shell
+  // vespertine.compositor.subscribe()/unsubscribe(): the session compositor's event stream over a connection the shell
   // opens per subscription. Queued as side effects like idle; `data` is null for the "reset" event.
   [[nodiscard]] bool scriptCompositorSubscribe(std::vector<std::string> events, int callbackRef);
   [[nodiscard]] bool scriptCompositorUnsubscribe(int subscriptionId);
@@ -256,7 +256,7 @@ public:
       std::chrono::milliseconds budget
   );
   bool hasCompositorSubscriptionCallback(int callbackRef) const;
-  // noctalia.nightlight.*: actions and watches are queued as side effects, like idle.
+  // vespertine.nightlight.*: actions and watches are queued as side effects, like idle.
   void scriptNightLightCommand(scripting::ScriptNightLightCommand command, bool value);
   [[nodiscard]] bool scriptNightLightWatch(int callbackRef);
   [[nodiscard]] bool scriptNightLightUnwatch(int watchId);
@@ -264,7 +264,7 @@ public:
       int callbackRef, const scripting::ScriptNightLightState& state, std::chrono::milliseconds budget
   );
   bool hasNightLightWatchCallback(int callbackRef) const;
-  // noctalia.layer.show()/hide()/configure() for this plugin's [[layer]] entry `localEntryId`.
+  // vespertine.layer.show()/hide()/configure() for this plugin's [[layer]] entry `localEntryId`.
   // Queued, applied on the main thread.
   void scriptLayerCommand(
       scripting::PluginLayerCommand command, const std::string& localEntryId, scripting::PluginLayerConfigPatch patch

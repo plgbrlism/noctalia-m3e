@@ -3,4 +3,4 @@
 #include "shell/bar/widget_definition.h"
 #include "shell/bar/widgets/network_widget.h"
 
-const noctalia::bar::WidgetDefinition<NetworkWidget::Options>& networkWidgetDefinition();
+const vespertine::bar::WidgetDefinition<NetworkWidget::Options>& networkWidgetDefinition();

@@ -15,11 +15,11 @@ namespace {
 
 } // namespace
 
-const noctalia::bar::WidgetDefinition<NetworkWidget::Options>& networkWidgetDefinition() {
-  using noctalia::bar::field;
+const vespertine::bar::WidgetDefinition<NetworkWidget::Options>& networkWidgetDefinition() {
+  using vespertine::bar::field;
   using Options = NetworkWidget::Options;
 
-  static const noctalia::bar::WidgetDefinition<Options> definition{
+  static const vespertine::bar::WidgetDefinition<Options> definition{
       .type = "network",
       .fields = {
           field<&Options::vpnStatusMode>({
@@ -46,9 +46,9 @@ const noctalia::bar::WidgetDefinition<NetworkWidget::Options>& networkWidgetDefi
           field<&Options::showLabel>({
               .key = "show_label",
           }),
-          noctalia::bar::glyphPositionField<Options>(noctalia::bar::whenAllTrue({"show_label"})),
-          noctalia::bar::peekField<Options>(noctalia::bar::whenAllTrue({"show_label"})),
-          noctalia::bar::peekDelayField<Options>(noctalia::bar::whenAllTrue({"show_label"})),
+          vespertine::bar::glyphPositionField<Options>(vespertine::bar::whenAllTrue({"show_label"})),
+          vespertine::bar::peekField<Options>(vespertine::bar::whenAllTrue({"show_label"})),
+          vespertine::bar::peekDelayField<Options>(vespertine::bar::whenAllTrue({"show_label"})),
           field<&Options::showVpnLabel>({
               .key = "show_vpn_label",
               .presentation = settings::WidgetSettingPresentation{

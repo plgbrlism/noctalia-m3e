@@ -2,8 +2,8 @@
 
 #include "shell/bar/glyph_value_definition.h"
 
-const noctalia::bar::WidgetDefinition<MediaWidget::Options>& mediaWidgetDefinition() {
-  using noctalia::bar::field;
+const vespertine::bar::WidgetDefinition<MediaWidget::Options>& mediaWidgetDefinition() {
+  using vespertine::bar::field;
   using Options = MediaWidget::Options;
 
   static const settings::WidgetSettingVisibility notAlbumArtOnly{"album_art_only", {"false"}};
@@ -16,12 +16,12 @@ const noctalia::bar::WidgetDefinition<MediaWidget::Options>& mediaWidgetDefiniti
     };
     return visibility;
   }();
-  const auto horizontalOnly = [](noctalia::bar::WidgetDefinitionField<Options> field) {
+  const auto horizontalOnly = [](vespertine::bar::WidgetDefinitionField<Options> field) {
     field.presentation->horizontalBarOnly = true;
     return field;
   };
 
-  static const noctalia::bar::WidgetDefinition<Options> definition{
+  static const vespertine::bar::WidgetDefinition<Options> definition{
       .type = "media",
       .fields = {
           field<&Options::albumArtOnly>({
@@ -63,9 +63,9 @@ const noctalia::bar::WidgetDefinition<MediaWidget::Options>& mediaWidgetDefiniti
                       .horizontalBarOnly = true,
                   },
           }),
-          horizontalOnly(noctalia::bar::glyphPositionField<Options>(artworkAndTitle)),
-          horizontalOnly(noctalia::bar::peekField<Options>(artworkAndTitle)),
-          horizontalOnly(noctalia::bar::peekDelayField<Options>(artworkAndTitle)),
+          horizontalOnly(vespertine::bar::glyphPositionField<Options>(artworkAndTitle)),
+          horizontalOnly(vespertine::bar::peekField<Options>(artworkAndTitle)),
+          horizontalOnly(vespertine::bar::peekDelayField<Options>(artworkAndTitle)),
           field<&Options::minWidth>({
               .key = "min_length",
               .minValue = 0.0,

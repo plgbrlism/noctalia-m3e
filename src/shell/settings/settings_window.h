@@ -63,7 +63,7 @@ namespace scripting {
   class PluginRecommendations;
 }
 
-namespace noctalia::theme {
+namespace vespertine::theme {
   struct GeneratedPalette;
 }
 
@@ -106,7 +106,7 @@ public:
   bool onPointerEvent(const PointerEvent& event);
   void onKeyboardEvent(const KeyboardEvent& event);
   void onThemeChanged();
-  void setResolvedPalette(const noctalia::theme::GeneratedPalette& generated, std::string_view mode);
+  void setResolvedPalette(const vespertine::theme::GeneratedPalette& generated, std::string_view mode);
   void onFontChanged();
   void requestRedraw();
   void onExternalOptionsChanged();
@@ -233,7 +233,7 @@ private:
   void closeWidgetInspectorPopup();
   void refreshIdleLiveStatusText();
   void saveSupportReport();
-  void saveConfigExport(settings::ConfigExportMode mode, noctalia::config::CredentialExportMode credentials);
+  void saveConfigExport(settings::ConfigExportMode mode, vespertine::config::CredentialExportMode credentials);
   bool headerDragRegionContains(float sceneX, float sceneY) const;
   void setSettingOverride(std::vector<std::string> path, ConfigOverrideValue value);
   void setSettingOverrides(std::vector<std::pair<std::vector<std::string>, ConfigOverrideValue>> overrides);

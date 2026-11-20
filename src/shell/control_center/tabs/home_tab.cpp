@@ -120,7 +120,7 @@ namespace {
 
   std::string userHostLine() { return std::format("{}@{}", sessionUserName(), hostName()); }
 
-  std::string noctaliaVersionLine() { return std::format("Noctalia {}", noctalia::build_info::displayVersion()); }
+  std::string vespertineVersionLine() { return std::format("Vespertine {}", vespertine::build_info::displayVersion()); }
 
   // The compositor's own version line already names it; fall back to the detected name.
   std::string compositorLine(const std::optional<std::string>& versionLine) {
@@ -283,7 +283,7 @@ std::unique_ptr<Flex> HomeTab::create() {
         return;
       }
       notify::error(
-          "Noctalia", i18n::tr("control-center.home.avatar-error-title"),
+          "Vespertine", i18n::tr("control-center.home.avatar-error-title"),
           i18n::tr(shell::avatarApplyErrorTranslationKey(applyResult.error))
       );
     });
@@ -359,7 +359,7 @@ std::unique_ptr<Flex> HomeTab::create() {
           }),
           ui::label({
               .out = &m_userVersion,
-              .text = noctaliaVersionLine(),
+              .text = vespertineVersionLine(),
               .fontSize = Style::fontSizeCaption * scale,
               .color = colorSpecFromRole(ColorRole::OnSurfaceVariant),
               .configure = configureUserDetailLabel,
@@ -1475,7 +1475,7 @@ void HomeTab::sync(Renderer& renderer) {
     m_userUptime->setText(i18n::tr("control-center.home.uptime", "uptime", uptimeText));
   }
   if (m_userVersion != nullptr) {
-    m_userVersion->setText(noctaliaVersionLine());
+    m_userVersion->setText(vespertineVersionLine());
   }
   if (m_userCompositor != nullptr) {
     const std::weak_ptr<void> aliveGuard = m_aliveGuard;

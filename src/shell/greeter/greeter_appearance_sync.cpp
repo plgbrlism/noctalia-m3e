@@ -64,15 +64,15 @@ namespace {
     bool m_releaseOnDestruction = true;
   };
 
-  constexpr std::string_view kApplyHelperName = "noctalia-greeter-apply-appearance";
+  constexpr std::string_view kApplyHelperName = "vespertine-greeter-apply-appearance";
   constexpr std::string_view kPkexecName = "pkexec";
   constexpr std::string_view kSyncArgument = "--sync";
   constexpr std::string_view kCapabilityArgument = "--supports";
   constexpr std::string_view kSecureSyncCapability = "secure-sync-v1";
-  constexpr std::string_view kGreeterName = "noctalia-greeter";
+  constexpr std::string_view kGreeterName = "vespertine-greeter";
   constexpr std::string_view kGreeterTomlFileName = "greeter.toml";
-  constexpr std::string_view kDefaultGreeterStateDir = "/var/lib/noctalia-greeter";
-  constexpr std::string_view kGreeterStateDirEnv = "NOCTALIA_GREETER_STATE_DIR";
+  constexpr std::string_view kDefaultGreeterStateDir = "/var/lib/vespertine-greeter";
+  constexpr std::string_view kGreeterStateDirEnv = "VESPERTINE_GREETER_STATE_DIR";
   constexpr std::string_view kStagedOutputLayoutFileName = "output_layout";
   constexpr std::string_view kStagedOutputTransformsFileName = "output_transforms";
   constexpr std::string_view kStagedOutputScalesFileName = "output_scales";
@@ -309,7 +309,7 @@ namespace {
   std::string findApplyHelper() {
     std::string helper = resolveProgramPath(
         kApplyHelperName,
-        {"/usr/bin/noctalia-greeter-apply-appearance", "/usr/local/bin/noctalia-greeter-apply-appearance"}
+        {"/usr/bin/vespertine-greeter-apply-appearance", "/usr/local/bin/vespertine-greeter-apply-appearance"}
     );
     if (!helper.empty() && !isTrustedPrivilegeExecutable(helper)) {
       kLog.warn("refusing untrusted greeter sync helper '{}'", helper);
@@ -359,7 +359,7 @@ namespace {
       return {};
     }
 
-    auto staging = runtimeDirectory / "noctalia-greeter-sync";
+    auto staging = runtimeDirectory / "vespertine-greeter-sync";
     std::filesystem::remove_all(staging, ec);
     if (ec) {
       kLog.warn("failed to clear greeter sync staging directory '{}': {}", staging.string(), ec.message());
@@ -524,7 +524,7 @@ namespace {
     if (!secureStagedFile(syncPath)) {
       return false;
     }
-    out << "# noctalia-greeter staged sync.toml (merged into live sync.toml by apply-appearance)\n\n";
+    out << "# vespertine-greeter staged sync.toml (merged into live sync.toml by apply-appearance)\n\n";
     out << formatToml(root);
     if (!out.good()) {
       kLog.warn("failed to write staged sync.toml '{}'", syncPath.string());
@@ -958,7 +958,7 @@ namespace greeter::detail {
 namespace greeter {
 
   bool appearanceSyncAvailable(const ShellGreeterSyncConfig& greeterSync) noexcept {
-    return programExists(kGreeterName, {"/usr/bin/noctalia-greeter", "/usr/local/bin/noctalia-greeter"})
+    return programExists(kGreeterName, {"/usr/bin/vespertine-greeter", "/usr/local/bin/vespertine-greeter"})
         && !findApplyHelper().empty()
         && (process::resolvePrivilegeEscalator().has_value() || hasPrivilegeCommandOverride(greeterSync));
   }
@@ -1144,14 +1144,14 @@ namespace greeter {
       return;
     }
     ipc.bind(
-        noctalia::cli::msg::greeterSync,
+        vespertine::cli::msg::greeterSync,
         [&config, resolvedThemeMode = std::move(resolvedThemeMode), platform,
          logindOnSystemBus = std::move(logindOnSystemBus)](const std::string& args) -> std::string {
           if (!StringUtils::trim(args).empty()) {
             return "error: usage: greeter-sync\n";
           }
           if (!appearanceSyncAvailable(config.config().shell.greeterSync)) {
-            return "error: noctalia greeter is not installed\n";
+            return "error: vespertine greeter is not installed\n";
           }
           const bool logind = logindOnSystemBus != nullptr && logindOnSystemBus();
           const GreeterSyncLaunch launch =

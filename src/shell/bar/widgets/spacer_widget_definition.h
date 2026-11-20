@@ -3,4 +3,4 @@
 #include "shell/bar/widget_definition.h"
 #include "shell/bar/widgets/spacer_widget.h"
 
-const noctalia::bar::WidgetDefinition<SpacerWidget::Options>& spacerWidgetDefinition();
+const vespertine::bar::WidgetDefinition<SpacerWidget::Options>& spacerWidgetDefinition();

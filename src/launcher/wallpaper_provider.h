@@ -5,14 +5,14 @@
 class ConfigService;
 class WaylandConnection;
 
-namespace noctalia::theme {
+namespace vespertine::theme {
   class ThemeService;
 }
 
 class WallpaperProvider : public LauncherProvider {
 public:
   WallpaperProvider(
-      ConfigService* config, WaylandConnection* wayland, noctalia::theme::ThemeService* themeService = nullptr
+      ConfigService* config, WaylandConnection* wayland, vespertine::theme::ThemeService* themeService = nullptr
   );
 
   std::string_view defaultPrefix() const override { return "wall"; }
@@ -29,5 +29,5 @@ public:
 private:
   ConfigService* m_config = nullptr;
   WaylandConnection* m_wayland = nullptr;
-  noctalia::theme::ThemeService* m_themeService = nullptr;
+  vespertine::theme::ThemeService* m_themeService = nullptr;
 };

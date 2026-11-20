@@ -3,4 +3,4 @@
 #include "shell/bar/widget_definition.h"
 #include "shell/bar/widgets/notification_widget.h"
 
-const noctalia::bar::WidgetDefinition<NotificationWidget::Options>& notificationWidgetDefinition();
+const vespertine::bar::WidgetDefinition<NotificationWidget::Options>& notificationWidgetDefinition();

@@ -19,17 +19,17 @@ in
 {
   hjemModule = {
     imports = [ ./nix/hjem-module.nix ];
-    programs.noctalia.package = mkDefault package;
+    programs.vespertine.package = mkDefault package;
   };
 
   homeModule = {
     imports = [ ./nix/home-module.nix ];
-    programs.noctalia.package = mkDefault package;
+    programs.vespertine.package = mkDefault package;
   };
 
   nixosModule = {
     imports = [ ./nix/nixos-module.nix ];
-    programs.noctalia.package = mkDefault package;
+    programs.vespertine.package = mkDefault package;
   };
 
   inherit package;

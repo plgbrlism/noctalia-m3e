@@ -31,7 +31,7 @@ class VirtualGridView;
 class WallpaperGridAdapter;
 class WaylandConnection;
 
-namespace noctalia::theme {
+namespace vespertine::theme {
   class ThemeService;
 }
 
@@ -47,7 +47,7 @@ public:
 
   WallpaperPanel(
       WaylandConnection* wayland, ConfigService* config, ThumbnailService* thumbnails, WallpaperScanner* scanner,
-      noctalia::theme::ThemeService* themeService = nullptr
+      vespertine::theme::ThemeService* themeService = nullptr
   );
   ~WallpaperPanel() override;
 
@@ -127,7 +127,7 @@ private:
   ConfigService* m_config = nullptr;
   ThumbnailService* m_thumbnails = nullptr;
   WallpaperScanner* m_scanner = nullptr;
-  noctalia::theme::ThemeService* m_themeService = nullptr;
+  vespertine::theme::ThemeService* m_themeService = nullptr;
 
   // UI nodes (owned by the root flex tree).
   Flex* m_rootLayout = nullptr;

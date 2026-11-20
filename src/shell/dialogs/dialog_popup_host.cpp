@@ -246,7 +246,7 @@ bool DialogPopupHost::createDimSurface(wl_output* output) {
   }
 
   auto config = LayerSurfaceConfig{
-      .nameSpace = "noctalia-dialog-dim",
+      .nameSpace = "vespertine-dialog-dim",
       .layer = LayerShellLayer::Bottom,
       .anchor = LayerShellAnchor::Top | LayerShellAnchor::Bottom | LayerShellAnchor::Left | LayerShellAnchor::Right,
       .width = 0,

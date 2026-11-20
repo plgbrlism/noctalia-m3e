@@ -3,12 +3,12 @@
 #include "shell/bar/glyph_button_definition.h"
 #include "shell/bar/glyph_value_definition.h"
 
-const noctalia::bar::WidgetDefinition<CustomButtonWidget::Options>& customButtonWidgetDefinition() {
-  using noctalia::bar::field;
+const vespertine::bar::WidgetDefinition<CustomButtonWidget::Options>& customButtonWidgetDefinition() {
+  using vespertine::bar::field;
   using Options = CustomButtonWidget::Options;
-  using noctalia::bar::glyphPositionField;
-  using noctalia::bar::peekDelayField;
-  using noctalia::bar::peekField;
+  using vespertine::bar::glyphPositionField;
+  using vespertine::bar::peekDelayField;
+  using vespertine::bar::peekField;
 
   // The label is the value; the glyph slot is the glyph or the custom image.
   settings::WidgetSettingVisibility iconAndLabel;
@@ -18,9 +18,9 @@ const noctalia::bar::WidgetDefinition<CustomButtonWidget::Options>& customButton
       {.key = "custom_image", .nonEmpty = true},
   };
 
-  static const noctalia::bar::WidgetDefinition<Options> definition{
+  static const vespertine::bar::WidgetDefinition<Options> definition{
       .type = "custom_button",
-      .fields = noctalia::bar::glyphButtonFields<Options>(
+      .fields = vespertine::bar::glyphButtonFields<Options>(
           field<&Options::label>({
               .key = "label",
           }),

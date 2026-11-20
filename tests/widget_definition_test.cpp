@@ -322,9 +322,9 @@ int main() {
           != std::unordered_map<std::string, std::string>{{"Noise Canceling", "microphone"}}) {
     fail("volume", "input device or effects profile glyph map did not resolve");
   }
-  const auto inputGestures = noctalia::bar::gestureDefaultsForType("volume", &inputVolume);
+  const auto inputGestures = vespertine::bar::gestureDefaultsForType("volume", &inputVolume);
   const auto inputMute =
-      std::ranges::find(inputGestures, noctalia::bar::Gesture::Right, &noctalia::bar::GestureBinding::gesture);
+      std::ranges::find(inputGestures, vespertine::bar::Gesture::Right, &vespertine::bar::GestureBinding::gesture);
   if (inputMute == inputGestures.end() || inputMute->action != "mic-mute") {
     fail("volume", "input device did not select microphone gesture defaults");
   }
@@ -381,8 +381,8 @@ int main() {
   // common spec so exactly one control exists per key.
   const auto sysmonSpecs = settings::widgetSettingSpecs("sysmon", nullptr, "sans-serif", false);
   for (const auto& [key, expectedType] :
-       {std::pair{"custom_label", noctalia::config::schema::WidgetSettingType::String},
-        std::pair{"show_glyph", noctalia::config::schema::WidgetSettingType::Bool}}) {
+       {std::pair{"custom_label", vespertine::config::schema::WidgetSettingType::String},
+        std::pair{"show_glyph", vespertine::config::schema::WidgetSettingType::Bool}}) {
     for (const std::string_view type : {"battery", "clock", "taskbar", "volume"}) {
       const auto spec = settings::findWidgetSettingSpec(type, key);
       if (!spec.has_value()) {

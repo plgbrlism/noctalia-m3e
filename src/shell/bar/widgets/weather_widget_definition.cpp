@@ -2,11 +2,11 @@
 
 #include "shell/bar/glyph_value_definition.h"
 
-const noctalia::bar::WidgetDefinition<WeatherWidget::Options>& weatherWidgetDefinition() {
-  using noctalia::bar::field;
-  using noctalia::bar::glyphPositionField;
-  using noctalia::bar::peekDelayField;
-  using noctalia::bar::peekField;
+const vespertine::bar::WidgetDefinition<WeatherWidget::Options>& weatherWidgetDefinition() {
+  using vespertine::bar::field;
+  using vespertine::bar::glyphPositionField;
+  using vespertine::bar::peekDelayField;
+  using vespertine::bar::peekField;
   using Options = WeatherWidget::Options;
 
   settings::WidgetSettingVisibility textShown;
@@ -15,7 +15,7 @@ const noctalia::bar::WidgetDefinition<WeatherWidget::Options>& weatherWidgetDefi
       {.key = "show_temperature", .values = {"true"}},
   };
 
-  static const noctalia::bar::WidgetDefinition<Options> definition{
+  static const vespertine::bar::WidgetDefinition<Options> definition{
       .type = "weather",
       .fields = {
           field<&Options::maxWidth>({

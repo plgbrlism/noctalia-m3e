@@ -185,6 +185,6 @@ Signal<>& paletteChanged();
 Palette lerpPalette(const Palette& a, const Palette& b, float t);
 
 // The stylesheet for icon themes that follow the color scheme (index.theme FollowsColorScheme), as KDE's KIconColors
-// writes it: the ColorScheme-* classes take the roles Noctalia's KColorScheme template gives KDE's Window colors, so
+// writes it: the ColorScheme-* classes take the roles Vespertine's KColorScheme template gives KDE's Window colors, so
 // icons match KDE apps. Declarations are `!important` so a librsvg user stylesheet wins over the icon's own <style>.
 std::string iconColorSchemeStylesheet(const Palette& colors);

@@ -1,6 +1,6 @@
 #pragma once
 
-// Wire format between the shell and noctalia-pam-helper.
+// Wire format between the shell and vespertine-pam-helper.
 //
 // shell -> helper (stdin):  u8 version, u32 length, password bytes
 // helper -> shell (stdout): u8 version, u8 Status, i32 PAM return code

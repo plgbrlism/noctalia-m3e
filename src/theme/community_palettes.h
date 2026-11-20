@@ -9,7 +9,7 @@
 
 class HttpClient;
 
-namespace noctalia::theme {
+namespace vespertine::theme {
 
   struct AvailablePalette {
     struct PreviewMode {
@@ -54,4 +54,4 @@ namespace noctalia::theme {
   std::filesystem::path communityPaletteCachePath(std::string_view name);
   std::string communityPaletteDownloadUrl(std::string_view name);
 
-} // namespace noctalia::theme
+} // namespace vespertine::theme

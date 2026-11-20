@@ -3,4 +3,4 @@
 #include "shell/bar/widget_definition.h"
 #include "shell/bar/widgets/clipboard_widget.h"
 
-const noctalia::bar::WidgetDefinition<ClipboardWidget::Options>& clipboardWidgetDefinition();
+const vespertine::bar::WidgetDefinition<ClipboardWidget::Options>& clipboardWidgetDefinition();

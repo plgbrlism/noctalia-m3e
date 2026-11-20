@@ -63,7 +63,7 @@ namespace {
 } // namespace
 
 int main() {
-  const auto dir = std::filesystem::temp_directory_path() / ("noctalia-sway-kb-" + std::to_string(::getpid()));
+  const auto dir = std::filesystem::temp_directory_path() / ("vespertine-sway-kb-" + std::to_string(::getpid()));
   std::filesystem::create_directories(dir);
   const std::string socketPath = (dir / "ipc.sock").string();
 

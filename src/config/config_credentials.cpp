@@ -9,7 +9,7 @@
 #include <unordered_set>
 #include <vector>
 
-namespace noctalia::config {
+namespace vespertine::config {
 
   namespace {
 
@@ -179,4 +179,4 @@ namespace noctalia::config {
     applyToPluginSources(root, mode);
   }
 
-} // namespace noctalia::config
+} // namespace vespertine::config

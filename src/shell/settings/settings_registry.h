@@ -258,7 +258,7 @@ namespace settings {
   };
 
   struct TemplateGridSetting {
-    std::vector<noctalia::theme::AvailableTemplate> options;
+    std::vector<vespertine::theme::AvailableTemplate> options;
     std::vector<std::string> selectedValues;
     std::string emptyText;
   };

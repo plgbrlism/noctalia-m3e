@@ -1,6 +1,6 @@
 # Architecture
 
-This file describes how Noctalia is put together and the invariants reviewers enforce. For code style, testing, commit conventions, and the project layout, see [CONTRIBUTING.md](CONTRIBUTING.md).
+This file describes how Vespertine is put together and the invariants reviewers enforce. For code style, testing, commit conventions, and the project layout, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Event Loop
 
@@ -42,14 +42,14 @@ Inside a hook, call the parent hook (for example `Flex::doLayout()`), not the pu
 
 ## Layer Boundaries
 
-**Library** (`lib/`): `core`, `i18n`, `render`, `ui`, `util`, and `wayland` form the `noctalia-ui` static library (`noctalia_ui_dep`). `lib/` is self-contained so other Noctalia applications can carry a verbatim copy: `lib/meson.build` finds its own dependencies, flags, and `wayland-scanner`, and `lib/` holds the protocol XMLs it generates (`lib/protocols/`), the assets it loads (`lib/assets/`: the glyph font and its metadata), and its vendored code (`lib/third_party/wuffs`). A consumer only runs `subdir('lib')`. The library builds without `src/` on its include path, so it never includes shell code, shell-only protocol headers, or build metadata such as the git revision.
+**Library** (`lib/`): `core`, `i18n`, `render`, `ui`, `util`, and `wayland` form the `vespertine-ui` static library (`vespertine_ui_dep`). `lib/` is self-contained so other Vespertine applications can carry a verbatim copy: `lib/meson.build` finds its own dependencies, flags, and `wayland-scanner`, and `lib/` holds the protocol XMLs it generates (`lib/protocols/`), the assets it loads (`lib/assets/`: the glyph font and its metadata), and its vendored code (`lib/third_party/wuffs`). A consumer only runs `subdir('lib')`. The library builds without `src/` on its include path, so it never includes shell code, shell-only protocol headers, or build metadata such as the git revision.
 
 The library holds no application policy; the application supplies it at startup (the shell does this in `configureSharedLibrary()`, `src/app/shell_library.cpp`):
 
 - **Identity**: `setApplicationIdentity()` (`core/application_identity.h`) names the XDG directories, the log file, the installed asset directory, and the `<PREFIX>_*` environment variables the library reads.
 - **Assets**: `paths::setAssetRoots()` (`core/files/resource_paths.h`) accepts application-selected application/library directories before the first asset lookup. Explicit roots bypass shell discovery and require no translation catalog. The library checks its own font and metadata; applications validate their additional required files. The shell retains its existing discovery when roots are not supplied.
 - **Text**: the library owns no translations. `setUiStrings()` (`core/ui_strings.h`) provides the few strings it shows on its own (key names, the `Select` placeholder).
-- **Image decoding**: the core has the `Image` control, the texture caches, and the `ImageDecoder` interface (`render/core/image_decoder.h`) but no codecs. `codecs::installImageDecoder()` installs the opt-in codec pack (`noctalia_ui_codecs_dep`, `render/codecs/`: Wuffs, ICO, WebP, JPEG XL, librsvg, runtime-loaded libheif, encoders, thumbnails); another application can install its own decoder instead.
+- **Image decoding**: the core has the `Image` control, the texture caches, and the `ImageDecoder` interface (`render/core/image_decoder.h`) but no codecs. `codecs::installImageDecoder()` installs the opt-in codec pack (`vespertine_ui_codecs_dep`, `render/codecs/`: Wuffs, ICO, WebP, JPEG XL, librsvg, runtime-loaded libheif, encoders, thumbnails); another application can install its own decoder instead.
 
 Reusable native windows use `ToplevelSurface`: borrowed `xdgToplevel()`/`xdgSurface()` access, native actions and configure-committed maximized/fullscreen/activated state. Register role lifecycle hooks before initialization: create application-owned attachments before the first commit and release them before role destruction, including failed initialization. Hook owners outlive the surface; release hooks must not throw. Decoration protocols and policy belong to the application. Close stops/notifies once, and early close/destruction cannot revive initialization.
 
@@ -132,7 +132,7 @@ Vertical text centering lives in the `Label` engine, never in widgets. Widgets b
 
 ### Panels
 
-- Every panel (attached, detached, floating, centered) owns its own `noctalia-panel` layer surface and draws its own background, shadow, blur, and reveal animation.
+- Every panel (attached, detached, floating, centered) owns its own `vespertine-panel` layer surface and draws its own background, shadow, blur, and reveal animation.
 - "Attached" is a placement mode only: the panel's own surface is anchored to the bar's edge at the bar's layer, with a clipped reveal. It is not hosted in the bar surface.
 - Attached and single-bar detached placement is computed before commit against a specific bar on a specific output, so a panel needs a concrete output before commit. A NULL layer-shell output would mis-anchor it.
 
@@ -164,7 +164,7 @@ Desktop widgets live under `src/shell/desktop/` and do not use the bar `Widget` 
 - Prefer passing `CompositorPlatform&` over passing both `WaylandConnection&` and `CompositorPlatform&`.
 - Detect compositors with `compositors::detect()`, `isHyprland()`, `isNiri()`, `isSway()`, and `isMango()` from `compositor_detect.h`; do not sniff environment variables again.
 - Logout goes through `uwsm stop` when UWSM manages the compositor, otherwise compositor-native logout commands. Niri goes through `NiriRuntime` IPC, not the CLI.
-- Plugin event-stream subscriptions (`noctalia.compositor.subscribe`) belong to `CompositorEventSubscriptions` (`src/compositors/compositor_event_subscriptions.*`), owned by `CompositorPlatform` and polled as its own poll source. Each subscription opens its own socket, separate from the runtimes' shared streams, and the shell neither caches nor replays messages. Supporting another compositor means adding its socket path, handshake, and line mapping there.
+- Plugin event-stream subscriptions (`vespertine.compositor.subscribe`) belong to `CompositorEventSubscriptions` (`src/compositors/compositor_event_subscriptions.*`), owned by `CompositorPlatform` and polled as its own poll source. Each subscription opens its own socket, separate from the runtimes' shared streams, and the shell neither caches nor replays messages. Supporting another compositor means adding its socket path, handshake, and line mapping there.
 
 ## Configuration and State
 
@@ -183,7 +183,7 @@ Desktop widgets live under `src/shell/desktop/` and do not use the bar `Widget` 
 
 ## Services
 
-- **Idle**: `IdleManager` runs `ext_idle_notifier_v1` behaviors. Each `[idle.behavior.*]` has a `command` and an optional `resume_command`. `noctalia:dpms-off` gets an automatic `noctalia:dpms-on` on resume. `pre_action_fade_seconds` drives `IdleGraceOverlay` on overlay layer surfaces.
+- **Idle**: `IdleManager` runs `ext_idle_notifier_v1` behaviors. Each `[idle.behavior.*]` has a `command` and an optional `resume_command`. `vespertine:dpms-off` gets an automatic `vespertine:dpms-on` on resume. `pre_action_fade_seconds` drives `IdleGraceOverlay` on overlay layer surfaces.
 - **PipeWire**: access SPA pod arrays with the stable `SPA_POD_ARRAY_*` macros from `spa/pod/pod.h`, not `spa_pod_get_array_full()` (added in PipeWire 1.6, absent in 1.4). Cast macro results from `size_t` to `uint32_t` explicitly.
 - **Clipboard**: large payloads are written across `POLLOUT` ticks; do not close the send fd on `EAGAIN`.
 - **Weather**: `auto_locate` is best effort and uses the cached location on failure. `[shell].offline_mode = true` disables all HTTP traffic. Never log coordinates or location names.
@@ -194,18 +194,18 @@ Desktop widgets live under `src/shell/desktop/` and do not use the bar `Widget` 
 - Plugins are trusted Luau code: installing one is equivalent to running a user-owned script. There is no permission broker, capability sandbox, consent prompt, or path sandbox. Luau sandboxing exists only for VM and global-state isolation.
 - A distributable plugin is a directory with one static `plugin.toml`. There are no single-file `define{}` plugins and no manifest defaults in script code.
 - Canonical ids are `author/plugin` and `author/plugin:entry`. Entry types are `[[widget]]`, `[[shortcut]]`, `[[service]]`, `[[desktop_widget]]`, `[[launcher_provider]]`, `[[panel]]`, and `[[layer]]`.
-- Defaults live once in `plugin.toml`. Plugin code reads them with `noctalia.getConfig(key)` or `barWidget.getConfig(key)`; undeclared keys are loud misses. Plugin-level overrides live under `[plugin_settings."author/plugin"]`.
+- Defaults live once in `plugin.toml`. Plugin code reads them with `vespertine.getConfig(key)` or `barWidget.getConfig(key)`; undeclared keys are loud misses. Plugin-level overrides live under `[plugin_settings."author/plugin"]`.
 - Plugin bar widgets use the normal named `[widget.<name>]` settings, so separate widget names can reuse one plugin entry with different settings. Entry-specific settings belong to the owning surface's config model.
 - Git and path source lifecycle belongs to `PluginManager` and `plugin_git.*`. Source names and plugin ids are validated flat identifiers before they touch paths. Git sources use an app-managed repo cache and exported runtime files (no sparse checkout); `path` sources are for local development.
-- Changes to the plugin-facing API (bindings in `src/scripting/luau_host.cpp` and `src/scripting/plugin_bindings.cpp`, the `ui.*` prelude in `src/scripting/ui_prelude.h`, or the entry callbacks the host calls) require a matching update to `noctalia.d.luau` in the official-plugins repository.
+- Changes to the plugin-facing API (bindings in `src/scripting/luau_host.cpp` and `src/scripting/plugin_bindings.cpp`, the `ui.*` prelude in `src/scripting/ui_prelude.h`, or the entry callbacks the host calls) require a matching update to `vespertine.d.luau` in the official-plugins repository.
 
 ## Theming and Style
 
 - Style constants live in `lib/ui/style.h`, colors in `lib/ui/palette.h`. Controls aim for a rounded, comfortably spaced look tuned for a native 1080p desktop.
 - Terminology: `Palette` is a resolved RGB set, `ColorRole` a named slot, `ColorSpec` a role or fixed value. User-facing strings say "color role"; "theme" refers to the `[theme]` palette subsystem.
 - `FixedPaletteMode` carries `dark` and `light`, each with a UI `palette` and a nested `terminal` palette.
-- Palette JSON (community, custom, `noctalia theme --theme-json`) carries a top-level integer `version`; a file without one is format 1. Format 2 keys are the color role names (`on_primary`, `surface_container`, terminal `selection_fg`), listed once in `kFixedPaletteJsonKeys`. `src/theme/fixed_palette_json.cpp` upgrades older formats in memory on read and rejects newer ones. Community palette requests send `?version=<kPaletteFormatVersion>`, and the API answers with at most that format, converting newer palettes down so older shells keep working.
-- Built-in template hooks live beside their template (for example `assets/templates/fuzzel/apply.sh`). Community templates are fetched from `https://api.noctalia.dev/templates` and cached under `$XDG_STATE_HOME/noctalia/community-templates`. Template application runs on a background worker.
+- Palette JSON (community, custom, `vespertine theme --theme-json`) carries a top-level integer `version`; a file without one is format 1. Format 2 keys are the color role names (`on_primary`, `surface_container`, terminal `selection_fg`), listed once in `kFixedPaletteJsonKeys`. `src/theme/fixed_palette_json.cpp` upgrades older formats in memory on read and rejects newer ones. Community palette requests send `?version=<kPaletteFormatVersion>`, and the API answers with at most that format, converting newer palettes down so older shells keep working.
+- Built-in template hooks live beside their template (for example `assets/templates/fuzzel/apply.sh`). Community templates are fetched from `https://api.vespertine.dev/templates` and cached under `$XDG_STATE_HOME/vespertine/community-templates`. Template application runs on a background worker.
 - Glyph names resolve through `lib/render/text/glyph_registry.cpp`: curated aliases, then `U+`/`0x` codepoints, then Tabler names from `lib/assets/fonts/tabler.json`. C++ glyph literals belong in the curated registry.
 
 ## Launcher

@@ -39,7 +39,7 @@ namespace settings {
   } // namespace
 
   TemplateStoreContent::TemplateStoreContent(
-      std::vector<noctalia::theme::AvailableTemplate> catalog, std::unordered_set<std::string> selectedIds,
+      std::vector<vespertine::theme::AvailableTemplate> catalog, std::unordered_set<std::string> selectedIds,
       ConfigService* config, TemplateStoreCallbacks callbacks
   )
       : m_catalog(std::move(catalog)), m_selectedIds(std::move(selectedIds)), m_config(config),
@@ -449,7 +449,7 @@ namespace settings {
       const std::string id = entry.id;
       row->bind(
           entry.displayName, entry.category, m_selectedIds.contains(entry.id), !entry.documentationUrl.empty(),
-          noctalia::theme::formatTemplateTooltip(entry),
+          vespertine::theme::formatTemplateTooltip(entry),
           [this, id, refreshCount](bool next) {
             if (next) {
               m_selectedIds.insert(id);

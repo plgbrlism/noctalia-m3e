@@ -5,7 +5,7 @@
 #include <cstdio>
 #include <stdexcept>
 
-namespace noctalia::theme {
+namespace vespertine::theme {
 
   namespace {
 
@@ -139,4 +139,4 @@ namespace noctalia::theme {
     return Color::fromHsl(h, std::min(s, sMax), lTarget);
   }
 
-} // namespace noctalia::theme
+} // namespace vespertine::theme

@@ -10,7 +10,7 @@
 #include <string_view>
 #include <vector>
 
-namespace noctalia::config {
+namespace vespertine::config {
 
   inline constexpr std::string_view kConfigVersionKey = "config_version";
 
@@ -50,4 +50,4 @@ namespace noctalia::config {
 
   inline constexpr std::int64_t kLegacyConfigReminderIntervalSeconds = 3 * 24 * 60 * 60;
 
-} // namespace noctalia::config
+} // namespace vespertine::config

@@ -24,12 +24,12 @@ namespace paths {
     std::atomic_bool gAssetLookupStarted = false;
 
     std::filesystem::path installedAssetsRoot() {
-      const std::filesystem::path datadir(NOCTALIA_UI_INSTALL_DATADIR);
+      const std::filesystem::path datadir(VESPERTINE_UI_INSTALL_DATADIR);
       const std::string& name = applicationIdentity().name;
       if (datadir.is_absolute()) {
         return datadir / name / "assets";
       }
-      return std::filesystem::path(NOCTALIA_UI_INSTALL_PREFIX) / datadir / name / "assets";
+      return std::filesystem::path(VESPERTINE_UI_INSTALL_PREFIX) / datadir / name / "assets";
     }
 
     bool isAssetRoot(const std::filesystem::path& root) {
@@ -79,7 +79,7 @@ namespace paths {
         appendUnique(candidates, exeDir / "assets");
         appendUnique(candidates, exeDir.parent_path() / "assets");
 
-        const std::filesystem::path datadir(NOCTALIA_UI_INSTALL_DATADIR);
+        const std::filesystem::path datadir(VESPERTINE_UI_INSTALL_DATADIR);
         const std::string& name = applicationIdentity().name;
         if (!datadir.empty() && !datadir.is_absolute()) {
           appendUnique(candidates, exeDir.parent_path() / datadir / name / "assets");
@@ -107,7 +107,7 @@ namespace paths {
     bool isLibraryAssetRoot(const std::filesystem::path& root) {
       std::error_code ec;
       return !root.empty()
-          && std::filesystem::is_regular_file(root / "fonts" / "noctalia-tabler.ttf", ec)
+          && std::filesystem::is_regular_file(root / "fonts" / "vespertine-tabler.ttf", ec)
           && std::filesystem::is_regular_file(root / "fonts" / "tabler.json", ec);
     }
 
@@ -135,7 +135,7 @@ namespace paths {
         }
       }
       throw std::runtime_error(
-          "could not locate library assets: fonts/noctalia-tabler.ttf and fonts/tabler.json are required"
+          "could not locate library assets: fonts/vespertine-tabler.ttf and fonts/tabler.json are required"
       );
     }
 

@@ -9,7 +9,7 @@
 #include <string_view>
 #include <vector>
 
-namespace noctalia::cli {
+namespace vespertine::cli {
 
   namespace {
 
@@ -160,7 +160,7 @@ namespace noctalia::cli {
 
     void appendBashWords(std::string& output, std::string_view words, unsigned indent) {
       output.append(indent, ' ');
-      output.append("_noctalia_complete_words ");
+      output.append("_vespertine_complete_words ");
       output.append(bashAnsiQuote(words));
       output.push_back('\n');
     }
@@ -221,28 +221,28 @@ namespace noctalia::cli {
   std::string generateBash(const Command& root) {
     const auto states = collectStates(root);
     std::string output =
-        "# bash completion for noctalia; generated from the live CLI schema\n"
-        "_noctalia_complete_words() {\n"
+        "# bash completion for vespertine; generated from the live CLI schema\n"
+        "_vespertine_complete_words() {\n"
         "  local words=\"$1\"\n"
         "  local IFS=$'\\n'\n"
         "  COMPREPLY=( $(compgen -W \"$words\" -- \"$cur\") )\n"
         "}\n\n"
-        "_noctalia_plugins_enabled() {\n"
-        "  local words=\"$(noctalia msg plugins list 2>/dev/null | awk '$4 == \"enabled\" {print $1}')\"\n"
+        "_vespertine_plugins_enabled() {\n"
+        "  local words=\"$(vespertine msg plugins list 2>/dev/null | awk '$4 == \"enabled\" {print $1}')\"\n"
         "  COMPREPLY=( $(compgen -W \"$words\" -- \"$cur\") )\n"
         "}\n\n"
-        "_noctalia_plugins_disabled() {\n"
-        "  local words=\"$(noctalia msg plugins list 2>/dev/null | awk '$4 == \"disabled\" {print $1}')\"\n"
+        "_vespertine_plugins_disabled() {\n"
+        "  local words=\"$(vespertine msg plugins list 2>/dev/null | awk '$4 == \"disabled\" {print $1}')\"\n"
         "  COMPREPLY=( $(compgen -W \"$words\" -- \"$cur\") )\n"
         "}\n\n"
-        "_noctalia_plugin_prefix() {\n"
-        "  local words=\"$(noctalia msg plugins list 2>/dev/null | awk '$4 == \"enabled\" {print $1\":\"}')\"\n"
+        "_vespertine_plugin_prefix() {\n"
+        "  local words=\"$(vespertine msg plugins list 2>/dev/null | awk '$4 == \"enabled\" {print $1\":\"}')\"\n"
         "  compopt -o nospace 2>/dev/null\n"
         "  COMPREPLY=( $(compgen -W \"$words\" -- \"$cur\") )\n"
         "}\n\n"
-        "_noctalia_completions() {\n"
+        "_vespertine_completions() {\n"
         "  local cur=\"${COMP_WORDS[COMP_CWORD]}\"\n"
-        "  local path=noctalia\n"
+        "  local path=vespertine\n"
         "  local depth=1\n"
         "  local i token\n"
         "  for ((i=1; i<COMP_CWORD; ++i)); do\n"
@@ -353,7 +353,7 @@ namespace noctalia::cli {
         output.append(")\n");
         if (!positional.runtimeProvider.empty()) {
           output.append(10, ' ');
-          output.append("_noctalia_");
+          output.append("_vespertine_");
           output.append(positional.runtimeProvider);
           output.append("\n");
         } else if (positional.choices.empty()) {
@@ -371,7 +371,7 @@ namespace noctalia::cli {
         const Positional& positional = command.positionals.back();
         if (!positional.runtimeProvider.empty()) {
           output.append(10, ' ');
-          output.append("_noctalia_");
+          output.append("_vespertine_");
           output.append(positional.runtimeProvider);
           output.append("\n");
         } else if (positional.choices.empty()) {
@@ -382,35 +382,35 @@ namespace noctalia::cli {
       }
       output.append("          ;;\n      esac\n      ;;\n");
     }
-    output.append("  esac\n}\n\ncomplete -F _noctalia_completions noctalia\n");
+    output.append("  esac\n}\n\ncomplete -F _vespertine_completions vespertine\n");
     return output;
   }
 
   std::string generateZsh(const Command& root) {
     const auto states = collectStates(root);
     std::string output =
-        "#compdef noctalia\n# generated from the live CLI schema\n\n"
-        "_noctalia_plugins_enabled() {\n"
+        "#compdef vespertine\n# generated from the live CLI schema\n\n"
+        "_vespertine_plugins_enabled() {\n"
         "  local -a plugins\n"
-        "  plugins=(${(f)\"$(noctalia msg plugins list 2>/dev/null | awk '$4 == \"enabled\" {print $1}')\"})\n"
+        "  plugins=(${(f)\"$(vespertine msg plugins list 2>/dev/null | awk '$4 == \"enabled\" {print $1}')\"})\n"
         "  if [[ ${#plugins[@]} -gt 0 ]]; then\n"
         "    _values 'enabled plugin' $plugins\n"
         "  else\n"
         "    _message 'no enabled plugins found'\n"
         "  fi\n"
         "}\n\n"
-        "_noctalia_plugins_disabled() {\n"
+        "_vespertine_plugins_disabled() {\n"
         "  local -a plugins\n"
-        "  plugins=(${(f)\"$(noctalia msg plugins list 2>/dev/null | awk '$4 == \"disabled\" {print $1}')\"})\n"
+        "  plugins=(${(f)\"$(vespertine msg plugins list 2>/dev/null | awk '$4 == \"disabled\" {print $1}')\"})\n"
         "  if [[ ${#plugins[@]} -gt 0 ]]; then\n"
         "    _values 'disabled plugin' $plugins\n"
         "  else\n"
         "    _message 'no disabled plugins found'\n"
         "  fi\n"
         "}\n\n"
-        "_noctalia_plugin_prefix() {\n"
+        "_vespertine_plugin_prefix() {\n"
         "  local -a plugins\n"
-        "  plugins=(${(f)\"$(noctalia msg plugins list 2>/dev/null | awk '$4 == \"enabled\" {print $1\":\"}')\"})\n"
+        "  plugins=(${(f)\"$(vespertine msg plugins list 2>/dev/null | awk '$4 == \"enabled\" {print $1\":\"}')\"})\n"
         "  if [[ ${#plugins[@]} -gt 0 ]]; then\n"
         "    compadd -S '' -a plugins\n"
         "  else\n"
@@ -420,7 +420,7 @@ namespace noctalia::cli {
 
     for (const CommandState& state : states) {
       const Command& command = *state.command;
-      output.append("_noctalia_");
+      output.append("_vespertine_");
       output.append(stateId(state.path));
       output.append("() {\n  local context state state_descr line\n  typeset -A opt_args\n");
 
@@ -451,7 +451,7 @@ namespace noctalia::cli {
           childPath.push_back(child.name);
           output.append("        ");
           output.append(child.name);
-          output.append(") _noctalia_");
+          output.append(") _vespertine_");
           output.append(stateId(childPath));
           output.append(" ;;\n");
         }
@@ -469,7 +469,7 @@ namespace noctalia::cli {
           spec.push_back(':');
 
           if (!positional.runtimeProvider.empty()) {
-            spec.append("_noctalia_").append(positional.runtimeProvider);
+            spec.append("_vespertine_").append(positional.runtimeProvider);
           } else if (positional.choices.empty()) {
             spec.append("_files");
           } else {
@@ -487,16 +487,16 @@ namespace noctalia::cli {
       output.append("}\n\n");
     }
 
-    output.append("_noctalia() { _noctalia_");
+    output.append("_vespertine() { _vespertine_");
     output.append(stateId(states.front().path));
-    output.append(" }\n\n_noctalia \"$@\"\n");
+    output.append(" }\n\n_vespertine \"$@\"\n");
     return output;
   }
 
   std::string generateFish(const Command& root) {
     const auto states = collectStates(root);
-    std::string output = "# fish completion for noctalia; generated from the live CLI schema\n"
-                         "function __noctalia_path_prefix\n"
+    std::string output = "# fish completion for vespertine; generated from the live CLI schema\n"
+                         "function __vespertine_path_prefix\n"
                          "    set -l tokens (commandline -opc)\n"
                          "    if test (count $tokens) -gt 0\n"
                          "        set -e tokens[1]\n"
@@ -509,7 +509,7 @@ namespace noctalia::cli {
                          "    end\n"
                          "    return 0\n"
                          "end\n\n"
-                         "function __noctalia_exact_path\n"
+                         "function __vespertine_exact_path\n"
                          "    set -l tokens (commandline -opc)\n"
                          "    if test (count $tokens) -gt 0\n"
                          "        set -e tokens[1]\n"
@@ -525,7 +525,7 @@ namespace noctalia::cli {
                          "    end\n"
                          "    return 0\n"
                          "end\n\n"
-                         "function __noctalia_at_pos\n"
+                         "function __vespertine_at_pos\n"
                          "    set -l wanted $argv[1]\n"
                          "    set -e argv[1]\n"
                          "    set -l tokens (commandline -opc)\n"
@@ -546,27 +546,27 @@ namespace noctalia::cli {
                          "    end\n"
                          "    test $seen -eq $wanted\n"
                          "end\n\n"
-                         "function __noctalia_plugins_enabled\n"
-                         "    noctalia msg plugins list 2>/dev/null | awk '$4 == \"enabled\" {print $1}'\n"
+                         "function __vespertine_plugins_enabled\n"
+                         "    vespertine msg plugins list 2>/dev/null | awk '$4 == \"enabled\" {print $1}'\n"
                          "end\n\n"
-                         "function __noctalia_plugins_disabled\n"
-                         "    noctalia msg plugins list 2>/dev/null | awk '$4 == \"disabled\" {print $1}'\n"
+                         "function __vespertine_plugins_disabled\n"
+                         "    vespertine msg plugins list 2>/dev/null | awk '$4 == \"disabled\" {print $1}'\n"
                          "end\n\n"
-                         "function __noctalia_plugin_prefix\n"
-                         "    noctalia msg plugins list 2>/dev/null | awk '$4 == \"enabled\" {print $1\":\"}'\n"
+                         "function __vespertine_plugin_prefix\n"
+                         "    vespertine msg plugins list 2>/dev/null | awk '$4 == \"enabled\" {print $1\":\"}'\n"
                          "end\n\n";
 
     for (const CommandState& state : states) {
       const Command& command = *state.command;
       const std::string path = pathArgs(state.path);
-      const std::string exactCondition = path.empty() ? "__noctalia_exact_path" : "__noctalia_exact_path " + path;
-      const std::string prefixCondition = path.empty() ? "__noctalia_path_prefix" : "__noctalia_path_prefix " + path;
+      const std::string exactCondition = path.empty() ? "__vespertine_exact_path" : "__vespertine_exact_path " + path;
+      const std::string prefixCondition = path.empty() ? "__vespertine_path_prefix" : "__vespertine_path_prefix " + path;
 
       for (const Command& child : command.subcommands) {
         if (child.hidden) {
           continue;
         }
-        output.append("complete -c noctalia -n ");
+        output.append("complete -c vespertine -n ");
         output.append(shellSingleQuote(exactCondition));
         output.append(" -f -a ");
         output.append(shellSingleQuote(child.name));
@@ -578,7 +578,7 @@ namespace noctalia::cli {
       }
 
       for (const Flag& flag : command.flags) {
-        output.append("complete -c noctalia -n ");
+        output.append("complete -c vespertine -n ");
         output.append(shellSingleQuote(prefixCondition));
         if (!flag.shortName.empty()) {
           output.append(" -s ");
@@ -603,7 +603,7 @@ namespace noctalia::cli {
         }
         output.push_back('\n');
       }
-      output.append("complete -c noctalia -n ");
+      output.append("complete -c vespertine -n ");
       output.append(shellSingleQuote(prefixCondition));
       output.append(" -s h -l help -d 'Show this help message'\n");
 
@@ -613,17 +613,17 @@ namespace noctalia::cli {
           continue;
         }
 
-        std::string condition = "__noctalia_at_pos " + std::to_string(i);
+        std::string condition = "__vespertine_at_pos " + std::to_string(i);
         if (!path.empty()) {
           condition.push_back(' ');
           condition.append(path);
         }
-        output.append("complete -c noctalia -n ");
+        output.append("complete -c vespertine -n ");
         output.append(shellSingleQuote(condition));
         output.append(" -f -a ");
 
         if (!positional.runtimeProvider.empty()) {
-          std::string call = "(__noctalia_" + std::string(positional.runtimeProvider) + ")";
+          std::string call = "(__vespertine_" + std::string(positional.runtimeProvider) + ")";
           output.append(shellSingleQuote(call));
         } else {
           output.append(shellSingleQuote(fishChoiceList(positional.choices)));
@@ -641,7 +641,7 @@ namespace noctalia::cli {
 
   int runCompletionsCli(int argc, char* argv[]) {
     auto parsed = parseOrReport(
-        kCompletionsCmd, "noctalia completions", std::span<char* const>{argv + 2, static_cast<std::size_t>(argc - 2)}
+        kCompletionsCmd, "vespertine completions", std::span<char* const>{argv + 2, static_cast<std::size_t>(argc - 2)}
     );
     if (!parsed) {
       return 1;
@@ -661,4 +661,4 @@ namespace noctalia::cli {
     return 0;
   }
 
-} // namespace noctalia::cli
+} // namespace vespertine::cli

@@ -2,7 +2,7 @@
 #include "tests/test_check.h"
 
 int main() {
-  using namespace noctalia::shell::panel::reveal;
+  using namespace vespertine::shell::panel::reveal;
 
   // AT-PANEL-01: Standard identity
   for (float p : {0.0F, 0.5F, 1.0F}) {

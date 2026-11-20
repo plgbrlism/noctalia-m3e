@@ -10,5 +10,5 @@ struct BatteryWidgetDefinitionContext {
   UPowerService* upower = nullptr;
 };
 
-const noctalia::bar::WidgetDefinition<BatteryWidget::Options, BatteryWidgetDefinitionContext>&
+const vespertine::bar::WidgetDefinition<BatteryWidget::Options, BatteryWidgetDefinitionContext>&
 batteryWidgetDefinition();

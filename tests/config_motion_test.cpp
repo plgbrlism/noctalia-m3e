@@ -11,7 +11,7 @@
 
 namespace {
 
-  using Diagnostics = noctalia::config::schema::Diagnostics;
+  using Diagnostics = vespertine::config::schema::Diagnostics;
 
   constexpr std::string_view kParent = "motion";
 
@@ -32,7 +32,7 @@ namespace {
 } // namespace
 
 int main() {
-  const auto& fields = noctalia::config::schema::motionSchema();
+  const auto& fields = vespertine::config::schema::motionSchema();
   const auto& expressiveField = fields[0];
   const auto& panelField = fields[1];
 

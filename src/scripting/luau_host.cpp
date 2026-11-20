@@ -61,10 +61,10 @@
 
 namespace {
   Logger kLog{"luau"};
-  constexpr const char* kHostKey = "__noctalia_host";
+  constexpr const char* kHostKey = "__vespertine_host";
   // Field on a module environment's metatable holding the module's own directory.
   // Not reachable through the environment table itself, and the metatable is frozen.
-  constexpr const char* kModuleDirKey = "__noctalia_moduledir";
+  constexpr const char* kModuleDirKey = "__vespertine_moduledir";
   constexpr auto kDefaultCommandTimeout = std::chrono::milliseconds(5000);
   constexpr auto kMinCommandTimeout = std::chrono::milliseconds(50);
   constexpr auto kMaxCommandTimeout = std::chrono::milliseconds(60000);
@@ -615,7 +615,7 @@ namespace {
     return 1;
   }
 
-  // nowMs() -> wall-clock milliseconds since the Unix epoch. os.time() and noctalia.formatTime()
+  // nowMs() -> wall-clock milliseconds since the Unix epoch. os.time() and vespertine.formatTime()
   // are both whole-second, so this is the only way a plugin can see sub-second time, e.g. to phase
   // its own updates onto a second boundary.
   int luau_nowMs(lua_State* L) {
@@ -855,7 +855,7 @@ namespace {
     if (auto* host = hostForState(L)) {
       host->scriptNotifyInfo(title, body);
     } else {
-      notify::info("Noctalia", title, body);
+      notify::info("Vespertine", title, body);
     }
     return 0;
   }
@@ -866,7 +866,7 @@ namespace {
     if (auto* host = hostForState(L)) {
       host->scriptNotifyError(title, body);
     } else {
-      notify::error("Noctalia", title, body);
+      notify::error("Vespertine", title, body);
     }
     return 0;
   }
@@ -1164,7 +1164,7 @@ namespace {
     return 0;
   }
 
-  // noctalia.osd.show(icon: string, value: string?, opts: { progress: number?, inactive: boolean? }?)
+  // vespertine.osd.show(icon: string, value: string?, opts: { progress: number?, inactive: boolean? }?)
   int luau_osd_show(lua_State* L) {
     size_t iconLen = 0;
     const char* icon = luaL_checklstring(L, 1, &iconLen);
@@ -1871,19 +1871,19 @@ namespace {
     return 0;
   }
 
-  const luaL_Reg kNoctaliaStateLib[] = {
+  const luaL_Reg kVespertineStateLib[] = {
       {"set", luau_state_set},
       {"get", luau_state_get},
       {"watch", luau_state_watch},
       {nullptr, nullptr},
   };
 
-  // noctalia.idle.watch(seconds, callback, { ignoreInhibitors = bool }?) -> id
+  // vespertine.idle.watch(seconds, callback, { ignoreInhibitors = bool }?) -> id
   int luau_idle_watch(lua_State* L) {
     const double seconds = luaL_checknumber(L, 1);
     luaL_checktype(L, 2, LUA_TFUNCTION);
     if (!std::isfinite(seconds) || seconds <= 0.0 || seconds > kMaxIdleWatchSeconds) {
-      luaL_error(L, "noctalia.idle.watch: seconds must be a positive number");
+      luaL_error(L, "vespertine.idle.watch: seconds must be a positive number");
     }
     bool ignoreInhibitors = false;
     if (!lua_isnoneornil(L, 3)) {
@@ -1904,13 +1904,13 @@ namespace {
     const auto timeoutMs = static_cast<std::uint32_t>(std::ceil(seconds * 1000.0));
     if (!host->scriptIdleWatch(timeoutMs, ignoreInhibitors, callbackRef)) {
       lua_unref(L, callbackRef);
-      luaL_error(L, "noctalia.idle.watch: at most %d watches per entry", static_cast<int>(kMaxIdleWatchesPerHost));
+      luaL_error(L, "vespertine.idle.watch: at most %d watches per entry", static_cast<int>(kMaxIdleWatchesPerHost));
     }
     lua_pushinteger(L, callbackRef);
     return 1;
   }
 
-  // noctalia.idle.unwatch(id) -> bool (false when the id is not an active watch)
+  // vespertine.idle.unwatch(id) -> bool (false when the id is not an active watch)
   int luau_idle_unwatch(lua_State* L) {
     const int watchId = luaL_checkinteger(L, 1);
     auto* host = hostForState(L);
@@ -1918,13 +1918,13 @@ namespace {
     return 1;
   }
 
-  const luaL_Reg kNoctaliaIdleLib[] = {
+  const luaL_Reg kVespertineIdleLib[] = {
       {"watch", luau_idle_watch},
       {"unwatch", luau_idle_unwatch},
       {nullptr, nullptr},
   };
 
-  // noctalia.nightlight.state() -> table
+  // vespertine.nightlight.state() -> table
   int luau_nightlight_state(lua_State* L) {
     auto* host = hostForState(L);
     if (host == nullptr) {
@@ -1935,7 +1935,7 @@ namespace {
     return 1;
   }
 
-  // noctalia.nightlight.setEnabled(enabled)
+  // vespertine.nightlight.setEnabled(enabled)
   int luau_nightlight_setEnabled(lua_State* L) {
     luaL_checktype(L, 1, LUA_TBOOLEAN);
     if (auto* host = hostForState(L)) {
@@ -1951,7 +1951,7 @@ namespace {
     return 0;
   }
 
-  // noctalia.nightlight.setForce(force)
+  // vespertine.nightlight.setForce(force)
   int luau_nightlight_setForce(lua_State* L) {
     luaL_checktype(L, 1, LUA_TBOOLEAN);
     if (auto* host = hostForState(L)) {
@@ -1967,7 +1967,7 @@ namespace {
     return 0;
   }
 
-  // noctalia.nightlight.watch(callback) -> id
+  // vespertine.nightlight.watch(callback) -> id
   int luau_nightlight_watch(lua_State* L) {
     luaL_checktype(L, 1, LUA_TFUNCTION);
     auto* host = hostForState(L);
@@ -1979,14 +1979,14 @@ namespace {
     if (!host->scriptNightLightWatch(callbackRef)) {
       lua_unref(L, callbackRef);
       luaL_error(
-          L, "noctalia.nightlight.watch: at most %d watches per entry", static_cast<int>(kMaxNightLightWatchesPerHost)
+          L, "vespertine.nightlight.watch: at most %d watches per entry", static_cast<int>(kMaxNightLightWatchesPerHost)
       );
     }
     lua_pushinteger(L, callbackRef);
     return 1;
   }
 
-  // noctalia.nightlight.unwatch(id) -> bool (false when the id is not an active watch)
+  // vespertine.nightlight.unwatch(id) -> bool (false when the id is not an active watch)
   int luau_nightlight_unwatch(lua_State* L) {
     const int watchId = luaL_checkinteger(L, 1);
     auto* host = hostForState(L);
@@ -1994,7 +1994,7 @@ namespace {
     return 1;
   }
 
-  const luaL_Reg kNoctaliaNightLightLib[] = {
+  const luaL_Reg kVespertineNightLightLib[] = {
       {"state", luau_nightlight_state},
       {"setEnabled", luau_nightlight_setEnabled},
       {"toggle", luau_nightlight_toggle},
@@ -2005,7 +2005,7 @@ namespace {
       {nullptr, nullptr},
   };
 
-  // noctalia.umbriel.action(request, callback?) -> bool. `request` is the typed action request from Umbriel's IPC
+  // vespertine.umbriel.action(request, callback?) -> bool. `request` is the typed action request from Umbriel's IPC
   // reference without `cmd`, for example { action = "workspace-set-layout", layout = "dwindle" }.
   int luau_umbriel_action(lua_State* L) {
     luaL_checktype(L, 1, LUA_TTABLE);
@@ -2044,12 +2044,12 @@ namespace {
     return 1;
   }
 
-  const luaL_Reg kNoctaliaUmbrielLib[] = {
+  const luaL_Reg kVespertineUmbrielLib[] = {
       {"action", luau_umbriel_action},
       {nullptr, nullptr},
   };
 
-  // noctalia.compositor.name() -> string: the detected session compositor ("umbriel", "niri", "hyprland", ...).
+  // vespertine.compositor.name() -> string: the detected session compositor ("umbriel", "niri", "hyprland", ...).
   int luau_compositor_name(lua_State* L) {
     const std::string_view name = compositors::id(compositors::detect());
     lua_pushlstring(L, name.data(), name.size());
@@ -2072,7 +2072,7 @@ namespace {
     for (int i = 1; i <= count; ++i) {
       lua_rawgeti(L, eventsIdx, i);
       if (lua_type(L, -1) != LUA_TSTRING) {
-        luaL_error(L, "noctalia.compositor.subscribe: options.events[%d] must be a string", i);
+        luaL_error(L, "vespertine.compositor.subscribe: options.events[%d] must be a string", i);
       }
       size_t len = 0;
       const char* value = lua_tolstring(L, -1, &len);
@@ -2083,7 +2083,7 @@ namespace {
     return events;
   }
 
-  // noctalia.compositor.subscribe(options?, callback) -> id or nil. `callback(event, data)` receives every message on
+  // vespertine.compositor.subscribe(options?, callback) -> id or nil. `callback(event, data)` receives every message on
   // a compositor event-stream connection the shell opens for this subscription, ("error", message) when Umbriel
   // rejects it, and ("reset", nil) whenever the connection drops before it reconnects. nil on compositors without an
   // event stream.
@@ -2110,7 +2110,7 @@ namespace {
     if (!host->scriptCompositorSubscribe(std::move(events), callbackRef)) {
       lua_unref(L, callbackRef);
       luaL_error(
-          L, "noctalia.compositor.subscribe: at most %d subscriptions per entry",
+          L, "vespertine.compositor.subscribe: at most %d subscriptions per entry",
           static_cast<int>(kMaxCompositorSubscriptionsPerHost)
       );
     }
@@ -2118,7 +2118,7 @@ namespace {
     return 1;
   }
 
-  // noctalia.compositor.unsubscribe(id) -> bool (false when the id is not an active subscription)
+  // vespertine.compositor.unsubscribe(id) -> bool (false when the id is not an active subscription)
   int luau_compositor_unsubscribe(lua_State* L) {
     const int subscriptionId = luaL_checkinteger(L, 1);
     auto* host = hostForState(L);
@@ -2126,14 +2126,14 @@ namespace {
     return 1;
   }
 
-  const luaL_Reg kNoctaliaCompositorLib[] = {
+  const luaL_Reg kVespertineCompositorLib[] = {
       {"name", luau_compositor_name},
       {"subscribe", luau_compositor_subscribe},
       {"unsubscribe", luau_compositor_unsubscribe},
       {nullptr, nullptr},
   };
 
-  // noctalia.layer.*: show, hide, and configure this plugin's [[layer]] entries.
+  // vespertine.layer.*: show, hide, and configure this plugin's [[layer]] entries.
 
   constexpr std::int64_t kMaxLayerExtent = 1 << 16;
 
@@ -2142,14 +2142,14 @@ namespace {
     const char* id = luaL_checklstring(L, 1, &len);
     const std::string_view view(id, len);
     if (view.empty() || view.contains(':') || view.contains('/')) {
-      luaL_error(L, "noctalia.layer.%s: expected the entry id of one of this plugin's [[layer]] entries", fn);
+      luaL_error(L, "vespertine.layer.%s: expected the entry id of one of this plugin's [[layer]] entries", fn);
     }
     return std::string(view);
   }
 
   std::int32_t checkLayerInteger(lua_State* L, int index, std::int64_t min, const char* what) {
     if (lua_type(L, index) != LUA_TNUMBER) {
-      luaL_error(L, "noctalia.layer.configure: %s must be an integer", what);
+      luaL_error(L, "vespertine.layer.configure: %s must be an integer", what);
     }
     const double value = lua_tonumber(L, index);
     if (!std::isfinite(value)
@@ -2157,7 +2157,7 @@ namespace {
         || value < static_cast<double>(min)
         || value > static_cast<double>(kMaxLayerExtent)) {
       luaL_error(
-          L, "noctalia.layer.configure: %s must be an integer between %d and %d", what, static_cast<int>(min),
+          L, "vespertine.layer.configure: %s must be an integer between %d and %d", what, static_cast<int>(min),
           static_cast<int>(kMaxLayerExtent)
       );
     }
@@ -2166,7 +2166,7 @@ namespace {
 
   std::string_view checkLayerString(lua_State* L, int index, const char* what) {
     if (lua_type(L, index) != LUA_TSTRING) {
-      luaL_error(L, "noctalia.layer.configure: %s must be a string", what);
+      luaL_error(L, "vespertine.layer.configure: %s must be a string", what);
     }
     size_t len = 0;
     const char* value = lua_tolstring(L, index, &len);
@@ -2179,13 +2179,13 @@ namespace {
     while (lua_next(L, table) != 0) {
       const int value = lua_gettop(L);
       if (lua_type(L, -2) != LUA_TSTRING) {
-        luaL_error(L, "noctalia.layer.configure: property names must be strings");
+        luaL_error(L, "vespertine.layer.configure: property names must be strings");
       }
       const std::string_view key = lua_tostring(L, -2);
       if (key == "layer") {
         const auto level = scripting::parsePluginLayerLevel(checkLayerString(L, value, "layer"));
         if (!level.has_value()) {
-          luaL_error(L, R"(noctalia.layer.configure: layer must be "background", "bottom", "top", or "overlay")");
+          luaL_error(L, R"(vespertine.layer.configure: layer must be "background", "bottom", "top", or "overlay")");
         }
         patch.layer = level;
       } else if (key == "anchors") {
@@ -2199,7 +2199,7 @@ namespace {
           if (!anchor.has_value() || (anchors & *anchor) != 0) {
             luaL_error(
                 L,
-                R"(noctalia.layer.configure: anchors must list distinct values from "top", "bottom", "left", "right")"
+                R"(vespertine.layer.configure: anchors must list distinct values from "top", "bottom", "left", "right")"
             );
           }
           anchors |= *anchor;
@@ -2233,7 +2233,7 @@ namespace {
       } else if (key == "keyboard") {
         const auto keyboard = scripting::parsePluginLayerKeyboard(checkLayerString(L, value, "keyboard"));
         if (!keyboard.has_value()) {
-          luaL_error(L, R"(noctalia.layer.configure: keyboard must be "none", "on_demand", or "exclusive")");
+          luaL_error(L, R"(vespertine.layer.configure: keyboard must be "none", "on_demand", or "exclusive")");
         }
         patch.keyboard = keyboard;
       } else if (key == "clickThrough") {
@@ -2242,11 +2242,11 @@ namespace {
       } else if (key == "output") {
         const std::string_view output = checkLayerString(L, value, "output");
         if (output.empty()) {
-          luaL_error(L, "noctalia.layer.configure: output must not be empty");
+          luaL_error(L, "vespertine.layer.configure: output must not be empty");
         }
         patch.output = std::string(output);
       } else {
-        luaL_error(L, "noctalia.layer.configure: unknown property '%s'", std::string(key).c_str());
+        luaL_error(L, "vespertine.layer.configure: unknown property '%s'", std::string(key).c_str());
       }
       lua_pop(L, 1);
     }
@@ -2279,7 +2279,7 @@ namespace {
     return 0;
   }
 
-  const luaL_Reg kNoctaliaLayerLib[] = {
+  const luaL_Reg kVespertineLayerLib[] = {
       {"show", luau_layer_show},
       {"hide", luau_layer_hide},
       {"configure", luau_layer_configure},
@@ -2315,18 +2315,18 @@ namespace {
     }
   }
 
-  const luaL_Reg kNoctaliaSoundLib[] = {
+  const luaL_Reg kVespertineSoundLib[] = {
       {"load", luau_sound_load},
       {"play", luau_sound_play},
       {nullptr, nullptr},
   };
 
-  const luaL_Reg kNoctaliaOsdLib[] = {
+  const luaL_Reg kVespertineOsdLib[] = {
       {"show", luau_osd_show},
       {nullptr, nullptr},
   };
 
-  const luaL_Reg kNoctaliaJsonLib[] = {
+  const luaL_Reg kVespertineJsonLib[] = {
       {"decode", luau_json_decode},
       {"encode", luau_json_encode},
       {nullptr, nullptr},
@@ -2356,7 +2356,7 @@ namespace {
     return 1;
   }
 
-  const luaL_Reg kNoctaliaStringLib[] = {
+  const luaL_Reg kVespertineStringLib[] = {
       {"trim", luau_string_trim},
       {"urlEncode", luau_string_urlEncode},
       {"urlDecode", luau_string_urlDecode},
@@ -2378,7 +2378,7 @@ namespace {
     return 1;
   }
 
-  const luaL_Reg kNoctaliaBaseLib[] = {
+  const luaL_Reg kVespertineBaseLib[] = {
       {"log", luau_log},
       {"runAsync", luau_runAsync},
       {"runStream", luau_runStream},
@@ -2442,47 +2442,47 @@ namespace {
       {nullptr, nullptr},
   };
 
-  void registerNoctaliaLib(lua_State* L) {
-    luaL_register(L, "noctalia", kNoctaliaBaseLib);
-    // noctalia.state = { set, get, watch }
+  void registerVespertineLib(lua_State* L) {
+    luaL_register(L, "vespertine", kVespertineBaseLib);
+    // vespertine.state = { set, get, watch }
     lua_createtable(L, 0, 0);
-    luaL_register(L, nullptr, kNoctaliaStateLib);
+    luaL_register(L, nullptr, kVespertineStateLib);
     lua_setfield(L, -2, "state");
-    // noctalia.json = { decode, encode }
+    // vespertine.json = { decode, encode }
     lua_createtable(L, 0, 0);
-    luaL_register(L, nullptr, kNoctaliaJsonLib);
+    luaL_register(L, nullptr, kVespertineJsonLib);
     lua_setfield(L, -2, "json");
-    // noctalia.sound = { load, play }
+    // vespertine.sound = { load, play }
     lua_createtable(L, 0, 0);
-    luaL_register(L, nullptr, kNoctaliaSoundLib);
+    luaL_register(L, nullptr, kVespertineSoundLib);
     lua_setfield(L, -2, "sound");
-    // noctalia.osd = { show }
+    // vespertine.osd = { show }
     lua_createtable(L, 0, 0);
-    luaL_register(L, nullptr, kNoctaliaOsdLib);
+    luaL_register(L, nullptr, kVespertineOsdLib);
     lua_setfield(L, -2, "osd");
-    // noctalia.string = { trim, urlEncode, urlDecode }
+    // vespertine.string = { trim, urlEncode, urlDecode }
     lua_createtable(L, 0, 0);
-    luaL_register(L, nullptr, kNoctaliaStringLib);
+    luaL_register(L, nullptr, kVespertineStringLib);
     lua_setfield(L, -2, "string");
-    // noctalia.idle = { watch, unwatch }
+    // vespertine.idle = { watch, unwatch }
     lua_createtable(L, 0, 0);
-    luaL_register(L, nullptr, kNoctaliaIdleLib);
+    luaL_register(L, nullptr, kVespertineIdleLib);
     lua_setfield(L, -2, "idle");
-    // noctalia.nightlight = { state, setEnabled, toggle, setForce, toggleForce, watch, unwatch }
+    // vespertine.nightlight = { state, setEnabled, toggle, setForce, toggleForce, watch, unwatch }
     lua_createtable(L, 0, 0);
-    luaL_register(L, nullptr, kNoctaliaNightLightLib);
+    luaL_register(L, nullptr, kVespertineNightLightLib);
     lua_setfield(L, -2, "nightlight");
-    // noctalia.layer = { show, hide, configure }
+    // vespertine.layer = { show, hide, configure }
     lua_createtable(L, 0, 0);
-    luaL_register(L, nullptr, kNoctaliaLayerLib);
+    luaL_register(L, nullptr, kVespertineLayerLib);
     lua_setfield(L, -2, "layer");
-    // noctalia.umbriel = { action }
+    // vespertine.umbriel = { action }
     lua_createtable(L, 0, 0);
-    luaL_register(L, nullptr, kNoctaliaUmbrielLib);
+    luaL_register(L, nullptr, kVespertineUmbrielLib);
     lua_setfield(L, -2, "umbriel");
-    // noctalia.compositor = { name, subscribe, unsubscribe }
+    // vespertine.compositor = { name, subscribe, unsubscribe }
     lua_createtable(L, 0, 0);
-    luaL_register(L, nullptr, kNoctaliaCompositorLib);
+    luaL_register(L, nullptr, kVespertineCompositorLib);
     lua_setfield(L, -2, "compositor");
     lua_pop(L, 1);
   }
@@ -2526,7 +2526,7 @@ LuauHost::LuauHost(scripting::ScriptApiContext& api, std::string runtimeName, Co
   lua_callbacks(m_mainState)->userdata = this;
   lua_callbacks(m_mainState)->interrupt = budgetInterrupt;
   luaL_openlibs(m_mainState);
-  registerNoctaliaLib(m_mainState);
+  registerVespertineLib(m_mainState);
   lua_pushcfunction(m_mainState, &LuauHost::luauRequire, "require");
   lua_setglobal(m_mainState, "require");
   // Freeze main state's stdlib + globals. The thread we create next inherits
@@ -3512,7 +3512,7 @@ void LuauHost::scriptNotifyInfo(std::string title, std::string body) {
     );
     return;
   }
-  notify::info("Noctalia", title, body);
+  notify::info("Vespertine", title, body);
 }
 
 void LuauHost::scriptNotifyError(std::string title, std::string body) {
@@ -3522,7 +3522,7 @@ void LuauHost::scriptNotifyError(std::string title, std::string body) {
     );
     return;
   }
-  notify::error("Noctalia", title, body);
+  notify::error("Vespertine", title, body);
 }
 
 bool LuauHost::scriptLoadSound(std::string name, std::string path, int callbackRef) {

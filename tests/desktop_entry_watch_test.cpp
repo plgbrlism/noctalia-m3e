@@ -32,7 +32,7 @@ namespace {
 } // namespace
 
 int main() {
-  const fs::path root = fs::temp_directory_path() / ("noctalia-desktop-entry-watch-" + std::to_string(getpid()));
+  const fs::path root = fs::temp_directory_path() / ("vespertine-desktop-entry-watch-" + std::to_string(getpid()));
   const fs::path applications = root / "data/applications";
   fs::create_directories(applications / "nested");
   writeEntry(applications / "watch-probe.desktop", "Watch Probe");

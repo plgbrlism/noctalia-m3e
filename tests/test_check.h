@@ -8,10 +8,10 @@
 #include <type_traits>
 
 #ifdef NDEBUG
-#error "Noctalia test targets must be compiled without NDEBUG"
+#error "Vespertine test targets must be compiled without NDEBUG"
 #endif
 
-namespace noctalia::test {
+namespace vespertine::test {
 
   [[noreturn]] inline void
   failCheck(const char* expression, std::source_location location = std::source_location::current()) {
@@ -59,12 +59,12 @@ namespace noctalia::test {
     }
   }
 
-} // namespace noctalia::test
+} // namespace vespertine::test
 
 // Variadic so a check can contain unparenthesized commas (designated initializers, template arguments).
-#define TEST_CHECK(...) ::noctalia::test::check(static_cast<bool>(__VA_ARGS__), #__VA_ARGS__)
+#define TEST_CHECK(...) ::vespertine::test::check(static_cast<bool>(__VA_ARGS__), #__VA_ARGS__)
 
 #define TEST_NEAR(actual, expected, tolerance)                                                                         \
-  ::noctalia::test::checkNear(                                                                                         \
+  ::vespertine::test::checkNear(                                                                                         \
       (actual), (expected), (tolerance), "TEST_NEAR(" #actual ", " #expected ", " #tolerance ")"                       \
   )

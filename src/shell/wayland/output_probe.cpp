@@ -17,7 +17,7 @@ namespace {
   constexpr Logger kLog("output-probe");
 
   int createAnonFd(std::size_t size) {
-    int fd = memfd_create("noctalia-output-probe", MFD_CLOEXEC);
+    int fd = memfd_create("vespertine-output-probe", MFD_CLOEXEC);
     if (fd < 0) {
       return -1;
     }
@@ -66,7 +66,7 @@ OutputProbe::OutputProbe(WaylandConnection& wayland, std::chrono::milliseconds t
   // No output argument: the compositor assigns the surface to the output it
   // would choose for any unpinned layer surface (the focused one).
   m_layerSurface = zwlr_layer_shell_v1_get_layer_surface(
-      layerShell, m_surface, nullptr, static_cast<std::uint32_t>(LayerShellLayer::Background), "noctalia-output-probe"
+      layerShell, m_surface, nullptr, static_cast<std::uint32_t>(LayerShellLayer::Background), "vespertine-output-probe"
   );
   if (m_layerSurface == nullptr) {
     finish(nullptr);

@@ -40,7 +40,7 @@ namespace {
 } // namespace
 
 int main() {
-  char tempDir[] = "/tmp/noctalia-app-icon-path-test-XXXXXX";
+  char tempDir[] = "/tmp/vespertine-app-icon-path-test-XXXXXX";
   if (mkdtemp(tempDir) == nullptr) {
     std::perror("mkdtemp");
     return 1;
@@ -55,14 +55,14 @@ int main() {
   // Shaped like com.microsoft.VSCode / com.microsoft.VSCodeInsiders (issue #5250), with made-up names
   // because the scan always appends /usr/share and host entries or themed icons must not interfere.
   writeDesktopEntry(
-      applications, "org.example.NoctaliaSample", "Noctalia Sample", "noctaliasample", "org.example.NoctaliaSample"
+      applications, "org.example.VespertineSample", "Vespertine Sample", "vespertinesample", "org.example.VespertineSample"
   );
   writeDesktopEntry(
-      applications, "org.example.NoctaliaSampleInsiders", "Noctalia Sample - Insiders", "noctaliasample-insiders",
-      "org.example.NoctaliaSampleInsiders"
+      applications, "org.example.VespertineSampleInsiders", "Vespertine Sample - Insiders", "vespertinesample-insiders",
+      "org.example.VespertineSampleInsiders"
   );
-  writeDesktopEntry(applications, "org.example.noctaliawrapped", "Wrapped Sample", "org.example.noctaliawrapped", "");
-  for (const char* icon : {"noctaliasample.png", "noctaliasample-insiders.png", "org.example.noctaliawrapped.png"}) {
+  writeDesktopEntry(applications, "org.example.vespertinewrapped", "Wrapped Sample", "org.example.vespertinewrapped", "");
+  for (const char* icon : {"vespertinesample.png", "vespertinesample-insiders.png", "org.example.vespertinewrapped.png"}) {
     std::ofstream(pixmaps / icon) << "png";
   }
 
@@ -85,18 +85,18 @@ int main() {
       std::format(
           R"(
     local px = "{}"
-    -- Raw icon name: must not be token-matched to org.example.NoctaliaSample.
-    assert(noctalia.appIconPath("noctaliasample-insiders") == px .. "noctaliasample-insiders.png")
+    -- Raw icon name: must not be token-matched to org.example.VespertineSample.
+    assert(vespertine.appIconPath("vespertinesample-insiders") == px .. "vespertinesample-insiders.png")
     -- Absolute paths are returned as-is when they exist, nil otherwise.
-    assert(noctalia.appIconPath(px .. "noctaliasample-insiders.png") == px .. "noctaliasample-insiders.png")
-    assert(noctalia.appIconPath(px .. "missing-noctaliasample.png") == nil)
+    assert(vespertine.appIconPath(px .. "vespertinesample-insiders.png") == px .. "vespertinesample-insiders.png")
+    assert(vespertine.appIconPath(px .. "missing-vespertinesample.png") == nil)
     -- Exact desktop-entry ids and raw names keep working.
-    assert(noctalia.appIconPath("org.example.NoctaliaSampleInsiders") == px .. "noctaliasample-insiders.png")
-    assert(noctalia.appIconPath("noctaliasample") == px .. "noctaliasample.png")
+    assert(vespertine.appIconPath("org.example.VespertineSampleInsiders") == px .. "vespertinesample-insiders.png")
+    assert(vespertine.appIconPath("vespertinesample") == px .. "vespertinesample.png")
     -- Window app ids still reach the taskbar heuristics (#4571).
-    assert(noctalia.appIconPath(".noctaliawrapped-gui-wrapped") == px .. "org.example.noctaliawrapped.png")
-    -- No bare "noctalia" token: an installed dev.noctalia.Noctalia entry would token-match it.
-    assert(noctalia.appIconPath("noctaliamissing-app") == nil)
+    assert(vespertine.appIconPath(".vespertinewrapped-gui-wrapped") == px .. "org.example.vespertinewrapped.png")
+    -- No bare "vespertine" token: an installed dev.vespertine.Vespertine entry would token-match it.
+    assert(vespertine.appIconPath("vespertinemissing-app") == nil)
   )",
           px
       )

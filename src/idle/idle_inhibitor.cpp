@@ -174,7 +174,7 @@ void IdleInhibitor::resyncAnchorSurfaces() {
 }
 
 void IdleInhibitor::registerIpc(IpcService& ipc, const StateFeedbackCallback& stateFeedback) {
-  ipc.bind(noctalia::cli::msg::caffeineEnable, [this, stateFeedback](const std::string&) -> std::string {
+  ipc.bind(vespertine::cli::msg::caffeineEnable, [this, stateFeedback](const std::string&) -> std::string {
     if (!available()) {
       return "error: caffeine protocol unavailable\n";
     }
@@ -188,7 +188,7 @@ void IdleInhibitor::registerIpc(IpcService& ipc, const StateFeedbackCallback& st
     return "ok\n";
   });
 
-  ipc.bind(noctalia::cli::msg::caffeineDisable, [this, stateFeedback](const std::string&) -> std::string {
+  ipc.bind(vespertine::cli::msg::caffeineDisable, [this, stateFeedback](const std::string&) -> std::string {
     if (!available()) {
       return "error: caffeine protocol unavailable\n";
     }
@@ -202,7 +202,7 @@ void IdleInhibitor::registerIpc(IpcService& ipc, const StateFeedbackCallback& st
     return "ok\n";
   });
 
-  ipc.bind(noctalia::cli::msg::caffeineToggle, [this, stateFeedback](const std::string&) -> std::string {
+  ipc.bind(vespertine::cli::msg::caffeineToggle, [this, stateFeedback](const std::string&) -> std::string {
     if (!available()) {
       return "error: caffeine protocol unavailable\n";
     }

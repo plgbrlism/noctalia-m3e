@@ -10,7 +10,7 @@
 #include <string_view>
 #include <vector>
 
-namespace noctalia::config {
+namespace vespertine::config {
 
   // Result of merging all config-dir files, including any pulled in via [include].
   struct [[nodiscard]] MergeResult {
@@ -47,4 +47,4 @@ namespace noctalia::config {
   // responsible for overlaying settings.toml afterwards (it is never include-expanded).
   MergeResult mergeConfigWithIncludes(std::string_view configDir, std::span<const std::string> systemConfigDirs);
 
-} // namespace noctalia::config
+} // namespace vespertine::config

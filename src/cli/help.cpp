@@ -5,7 +5,7 @@
 #include <utility>
 #include <vector>
 
-namespace noctalia::cli {
+namespace vespertine::cli {
 
   namespace {
 
@@ -159,7 +159,7 @@ namespace noctalia::cli {
       for (const Command* child : children) {
         std::string left{child->name};
         const std::string args =
-            command.name == "noctalia" && !child->subcommands.empty() ? "<command>" : renderArgsSpec(*child);
+            command.name == "vespertine" && !child->subcommands.empty() ? "<command>" : renderArgsSpec(*child);
         if (!args.empty()) {
           left.push_back(' ');
           left.append(args);
@@ -226,4 +226,4 @@ namespace noctalia::cli {
     return output;
   }
 
-} // namespace noctalia::cli
+} // namespace vespertine::cli

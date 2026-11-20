@@ -17,18 +17,18 @@ namespace {
         : m_root(std::filesystem::temp_directory_path() / (std::string(name) + "-" + std::to_string(::getpid()))) {
       std::filesystem::remove_all(m_root);
       std::filesystem::create_directories(userDir());
-      std::filesystem::create_directories(m_root / "state" / "noctalia");
+      std::filesystem::create_directories(m_root / "state" / "vespertine");
       std::filesystem::create_directories(m_root / "data");
-      ::setenv("NOCTALIA_CONFIG_HOME", (m_root / "config").c_str(), 1);
-      ::setenv("NOCTALIA_STATE_HOME", (m_root / "state").c_str(), 1);
-      ::setenv("NOCTALIA_DATA_HOME", (m_root / "data").c_str(), 1);
+      ::setenv("VESPERTINE_CONFIG_HOME", (m_root / "config").c_str(), 1);
+      ::setenv("VESPERTINE_STATE_HOME", (m_root / "state").c_str(), 1);
+      ::setenv("VESPERTINE_DATA_HOME", (m_root / "data").c_str(), 1);
     }
 
     ~TestRoot() {
       ::unsetenv("XDG_CONFIG_DIRS");
-      ::unsetenv("NOCTALIA_CONFIG_HOME");
-      ::unsetenv("NOCTALIA_STATE_HOME");
-      ::unsetenv("NOCTALIA_DATA_HOME");
+      ::unsetenv("VESPERTINE_CONFIG_HOME");
+      ::unsetenv("VESPERTINE_STATE_HOME");
+      ::unsetenv("VESPERTINE_DATA_HOME");
       std::filesystem::remove_all(m_root);
     }
 
@@ -36,7 +36,7 @@ namespace {
     TestRoot& operator=(const TestRoot&) = delete;
 
     [[nodiscard]] std::filesystem::path base(const std::string_view name) const { return m_root / name; }
-    [[nodiscard]] std::filesystem::path userDir() const { return m_root / "config" / "noctalia"; }
+    [[nodiscard]] std::filesystem::path userDir() const { return m_root / "config" / "vespertine"; }
 
   private:
     std::filesystem::path m_root;
@@ -55,9 +55,9 @@ namespace {
   }
 
   void checkSystemLayerKeepsBuiltinDefaults() {
-    const TestRoot root("noctalia-system-layer-defaults");
+    const TestRoot root("vespertine-system-layer-defaults");
     setSystemBases(root.base("vendor").string());
-    writeWallpaper(root.base("vendor") / "noctalia" / "10-vendor.toml", "/usr/share/backgrounds/vendor.png");
+    writeWallpaper(root.base("vendor") / "vespertine" / "10-vendor.toml", "/usr/share/backgrounds/vendor.png");
 
     const ConfigService config;
     TEST_CHECK(config.getWallpaperPath("DP-1") == "/usr/share/backgrounds/vendor.png");
@@ -67,30 +67,30 @@ namespace {
   }
 
   void checkFirstSystemBaseIsMostImportant() {
-    const TestRoot root("noctalia-system-layer-order");
+    const TestRoot root("vespertine-system-layer-order");
     setSystemBases(root.base("admin").string() + ":" + root.base("vendor").string());
-    writeWallpaper(root.base("admin") / "noctalia" / "config.toml", "/admin.png");
-    writeWallpaper(root.base("vendor") / "noctalia" / "config.toml", "/vendor.png");
+    writeWallpaper(root.base("admin") / "vespertine" / "config.toml", "/admin.png");
+    writeWallpaper(root.base("vendor") / "vespertine" / "config.toml", "/vendor.png");
 
     const ConfigService config;
     TEST_CHECK(config.getWallpaperPath("DP-1") == "/admin.png");
   }
 
   void checkRepeatedSystemBaseKeepsFirstPosition() {
-    const TestRoot root("noctalia-system-layer-repeat");
+    const TestRoot root("vespertine-system-layer-repeat");
     const std::string admin = root.base("admin").string();
     setSystemBases(admin + ":" + root.base("vendor").string() + ":" + admin + "/");
-    writeWallpaper(root.base("admin") / "noctalia" / "config.toml", "/admin.png");
-    writeWallpaper(root.base("vendor") / "noctalia" / "config.toml", "/vendor.png");
+    writeWallpaper(root.base("admin") / "vespertine" / "config.toml", "/admin.png");
+    writeWallpaper(root.base("vendor") / "vespertine" / "config.toml", "/vendor.png");
 
     const ConfigService config;
     TEST_CHECK(config.getWallpaperPath("DP-1") == "/admin.png");
   }
 
   void checkUserAndSettingsOutrankSystem() {
-    const TestRoot root("noctalia-system-layer-precedence");
+    const TestRoot root("vespertine-system-layer-precedence");
     setSystemBases(root.base("vendor").string());
-    writeWallpaper(root.base("vendor") / "noctalia" / "config.toml", "/vendor.png");
+    writeWallpaper(root.base("vendor") / "vespertine" / "config.toml", "/vendor.png");
     writeWallpaper(root.userDir() / "config.toml", "/user.png");
 
     ConfigService config;
@@ -101,9 +101,9 @@ namespace {
   }
 
   void checkUserAutoloadOptOutKeepsSystemLayer() {
-    const TestRoot root("noctalia-system-layer-autoload");
+    const TestRoot root("vespertine-system-layer-autoload");
     setSystemBases(root.base("vendor").string());
-    writeFile(root.base("vendor") / "noctalia" / "config.toml", "[theme]\nmode = \"light\"\n");
+    writeFile(root.base("vendor") / "vespertine" / "config.toml", "[theme]\nmode = \"light\"\n");
     writeFile(root.userDir() / "config.toml", "[include]\nautoload = false\n");
     writeWallpaper(root.userDir() / "other.toml", "/skipped.png");
 
@@ -113,9 +113,9 @@ namespace {
   }
 
   void checkUserDirListedAsSystemBaseKeepsUserPrecedence() {
-    const TestRoot root("noctalia-system-layer-user-dir");
+    const TestRoot root("vespertine-system-layer-user-dir");
     setSystemBases(root.base("vendor").string() + ":" + root.userDir().parent_path().string());
-    writeWallpaper(root.base("vendor") / "noctalia" / "config.toml", "/vendor.png");
+    writeWallpaper(root.base("vendor") / "vespertine" / "config.toml", "/vendor.png");
     writeWallpaper(root.userDir() / "config.toml", "/user.png");
 
     const ConfigService config;
@@ -126,7 +126,7 @@ namespace {
 
 int main(const int argc, char** argv) {
   TEST_CHECK(argc == 2);
-  ::setenv("NOCTALIA_ASSETS_DIR", argv[1], 1);
+  ::setenv("VESPERTINE_ASSETS_DIR", argv[1], 1);
   checkSystemLayerKeepsBuiltinDefaults();
   checkFirstSystemBaseIsMostImportant();
   checkRepeatedSystemBaseKeepsFirstPosition();

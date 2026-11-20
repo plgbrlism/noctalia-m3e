@@ -51,7 +51,7 @@ namespace {
         m_previousWaylandSocket = waylandSocket;
       }
 
-      char runtimeTemplate[] = "/tmp/noctalia-screencopy-test-XXXXXX";
+      char runtimeTemplate[] = "/tmp/vespertine-screencopy-test-XXXXXX";
       const char* createdRuntimeDir = mkdtemp(runtimeTemplate);
       if (createdRuntimeDir == nullptr) {
         throw std::runtime_error(std::string("mkdtemp failed: ") + std::strerror(errno));
@@ -195,7 +195,7 @@ namespace {
       }
 
       wl_output_send_geometry(
-          resource, 0, 0, 600, 340, WL_OUTPUT_SUBPIXEL_UNKNOWN, "Noctalia", "Mock output", WL_OUTPUT_TRANSFORM_NORMAL
+          resource, 0, 0, 600, 340, WL_OUTPUT_SUBPIXEL_UNKNOWN, "Vespertine", "Mock output", WL_OUTPUT_TRANSFORM_NORMAL
       );
       wl_output_send_mode(resource, WL_OUTPUT_MODE_CURRENT | WL_OUTPUT_MODE_PREFERRED, 1920, 1080, 60000);
       if (resourceVersion >= WL_OUTPUT_SCALE_SINCE_VERSION) {
@@ -203,7 +203,7 @@ namespace {
       }
       if (resourceVersion >= WL_OUTPUT_NAME_SINCE_VERSION) {
         wl_output_send_name(resource, "MOCK-1");
-        wl_output_send_description(resource, "Noctalia screencopy isolation test output");
+        wl_output_send_description(resource, "Vespertine screencopy isolation test output");
       }
       if (resourceVersion >= WL_OUTPUT_DONE_SINCE_VERSION) {
         wl_output_send_done(resource);

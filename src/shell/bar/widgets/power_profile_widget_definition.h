@@ -4,4 +4,4 @@
 
 #include <variant>
 
-const noctalia::bar::WidgetDefinition<std::monostate>& powerProfileWidgetDefinition();
+const vespertine::bar::WidgetDefinition<std::monostate>& powerProfileWidgetDefinition();

@@ -2,12 +2,12 @@
 
 #include "shell/bar/glyph_button_definition.h"
 
-const noctalia::bar::WidgetDefinition<WallpaperWidget::Options>& wallpaperWidgetDefinition() {
+const vespertine::bar::WidgetDefinition<WallpaperWidget::Options>& wallpaperWidgetDefinition() {
   using Options = WallpaperWidget::Options;
 
-  static const noctalia::bar::WidgetDefinition<Options> definition{
+  static const vespertine::bar::WidgetDefinition<Options> definition{
       .type = "wallpaper",
-      .fields = noctalia::bar::glyphButtonFields<Options>(),
+      .fields = vespertine::bar::glyphButtonFields<Options>(),
       .glyph = [](const Options& options) { return options.glyph; },
   };
   return definition;

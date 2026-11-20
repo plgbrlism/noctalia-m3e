@@ -13,7 +13,7 @@
 #include <string_view>
 #include <utility>
 
-namespace noctalia::config {
+namespace vespertine::config {
   namespace {
 
     constexpr int kNegativeBarRadiusMigrationVersion = 1;
@@ -1611,4 +1611,4 @@ namespace noctalia::config {
         || nowEpochSeconds - previousEpochSeconds >= kLegacyConfigReminderIntervalSeconds;
   }
 
-} // namespace noctalia::config
+} // namespace vespertine::config

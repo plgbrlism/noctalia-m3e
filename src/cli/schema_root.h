@@ -10,7 +10,7 @@
 
 #include <array>
 
-namespace noctalia::cli {
+namespace vespertine::cli {
 
   inline constexpr std::array<std::string_view, 3> kCompletionShellChoices{"bash", "fish", "zsh"};
   inline constexpr std::array kCompletionsPositionals{
@@ -21,8 +21,8 @@ namespace noctalia::cli {
       "Generate shell completion scripts",
       "Generate a completion script from the live CLI schema.\n\n"
       "Examples:\n"
-      "  source <(noctalia completions bash)\n"
-      "  noctalia completions fish > ~/.config/fish/completions/noctalia.fish",
+      "  source <(vespertine completions bash)\n"
+      "  vespertine completions fish > ~/.config/fish/completions/vespertine.fish",
       {},
       {},
       kCompletionsPositionals,
@@ -40,10 +40,10 @@ namespace noctalia::cli {
   };
 
   inline constexpr Command kRootCmd{
-      "noctalia",
+      "vespertine",
       "A sleek, customizable desktop shell crafted for Wayland",
       {},
-      "For more information and documentation, visit:\n  https://noctalia.dev",
+      "For more information and documentation, visit:\n  https://vespertine.dev",
       kRootFlags,
       {},
       kRootSubcommands,
@@ -52,4 +52,4 @@ namespace noctalia::cli {
 
   static_assert(validateCommand(kRootCmd));
 
-} // namespace noctalia::cli
+} // namespace vespertine::cli

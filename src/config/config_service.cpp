@@ -49,7 +49,7 @@
 #include <unordered_map>
 #include <vector>
 
-namespace schema = noctalia::config::schema;
+namespace schema = vespertine::config::schema;
 
 namespace {
 
@@ -98,12 +98,12 @@ namespace {
 
   template <typename T>
   void readConfigSection(
-      const toml::table& table, T& target, const noctalia::config::schema::Schema<T>& sectionSchema,
-      std::string_view path, noctalia::config::schema::Diagnostics& diagnostics
+      const toml::table& table, T& target, const vespertine::config::schema::Schema<T>& sectionSchema,
+      std::string_view path, vespertine::config::schema::Diagnostics& diagnostics
   ) {
     T candidate = target;
     try {
-      noctalia::config::schema::readInto(table, candidate, sectionSchema, path, diagnostics);
+      vespertine::config::schema::readInto(table, candidate, sectionSchema, path, diagnostics);
       target = std::move(candidate);
     } catch (const std::exception& e) {
       diagnostics.error(std::string(path), e.what());
@@ -227,7 +227,7 @@ namespace {
   }
 
   void restoreInvalidComponents(
-      Config& candidate, const Config& active, const noctalia::config::schema::Diagnostics& diagnostics
+      Config& candidate, const Config& active, const vespertine::config::schema::Diagnostics& diagnostics
   ) {
     const auto restorePlacementWidget = [](std::vector<DesktopWidgetState>& candidateWidgets,
                                            const std::vector<DesktopWidgetState>& activeWidgets,
@@ -246,8 +246,8 @@ namespace {
     };
 
     for (const auto& entry : diagnostics.entries) {
-      if (entry.severity != noctalia::config::schema::Diagnostics::Severity::Error
-          || entry.recoveryScope != noctalia::config::schema::Diagnostics::RecoveryScope::Component) {
+      if (entry.severity != vespertine::config::schema::Diagnostics::Severity::Error
+          || entry.recoveryScope != vespertine::config::schema::Diagnostics::RecoveryScope::Component) {
         continue;
       }
       if (const auto barId = componentOwnerId(entry.ownerPath, "widget.")) {
@@ -318,7 +318,7 @@ namespace {
     }
     if (const auto* settingsTable = widgetTable["settings"].as_table()) {
       for (const auto& [key, value] : *settingsTable) {
-        if (auto parsed = noctalia::config::readWidgetSettingValue(value); parsed.has_value()) {
+        if (auto parsed = vespertine::config::readWidgetSettingValue(value); parsed.has_value()) {
           widget.settings.emplace(std::string(key.str()), std::move(*parsed));
         }
       }
@@ -543,7 +543,7 @@ namespace {
       std::string_view configDir, std::span<const std::string> systemConfigDirs, std::string_view settingsPath,
       std::string* error
   ) {
-    auto mergeResult = noctalia::config::mergeConfigWithIncludes(configDir, systemConfigDirs);
+    auto mergeResult = vespertine::config::mergeConfigWithIncludes(configDir, systemConfigDirs);
     toml::table merged = std::move(mergeResult.merged);
     if (!mergeResult.firstError.empty()) {
       const std::string located = mergeResult.firstErrorOrigin.prefixed(mergeResult.firstError);
@@ -560,12 +560,12 @@ namespace {
       try {
         sidecar = toml::parse_file(settingsPath);
         seedLegacyDockAllowListEnabled(sidecar, merged);
-        noctalia::config::ConfigOriginIndex origins;
+        vespertine::config::ConfigOriginIndex origins;
         origins.record(settingsFile, sidecar);
         schema::Diagnostics migrationDiag;
-        const auto storedVersion = noctalia::config::storedConfigVersion(sidecar, migrationDiag);
+        const auto storedVersion = vespertine::config::storedConfigVersion(sidecar, migrationDiag);
         if (storedVersion.has_value()) {
-          (void)noctalia::config::applyPendingConfigMigrations(sidecar, merged, *storedVersion, migrationDiag);
+          (void)vespertine::config::applyPendingConfigMigrations(sidecar, merged, *storedVersion, migrationDiag);
         }
         origins.annotate(migrationDiag);
         for (const auto& entry : migrationDiag.entries) {
@@ -580,7 +580,7 @@ namespace {
         ConfigService::deepMerge(merged, sidecar);
       } catch (const toml::parse_error& e) {
         if (error != nullptr) {
-          *error = noctalia::config::parseErrorOrigin(e, settingsFile).prefixed(e.description());
+          *error = vespertine::config::parseErrorOrigin(e, settingsFile).prefixed(e.description());
           return std::nullopt;
         }
         sidecar.clear();
@@ -673,7 +673,7 @@ void ConfigService::forceReload() {
 }
 
 void ConfigService::fireReloadCallbacks() {
-  if (!noctalia::profiling::enabled()) {
+  if (!vespertine::profiling::enabled()) {
     for (const auto& sub : m_reloadCallbacks) {
       sub.callback();
     }
@@ -718,10 +718,10 @@ void ConfigService::fireReloadCallbacks() {
     kLog.info("reload: changed sections = [{}]", changed.empty() ? "none" : changed);
   }
 
-  noctalia::profiling::StopWatch total;
+  vespertine::profiling::StopWatch total;
   for (std::size_t i = 0; i < m_reloadCallbacks.size(); ++i) {
     const auto& sub = m_reloadCallbacks[i];
-    noctalia::profiling::StopWatch one;
+    vespertine::profiling::StopWatch one;
     sub.callback();
     const double ms = one.elapsedMs();
     if (ms >= 0.5) {
@@ -780,10 +780,10 @@ std::string ConfigService::buildSupportReport() const {
 
   toml::table report;
   report.insert_or_assign("format_version", std::int64_t{1});
-  report.insert_or_assign("generated_by", "noctalia");
+  report.insert_or_assign("generated_by", "vespertine");
   report.insert_or_assign("generated_at_utc", utcTimestamp());
-  report.insert_or_assign("noctalia_version", std::string(noctalia::build_info::version()));
-  report.insert_or_assign("git_revision", std::string(noctalia::build_info::revision()));
+  report.insert_or_assign("vespertine_version", std::string(vespertine::build_info::version()));
+  report.insert_or_assign("git_revision", std::string(vespertine::build_info::revision()));
   root.insert_or_assign("report", std::move(report));
 
   toml::table system;
@@ -793,7 +793,7 @@ std::string ConfigService::buildSupportReport() const {
 
   toml::table paths;
   paths.insert_or_assign("config_dir", m_configDir);
-  const auto systemConfigDirs = noctalia::config::systemConfigDirs();
+  const auto systemConfigDirs = vespertine::config::systemConfigDirs();
   toml::array reportedSystemConfigDirs;
   for (const auto& dir : systemConfigDirs) {
     reportedSystemConfigDirs.push_back(dir);
@@ -883,51 +883,51 @@ std::string ConfigService::buildSupportReport() const {
   return formatToml(root) + "\n";
 }
 
-std::string ConfigService::buildMergedUserConfig(noctalia::config::CredentialExportMode credentials) const {
+std::string ConfigService::buildMergedUserConfig(vespertine::config::CredentialExportMode credentials) const {
   return buildMergedUserConfigFromSources(m_configDir, m_overridesPath, nullptr, credentials);
 }
 
-std::string ConfigService::buildEffectiveConfig(noctalia::config::CredentialExportMode credentials) const {
-  if (credentials == noctalia::config::CredentialExportMode::Keep) {
+std::string ConfigService::buildEffectiveConfig(vespertine::config::CredentialExportMode credentials) const {
+  if (credentials == vespertine::config::CredentialExportMode::Keep) {
     return formatToml(*m_configTable) + "\n";
   }
   toml::table effective = *m_configTable;
-  noctalia::config::applyCredentialExportMode(effective, credentials);
+  vespertine::config::applyCredentialExportMode(effective, credentials);
   return formatToml(effective) + "\n";
 }
 
 std::string ConfigService::buildMergedUserConfigFromSources(
     std::string_view configDir, std::string_view settingsPath, std::string* error,
-    noctalia::config::CredentialExportMode credentials
+    vespertine::config::CredentialExportMode credentials
 ) {
   const auto sources = mergeUserConfigSources(configDir, {}, settingsPath, error);
   if (!sources.has_value()) {
     return {};
   }
   toml::table normalized = sources->merged;
-  normalized.erase(noctalia::config::kConfigVersionKey);
-  noctalia::config::LegacyConfigIssues issues;
-  noctalia::config::normalizeLegacyConfig(normalized, issues, &sources->sidecar);
-  noctalia::config::applyCredentialExportMode(normalized, credentials);
+  normalized.erase(vespertine::config::kConfigVersionKey);
+  vespertine::config::LegacyConfigIssues issues;
+  vespertine::config::normalizeLegacyConfig(normalized, issues, &sources->sidecar);
+  vespertine::config::applyCredentialExportMode(normalized, credentials);
   return formatToml(normalized) + "\n";
 }
 
 std::string ConfigService::buildEffectiveConfigFromSources(
     std::string_view configDir, std::string_view settingsPath, std::string* error,
-    noctalia::config::CredentialExportMode credentials
+    vespertine::config::CredentialExportMode credentials
 ) {
-  const auto sources = mergeUserConfigSources(configDir, noctalia::config::systemConfigDirs(), settingsPath, error);
+  const auto sources = mergeUserConfigSources(configDir, vespertine::config::systemConfigDirs(), settingsPath, error);
   if (!sources.has_value()) {
     return {};
   }
 
   toml::table normalized = sources->merged;
-  normalized.erase(noctalia::config::kConfigVersionKey);
-  noctalia::config::LegacyConfigIssues issues;
-  noctalia::config::normalizeLegacyConfig(normalized, issues, &sources->sidecar);
+  normalized.erase(vespertine::config::kConfigVersionKey);
+  vespertine::config::LegacyConfigIssues issues;
+  vespertine::config::normalizeLegacyConfig(normalized, issues, &sources->sidecar);
 
   Config config;
-  noctalia::config::seedBuiltinWidgets(config);
+  vespertine::config::seedBuiltinWidgets(config);
   if (normalized.empty()) {
     config = makeDefaultConfig();
   } else {
@@ -945,13 +945,13 @@ std::string ConfigService::buildEffectiveConfigFromSources(
     error->clear();
   }
   toml::table effective = config_export::serialize(config);
-  noctalia::config::applyCredentialExportMode(effective, credentials);
+  vespertine::config::applyCredentialExportMode(effective, credentials);
   return formatToml(effective) + "\n";
 }
 
 Config ConfigService::makeDefaultConfig() {
   Config config;
-  noctalia::config::seedBuiltinWidgets(config);
+  vespertine::config::seedBuiltinWidgets(config);
   config.idle.behaviors = defaultIdleBehaviors();
   config.bars.push_back(BarConfig{});
   config.controlCenter.shortcuts = defaultControlCenterShortcuts();
@@ -1202,8 +1202,8 @@ BarConfig ConfigService::resolveForOutput(const BarConfig& base, const WaylandOu
       resolved.widgetCapsuleOpacity = std::clamp(static_cast<float>(*ovr.widgetCapsuleOpacity), 0.0F, 1.0F);
     }
     if (ovr.widgetCapsuleBorderWidth) {
-      resolved.widgetCapsuleBorderWidth = noctalia::config::schema::applyRange(
-          *ovr.widgetCapsuleBorderWidth, noctalia::config::schema::kBarCapsuleBorderWidthRange
+      resolved.widgetCapsuleBorderWidth = vespertine::config::schema::applyRange(
+          *ovr.widgetCapsuleBorderWidth, vespertine::config::schema::kBarCapsuleBorderWidthRange
       );
     }
     if (ovr.hoverHighlight) {
@@ -1402,7 +1402,7 @@ void ConfigService::loadOverridesFromFile() {
     m_overridesTable = toml::parse_file(m_overridesPath);
     m_persistedOverridesTable = m_overridesTable;
   } catch (const toml::parse_error& e) {
-    auto origin = noctalia::config::parseErrorOrigin(e, std::filesystem::path(m_overridesPath));
+    auto origin = vespertine::config::parseErrorOrigin(e, std::filesystem::path(m_overridesPath));
     kLog.warn("{}", origin.prefixed(e.description()));
     m_overridesParseError = ConfigProblem{std::move(origin), std::string(e.description())};
     m_overridesTable = toml::table{};
@@ -1436,10 +1436,10 @@ void ConfigService::setConfigParseError(ConfigProblem problem) {
   std::string title = located ? problem.origin.shortFormat(m_configDir) : std::string("Config error");
   std::string body = located ? "Error: " + problem.message : std::move(problem.message);
   m_configErrorNotificationId =
-      m_notificationManager->addInternal("Noctalia", std::move(title), std::move(body), Urgency::Critical, 0);
+      m_notificationManager->addInternal("Vespertine", std::move(title), std::move(body), Urgency::Critical, 0);
 }
 
-void ConfigService::updateLegacyConfigIssues(noctalia::config::LegacyConfigIssues issues) {
+void ConfigService::updateLegacyConfigIssues(vespertine::config::LegacyConfigIssues issues) {
   std::ranges::sort(issues, [](const auto& lhs, const auto& rhs) {
     return std::tie(lhs.migrationVersion, lhs.path) < std::tie(rhs.migrationVersion, rhs.path);
   });
@@ -1450,7 +1450,7 @@ void ConfigService::updateLegacyConfigIssues(noctalia::config::LegacyConfigIssue
       issues.end()
   );
 
-  const std::string fingerprint = noctalia::config::legacyConfigIssueFingerprint(issues);
+  const std::string fingerprint = vespertine::config::legacyConfigIssueFingerprint(issues);
   if (fingerprint != m_loggedLegacyIssueFingerprint) {
     for (const auto& issue : issues) {
       kLog.warn(
@@ -1474,9 +1474,9 @@ void ConfigService::updateLegacyConfigIssues(noctalia::config::LegacyConfigIssue
   const auto encodedState = m_stateStore.stringValue(kMigrationReminderOwner, kMigrationReminderKey);
   const auto reminderState = encodedState.has_value() ? parseMigrationReminderState(*encodedState) : std::nullopt;
   const bool hasNewIssues = !reminderState.has_value()
-      || noctalia::config::legacyConfigFingerprintHasNewIssues(fingerprint, reminderState->issueFingerprint);
+      || vespertine::config::legacyConfigFingerprintHasNewIssues(fingerprint, reminderState->issueFingerprint);
   const bool intervalElapsed = !reminderState.has_value()
-      || noctalia::config::legacyConfigReminderIntervalElapsed(now, reminderState->epochSeconds);
+      || vespertine::config::legacyConfigReminderIntervalElapsed(now, reminderState->epochSeconds);
   m_legacyReminderPending = hasNewIssues || intervalElapsed;
   if (m_legacyReminderPending) {
     notifyLegacyConfigIssues();
@@ -1484,7 +1484,7 @@ void ConfigService::updateLegacyConfigIssues(noctalia::config::LegacyConfigIssue
   }
 
   const auto elapsed = std::chrono::seconds(now - reminderState->epochSeconds);
-  const auto remaining = std::chrono::seconds(noctalia::config::kLegacyConfigReminderIntervalSeconds) - elapsed;
+  const auto remaining = std::chrono::seconds(vespertine::config::kLegacyConfigReminderIntervalSeconds) - elapsed;
   m_legacyReminderTimer.start(std::chrono::duration_cast<std::chrono::milliseconds>(remaining), [this] {
     m_legacyReminderPending = true;
     notifyLegacyConfigIssues();
@@ -1497,19 +1497,19 @@ void ConfigService::notifyLegacyConfigIssues() {
   }
 
   const auto& issue = m_legacyConfigIssues.front();
-  const std::string fingerprint = noctalia::config::legacyConfigIssueFingerprint(m_legacyConfigIssues);
+  const std::string fingerprint = vespertine::config::legacyConfigIssueFingerprint(m_legacyConfigIssues);
   const std::int64_t now = currentEpochSeconds();
   std::string title = issue.origin.valid() ? issue.origin.shortFormat(m_configDir)
                                            : i18n::tr("notifications.internal.config-migration-title");
   m_notificationManager->addInternal(
-      "Noctalia", std::move(title),
+      "Vespertine", std::move(title),
       i18n::tr("notifications.internal.config-migration-body", "path", issue.path + ": " + issue.message),
       Urgency::Normal
   );
   m_stateStore.setString(kMigrationReminderOwner, kMigrationReminderKey, std::format("{}\n{}", now, fingerprint));
   m_legacyReminderPending = false;
   m_legacyReminderTimer.start(
-      std::chrono::milliseconds(noctalia::config::kLegacyConfigReminderIntervalSeconds * 1000), [this] {
+      std::chrono::milliseconds(vespertine::config::kLegacyConfigReminderIntervalSeconds * 1000), [this] {
         m_legacyReminderPending = true;
         notifyLegacyConfigIssues();
       }
@@ -1576,21 +1576,21 @@ void ConfigService::deepMerge(toml::table& base, const toml::table& overlay) {
 }
 
 void ConfigService::loadAll() {
-  noctalia::profiling::ScopedTimer parseTimer(kLog, "reload: parse (loadAll)");
+  vespertine::profiling::ScopedTimer parseTimer(kLog, "reload: parse (loadAll)");
   m_effectiveOverrideCache.clear();
 
   Config nextConfig;
-  noctalia::config::seedBuiltinWidgets(nextConfig);
+  vespertine::config::seedBuiltinWidgets(nextConfig);
 
-  auto mergeResult = noctalia::config::mergeConfigWithIncludes(m_configDir, noctalia::config::systemConfigDirs());
+  auto mergeResult = vespertine::config::mergeConfigWithIncludes(m_configDir, vespertine::config::systemConfigDirs());
   toml::table merged = std::move(mergeResult.merged);
   std::string firstError = std::move(mergeResult.firstError);
-  const noctalia::config::schema::SourceOrigin firstErrorOrigin = std::move(mergeResult.firstErrorOrigin);
+  const vespertine::config::schema::SourceOrigin firstErrorOrigin = std::move(mergeResult.firstErrorOrigin);
   m_includeLoadedFiles = std::move(mergeResult.loadedFiles);
   m_includeDirs = std::move(mergeResult.watchedDirs);
 
   // Recorded after the config dir so the sidecar wins, matching the deepMerge below.
-  noctalia::config::ConfigOriginIndex origins = std::move(mergeResult.origins);
+  vespertine::config::ConfigOriginIndex origins = std::move(mergeResult.origins);
   if (!m_overridesPath.empty()) {
     origins.record(std::filesystem::path(m_overridesPath), m_overridesTable);
   }
@@ -1652,19 +1652,19 @@ void ConfigService::loadAll() {
   toml::table effectiveOverrides = m_overridesTable;
   schema::Diagnostics migrationDiag;
   ConfigProblem migrationError;
-  int storedVersion = noctalia::config::currentConfigVersion();
+  int storedVersion = vespertine::config::currentConfigVersion();
   int appliedVersion = storedVersion;
   bool sidecarNeedsPersist = false;
   if (!m_overridesTable.empty()) {
     seedLegacyDockAllowListEnabled(effectiveOverrides, merged);
-    const auto parsedVersion = noctalia::config::storedConfigVersion(effectiveOverrides, migrationDiag);
+    const auto parsedVersion = vespertine::config::storedConfigVersion(effectiveOverrides, migrationDiag);
     if (parsedVersion.has_value()) {
       storedVersion = *parsedVersion;
       appliedVersion =
-          noctalia::config::applyPendingConfigMigrations(effectiveOverrides, merged, storedVersion, migrationDiag);
+          vespertine::config::applyPendingConfigMigrations(effectiveOverrides, merged, storedVersion, migrationDiag);
       sidecarNeedsPersist = appliedVersion != storedVersion;
       effectiveOverrides.insert_or_assign(
-          noctalia::config::kConfigVersionKey, static_cast<std::int64_t>(appliedVersion)
+          vespertine::config::kConfigVersionKey, static_cast<std::int64_t>(appliedVersion)
       );
     }
   }
@@ -1682,9 +1682,9 @@ void ConfigService::loadAll() {
   // Apply the app-writable overrides overlay last; sidecar wins. Compatibility
   // normalization must see the final effective values to preserve overlay intent.
   deepMerge(merged, effectiveOverrides);
-  merged.erase(noctalia::config::kConfigVersionKey);
-  noctalia::config::LegacyConfigIssues legacyIssues;
-  noctalia::config::normalizeLegacyConfig(merged, legacyIssues, &effectiveOverrides);
+  merged.erase(vespertine::config::kConfigVersionKey);
+  vespertine::config::LegacyConfigIssues legacyIssues;
+  vespertine::config::normalizeLegacyConfig(merged, legacyIssues, &effectiveOverrides);
   for (auto& issue : legacyIssues) {
     if (const auto* origin = origins.find(issue.path)) {
       issue.origin = *origin;
@@ -1716,7 +1716,7 @@ void ConfigService::loadAll() {
   schema::Diagnostics diagnostics;
   if (semanticError.empty()) {
     try {
-      diagnostics = noctalia::config::validateMergedConfig(merged, origins);
+      diagnostics = vespertine::config::validateMergedConfig(merged, origins);
       std::size_t errorCount = 0;
       for (const auto& entry : diagnostics.entries) {
         if (entry.severity == schema::Diagnostics::Severity::Error) {
@@ -1874,7 +1874,7 @@ void ConfigService::parseConfigTable(
       }
 
       const std::string widgetName(name.str());
-      WidgetConfig wc = noctalia::config::readBarWidgetConfig(widgetName, *entryTbl, config);
+      WidgetConfig wc = vespertine::config::readBarWidgetConfig(widgetName, *entryTbl, config);
 
       try {
         validateWidgetSettings(widgetName, wc);
@@ -2017,7 +2017,7 @@ void ConfigService::parseConfigTable(
       }
       auto& bucket = config.plugins.pluginSettings[std::string(pluginId.str())];
       for (const auto& [key, value] : *perPlugin) {
-        if (auto parsed = noctalia::config::readWidgetSettingValue(value); parsed.has_value()) {
+        if (auto parsed = vespertine::config::readWidgetSettingValue(value); parsed.has_value()) {
           bucket[std::string(key.str())] = std::move(*parsed);
         }
       }
@@ -2067,12 +2067,12 @@ bool ConfigService::matchesKeybind(KeybindAction action, std::uint32_t sym, std:
 }
 
 void ConfigService::registerIpc(IpcService& ipc) {
-  ipc.bind(noctalia::cli::msg::configReload, [this](const std::string&) -> std::string {
+  ipc.bind(vespertine::cli::msg::configReload, [this](const std::string&) -> std::string {
     forceReload();
     return "ok\n";
   });
 
-  ipc.bind(noctalia::cli::msg::configGet, [this](const std::string& args) -> std::string {
+  ipc.bind(vespertine::cli::msg::configGet, [this](const std::string& args) -> std::string {
     auto tokens = StringUtils::splitShellWords(args);
     if (!tokens || tokens->size() != 1) {
       return "error: expected exactly one argument: <path>\n";
@@ -2087,7 +2087,7 @@ void ConfigService::registerIpc(IpcService& ipc) {
     return oss.str();
   });
 
-  ipc.bind(noctalia::cli::msg::configSet, [this](const std::string& args) -> std::string {
+  ipc.bind(vespertine::cli::msg::configSet, [this](const std::string& args) -> std::string {
     const auto parsed = splitConfigSetArgs(args);
     if (!parsed) {
       return "error: expected arguments: <path> <value>\n";

@@ -1,25 +1,25 @@
 ---
 title: Mango
-description: Configure Mango effects and keybinds for Noctalia.
+description: Configure Mango effects and keybinds for Vespertine.
 sidebar:
   order: 7
 ---
 
-Configure Mango for Noctalia surfaces and use Mango binds to launch Noctalia IPC commands directly from the compositor.
+Configure Mango for Vespertine surfaces and use Mango binds to launch Vespertine IPC commands directly from the compositor.
 
 The examples below use Mango's `.conf` format, which is supported in Mango 0.18.2. Mango also supports `~/.config/mango/config.toml`; when both files exist, `config.conf` takes precedence. For TOML, place settings and `exec_once` under `[global]`, and keybinds under `[bind.default]`. See Mango's [TOML conversion guide](https://github.com/mangowm/mango/blob/main/docs/configuration/toml.md) for the corresponding syntax.
 
-## Autostart Noctalia
+## Autostart Vespertine
 
 Add to your `~/.config/mango/config.conf`:
 
 ```bash
-exec_once=noctalia
+exec_once=vespertine
 ```
 
 ## Layer Animations
 
-Disable Mango's layer animations. Noctalia animates its own surfaces; compositor layer animations run on top of them and cause visual glitches, such as a panel tearing when it is reopened while still closing. Add this even if you do not use the effects below.
+Disable Mango's layer animations. Vespertine animates its own surfaces; compositor layer animations run on top of them and cause visual glitches, such as a panel tearing when it is reopened while still closing. Add this even if you do not use the effects below.
 
 Add this to `~/.config/mango/config.conf`:
 
@@ -29,7 +29,7 @@ layer_animations=0
 
 ## Blur and shadows
 
-The configuration below uses Mango's shadows instead of Noctalia's. It disables compositor blur behind bars and panels with `blur_layer=0`, while keeping blur enabled for application windows.
+The configuration below uses Mango's shadows instead of Vespertine's. It disables compositor blur behind bars and panels with `blur_layer=0`, while keeping blur enabled for application windows.
 
 Add this to `~/.config/mango/config.conf`:
 
@@ -56,7 +56,7 @@ shadows_color=0x000000ff
 
 Mango uses `blur_layer` for layer-surface blur and `layer_shadows` for layer-surface shadows. Use those exact names; both also require their global toggles, `blur=1` and `shadows=1`.
 
-Then disable Noctalia's rendered drop shadows in your Noctalia TOML config:
+Then disable Vespertine's rendered drop shadows in your Vespertine TOML config:
 
 ```toml
 [bar.default]
@@ -78,14 +78,14 @@ Add these binds to your `~/.config/mango/config.conf`:
 
 ```bash
 # Core binds
-bind=SUPER,space,spawn,noctalia msg panel-toggle launcher
-bind=SUPER,s,spawn,noctalia msg panel-toggle control-center
-bind=SUPER,comma,spawn,noctalia msg settings-toggle
+bind=SUPER,space,spawn,vespertine msg panel-toggle launcher
+bind=SUPER,s,spawn,vespertine msg panel-toggle control-center
+bind=SUPER,comma,spawn,vespertine msg settings-toggle
 
 # Media keys
-bind=NONE,XF86AudioRaiseVolume,spawn,noctalia msg volume-up
-bind=NONE,XF86AudioLowerVolume,spawn,noctalia msg volume-down
-bind=NONE,XF86AudioMute,spawn,noctalia msg volume-mute
-bind=NONE,XF86MonBrightnessUp,spawn,noctalia msg brightness-up
-bind=NONE,XF86MonBrightnessDown,spawn,noctalia msg brightness-down
+bind=NONE,XF86AudioRaiseVolume,spawn,vespertine msg volume-up
+bind=NONE,XF86AudioLowerVolume,spawn,vespertine msg volume-down
+bind=NONE,XF86AudioMute,spawn,vespertine msg volume-mute
+bind=NONE,XF86MonBrightnessUp,spawn,vespertine msg brightness-up
+bind=NONE,XF86MonBrightnessDown,spawn,vespertine msg brightness-down
 ```

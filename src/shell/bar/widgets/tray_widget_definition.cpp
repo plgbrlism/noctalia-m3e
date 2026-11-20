@@ -2,10 +2,10 @@
 
 #include "shell/bar/glyph_value_definition.h"
 
-const noctalia::bar::WidgetDefinition<TrayWidget::Options, TrayWidgetDefinitionContext>& trayWidgetDefinition() {
-  using noctalia::bar::field;
+const vespertine::bar::WidgetDefinition<TrayWidget::Options, TrayWidgetDefinitionContext>& trayWidgetDefinition() {
+  using vespertine::bar::field;
   using Options = TrayWidget::Options;
-  using Definition = noctalia::bar::WidgetDefinition<Options, TrayWidgetDefinitionContext>;
+  using Definition = vespertine::bar::WidgetDefinition<Options, TrayWidgetDefinitionContext>;
 
   static const settings::WidgetSettingVisibility drawerOn{"drawer", {"true"}};
   static const settings::WidgetSettingVisibility drawerOff{"drawer", {"false"}};
@@ -46,7 +46,7 @@ const noctalia::bar::WidgetDefinition<TrayWidget::Options, TrayWidgetDefinitionC
                   .key = "drawer",
                   .presentation = settings::WidgetSettingPresentation{.group = "tray.drawer"},
               }),
-              noctalia::bar::peekField<Options>(drawerOff),
+              vespertine::bar::peekField<Options>(drawerOff),
               field<&Options::glyph>({
                   .key = "glyph",
                   .control = settings::WidgetControlKind::Glyph,
@@ -56,8 +56,8 @@ const noctalia::bar::WidgetDefinition<TrayWidget::Options, TrayWidgetDefinitionC
                           .visibleWhen = glyphVisible,
                       },
               }),
-              noctalia::bar::glyphPositionField<Options>(glyphVisible),
-              noctalia::bar::peekDelayField<Options>(drawerOff),
+              vespertine::bar::glyphPositionField<Options>(glyphVisible),
+              vespertine::bar::peekDelayField<Options>(drawerOff),
               field<&Options::panelGridColumns>({
                   .key = "drawer_columns",
                   .minValue = 1.0,

@@ -12,7 +12,7 @@
 
 class HttpClient;
 
-namespace noctalia::theme {
+namespace vespertine::theme {
 
   class CommunityTemplateService {
   public:
@@ -41,4 +41,4 @@ namespace noctalia::theme {
   std::filesystem::path communityTemplateConfigPath(std::string_view id);
   bool isSafeCommunityTemplateId(std::string_view id);
 
-} // namespace noctalia::theme
+} // namespace vespertine::theme

@@ -1,14 +1,14 @@
 # Scope
 
-Noctalia is a native Wayland desktop shell built directly on Wayland and OpenGL ES, with no Qt or GTK. It is a desktop shell, not a full desktop environment: it provides the visual and service layer around your compositor, and leaves window management, system services, and standalone applications to the tools built for them. It is built by the people who use it daily. It already covers a lot of ground, and the fastest way to make it worse is to keep growing it in every direction at once. This file records what the project takes on and what it declines, so a request gets a predictable answer instead of a case-by-case one.
+Vespertine is a native Wayland desktop shell built directly on Wayland and OpenGL ES, with no Qt or GTK. It is a desktop shell, not a full desktop environment: it provides the visual and service layer around your compositor, and leaves window management, system services, and standalone applications to the tools built for them. It is built by the people who use it daily. It already covers a lot of ground, and the fastest way to make it worse is to keep growing it in every direction at once. This file records what the project takes on and what it declines, so a request gets a predictable answer instead of a case-by-case one.
 
-Read the project [ethos](https://noctalia.dev/ethos) for the values behind these lines, [CONTRIBUTING.md](CONTRIBUTING.md) for the technical principles they follow from, and [ARCHITECTURE.md](ARCHITECTURE.md) for the invariants reviewers enforce.
+Read the project [ethos](https://vespertine.dev/ethos) for the values behind these lines, [CONTRIBUTING.md](CONTRIBUTING.md) for the technical principles they follow from, and [ARCHITECTURE.md](ARCHITECTURE.md) for the invariants reviewers enforce.
 
 ## In scope
 
-- Bugs, crashes, regressions, and protocol misbehavior in anything Noctalia already does.
+- Bugs, crashes, regressions, and protocol misbehavior in anything Vespertine already does.
 - Refinement of the surfaces that already exist: bars and their widgets, dock, launcher, control center, notifications, wallpaper, lock screen, idle behavior, session actions, clipboard history, OSDs, tray, and desktop widgets.
-- Configuration keys that expose behavior Noctalia already implements, plus IPC actions for state it already tracks.
+- Configuration keys that expose behavior Vespertine already implements, plus IPC actions for state it already tracks.
 - Wayland protocol support the shell needs, and compositor integration through `CompositorPlatform` for compositors that expose the required protocols or IPC.
 - Correct behavior on scaled outputs, multiple monitors, hotplug, and across the supported compositors.
 - Theming, palettes, and templates that keep the desktop visually consistent.
@@ -17,9 +17,9 @@ Read the project [ethos](https://noctalia.dev/ethos) for the values behind these
 
 ## Out of scope
 
-- **Window management and compositor work.** Tiling, window rules, monitor arrangement, and compositor configuration belong to the compositor, for example [Umbriel](https://github.com/noctalia-dev/umbriel). Noctalia's job is to build on what a compositor exposes, not to become one.
-- **Managing your compositor settings or dotfiles.** Core Noctalia is non-invasive. Compositor-specific controls are opt-in plugins, not core shell behavior.
-- **Replacing desktop applications and system services.** File management, removable-drive mounting, printer management, and screen mirroring or casting belong to dedicated tools. Login and display greeting live in [Noctalia Greeter](https://github.com/noctalia-dev/noctalia-greeter).
+- **Window management and compositor work.** Tiling, window rules, monitor arrangement, and compositor configuration belong to the compositor, for example [Umbriel](https://github.com/vespertine-dev/umbriel). Vespertine's job is to build on what a compositor exposes, not to become one.
+- **Managing your compositor settings or dotfiles.** Core Vespertine is non-invasive. Compositor-specific controls are opt-in plugins, not core shell behavior.
+- **Replacing desktop applications and system services.** File management, removable-drive mounting, printer management, and screen mirroring or casting belong to dedicated tools. Login and display greeting live in [Vespertine Greeter](https://github.com/vespertine-dev/vespertine-greeter).
 - **Features that are useful to some users but not essential to the shell.** Extra bar widgets, launcher providers, panels, hardware-specific controls, and third-party service integrations belong in plugins.
 - **Toolkits and other rendering stacks.** No Qt, no GTK, no web views. UI is built from `lib/ui/controls/`.
 - **Configuration languages other than TOML**, and compatibility aliases, migration readers, or silent fallbacks for renamed keys, IPC names, or paths.
@@ -43,7 +43,7 @@ A request that survives all four is worth an issue. One that does not is still w
 ## Where to raise things
 
 - **Bug or regression:** open a bug report. These are always welcome, including small ones.
-- **Idea, question, or "would you consider":** ask on [Discord](https://discord.noctalia.dev) first. It is faster than an issue and it survives being wrong.
+- **Idea, question, or "would you consider":** ask on [Discord](https://discord.vespertine.dev) first. It is faster than an issue and it survives being wrong.
 - **Large or invasive pull request:** agree on the change before writing it. An unsolicited rewrite can be declined on scope alone, and nobody enjoys that outcome.
 
 This file is not a promise that the answer stays no forever. Scope widens deliberately, when the foundation is stable enough to carry the addition, and it is recorded here when it does.

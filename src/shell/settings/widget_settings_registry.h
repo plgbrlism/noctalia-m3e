@@ -138,11 +138,11 @@ namespace settings {
 
   // Complete setting description.
   struct WidgetSettingSpec : WidgetSettingPresentation {
-    noctalia::config::schema::WidgetSettingField schema;
+    vespertine::config::schema::WidgetSettingField schema;
   };
 
   // The schema (validation) value type behind a UI control kind.
-  noctalia::config::schema::WidgetSettingType schemaTypeForControl(WidgetControlKind control);
+  vespertine::config::schema::WidgetSettingType schemaTypeForControl(WidgetControlKind control);
 
   const std::vector<WidgetTypeSpec>& widgetTypeSpecs();
   bool isBuiltInWidgetType(std::string_view type);
@@ -176,14 +176,14 @@ namespace settings {
   // Schema projection (the validity half of the specs), consumed by the config
   // layer (e.g. `config validate`). For plugin widgets the type alone resolves the
   // manifest, so the config arg is no longer required for them.
-  noctalia::config::schema::WidgetSettingSchema widgetSettingSchema(std::string_view type);
-  noctalia::config::schema::WidgetSettingSchema widgetSettingSchema(
+  vespertine::config::schema::WidgetSettingSchema widgetSettingSchema(std::string_view type);
+  vespertine::config::schema::WidgetSettingSchema widgetSettingSchema(
       std::string_view type, const WidgetConfig* config, scripting::PluginRegistry* pluginRegistry = nullptr
   );
   // Semantic cross-field validation for a widget config entry. Nullopt means the
   // resolved options are valid or the widget type declares no semantic rule.
   std::optional<std::string> validateWidgetSemantics(std::string_view type, const WidgetConfig* config);
-  std::optional<noctalia::config::schema::WidgetSettingField>
+  std::optional<vespertine::config::schema::WidgetSettingField>
   findWidgetSettingField(std::string_view widgetType, std::string_view settingKey);
 
   std::optional<WidgetSettingSpec> findWidgetSettingSpec(std::string_view widgetType, std::string_view settingKey);

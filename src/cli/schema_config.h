@@ -5,7 +5,7 @@
 #include <array>
 #include <string_view>
 
-namespace noctalia::cli {
+namespace vespertine::cli {
 
   inline constexpr std::array kConfigValidatePositionals{
       Positional{"path", "Config file or directory; defaults to the active config", {}, false, false, false},
@@ -89,8 +89,8 @@ namespace noctalia::cli {
   inline constexpr Command kConfigReplayReportCmd{
       "replay-report",
       "Reconstruct config and state from a support report",
-      "Reconstruct config-home/noctalia and state-home/noctalia from a support report.\n\n"
-      "With --flattened, reconstruct a single config-home/noctalia/config.toml from the report's merged config.",
+      "Reconstruct config-home/vespertine and state-home/vespertine from a support report.\n\n"
+      "With --flattened, reconstruct a single config-home/vespertine/config.toml from the report's merged config.",
       {},
       kConfigReplayFlags,
       kConfigReplayPositionals,
@@ -108,4 +108,4 @@ namespace noctalia::cli {
       "config", "Validate config and support/replay helpers", {}, {}, {}, {}, kConfigSubcommands, false,
   };
 
-} // namespace noctalia::cli
+} // namespace vespertine::cli

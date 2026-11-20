@@ -2,15 +2,15 @@
 
 #include "shell/bar/glyph_value_definition.h"
 
-const noctalia::bar::WidgetDefinition<BrightnessWidget::Options>& brightnessWidgetDefinition() {
-  using noctalia::bar::field;
-  using noctalia::bar::glyphPositionField;
-  using noctalia::bar::peekDelayField;
-  using noctalia::bar::peekField;
-  using noctalia::bar::whenAllTrue;
+const vespertine::bar::WidgetDefinition<BrightnessWidget::Options>& brightnessWidgetDefinition() {
+  using vespertine::bar::field;
+  using vespertine::bar::glyphPositionField;
+  using vespertine::bar::peekDelayField;
+  using vespertine::bar::peekField;
+  using vespertine::bar::whenAllTrue;
   using Options = BrightnessWidget::Options;
 
-  static const noctalia::bar::WidgetDefinition<Options> definition{
+  static const vespertine::bar::WidgetDefinition<Options> definition{
       .type = "brightness",
       .fields =
           {

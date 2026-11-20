@@ -1484,9 +1484,9 @@ void LockScreen::tryAuthenticate() {
   updatePromptOnSurfaces();
 
   const PamAuthenticator authenticator = m_authenticator;
-  // PAM runs in noctalia-pam-helper against the service set at build time
+  // PAM runs in vespertine-pam-helper against the service set at build time
   // (-Dpam_service, "login" by default). If fingerprint is enabled, strip
-  // pam_fprintd from it: noctalia drives the reader itself over D-Bus and the
+  // pam_fprintd from it: vespertine drives the reader itself over D-Bus and the
   // two can't share the sensor. See docs/fingerprint.md.
   PamAuthenticator::Messages pamMessages{
       .startFailed = i18n::tr("auth.pam.start-failed"),

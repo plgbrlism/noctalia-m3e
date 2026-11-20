@@ -102,29 +102,29 @@ namespace {
   }
 
   void testSharedNamespaceDoesNotIdentifyApplication() {
-    const DesktopEntry noctalia = issueEntry("dev.noctalia.Noctalia", "Noctalia", "noctalia");
-    const DesktopEntry luciole = issueEntry("dev.noctalia.luciole", "Luciole", "luciole");
-    const auto shellOnly = std::array<DesktopEntry, 1>{noctalia};
+    const DesktopEntry vespertine = issueEntry("dev.vespertine.Vespertine", "Vespertine", "vespertine");
+    const DesktopEntry luciole = issueEntry("dev.vespertine.luciole", "Luciole", "luciole");
+    const auto shellOnly = std::array<DesktopEntry, 1>{vespertine};
     TEST_CHECK(!app_identity::findDesktopEntry(luciole.id, shellOnly));
     const DesktopEntry unresolved = app_identity::resolveRunningDesktopEntry(luciole.id, shellOnly);
     TEST_CHECK(unresolved.id == luciole.id && unresolved.name == luciole.id);
     TEST_CHECK(unresolved.icon.empty() && unresolved.exec.empty());
 
     const auto running =
-        app_identity::resolveRunningApps(std::array<std::string, 2>{noctalia.id, luciole.id}, shellOnly);
+        app_identity::resolveRunningApps(std::array<std::string, 2>{vespertine.id, luciole.id}, shellOnly);
     TEST_CHECK(running.size() == 2);
-    TEST_CHECK(running[0].entry.id == noctalia.id && running[1].entry.id == luciole.id);
-    TEST_CHECK(running[0].entry.icon == noctalia.icon && running[1].entry.icon.empty());
+    TEST_CHECK(running[0].entry.id == vespertine.id && running[1].entry.id == luciole.id);
+    TEST_CHECK(running[0].entry.icon == vespertine.icon && running[1].entry.icon.empty());
 
-    const auto installed = std::array<DesktopEntry, 2>{noctalia, luciole};
+    const auto installed = std::array<DesktopEntry, 2>{vespertine, luciole};
     const auto matched = app_identity::findDesktopEntry(luciole.id, installed, shellOnly);
     TEST_CHECK(matched && matched->id == luciole.id && matched->icon == luciole.icon);
-    TEST_CHECK(!app_identity::findDesktopEntry(noctalia.id, std::array<DesktopEntry, 1>{luciole}));
+    TEST_CHECK(!app_identity::findDesktopEntry(vespertine.id, std::array<DesktopEntry, 1>{luciole}));
 
     auto terminal = issueEntry("terminal", "Terminal", "terminal");
-    terminal.startupWmClass = "dev.noctalia.Terminal";
+    terminal.startupWmClass = "dev.vespertine.Terminal";
     TEST_CHECK(!app_identity::findDesktopEntry(luciole.id, std::array<DesktopEntry, 1>{terminal}));
-    TEST_CHECK(!app_identity::findDesktopEntry("noctalia", std::array<DesktopEntry, 1>{terminal}));
+    TEST_CHECK(!app_identity::findDesktopEntry("vespertine", std::array<DesktopEntry, 1>{terminal}));
     TEST_CHECK(!app_identity::findDesktopEntry("luciole", shellOnly));
 
     const auto calculator = issueEntry("org.gnome.Calculator", "Calculator", "calculator");
@@ -136,7 +136,7 @@ namespace {
   void testAppImageOriginDetection() {
     namespace fs = std::filesystem;
 
-    const fs::path root = fs::temp_directory_path() / ("noctalia-appimage-origin-" + std::to_string(getpid()));
+    const fs::path root = fs::temp_directory_path() / ("vespertine-appimage-origin-" + std::to_string(getpid()));
     const fs::path applications = root / "data/applications";
     const fs::path systemApplications = root / "system/applications";
     const fs::path executable = root / "PortableApp";

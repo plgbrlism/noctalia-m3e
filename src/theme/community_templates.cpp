@@ -24,16 +24,16 @@
 #include <unordered_set>
 #include <utility>
 
-namespace noctalia::theme {
+namespace vespertine::theme {
 
   namespace {
 
     constexpr Logger kLog("community_templates");
-    constexpr std::string_view kCatalogUrl = "https://api.noctalia.dev/templates";
-    constexpr std::string_view kCacheMetadataFilename = ".noctalia-cache.json";
+    constexpr std::string_view kCatalogUrl = "https://api.vespertine.dev/templates";
+    constexpr std::string_view kCacheMetadataFilename = ".vespertine-cache.json";
 
     std::string templateReadmeUrl(std::string_view id) {
-      return std::format("https://github.com/noctalia-dev/community-templates/blob/main/{}/README.md", id);
+      return std::format("https://github.com/vespertine-dev/community-templates/blob/main/{}/README.md", id);
     }
 
     struct CommunityTemplateFile {
@@ -992,7 +992,7 @@ namespace noctalia::theme {
     if (!state.empty()) {
       return std::filesystem::path(state) / "community-templates";
     }
-    return std::filesystem::path("/tmp") / "noctalia" / "community-templates";
+    return std::filesystem::path("/tmp") / "vespertine" / "community-templates";
   }
 
   std::filesystem::path communityTemplateDir(std::string_view id) {
@@ -1009,4 +1009,4 @@ namespace noctalia::theme {
     });
   }
 
-} // namespace noctalia::theme
+} // namespace vespertine::theme

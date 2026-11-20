@@ -5,7 +5,7 @@ sidebar:
   order: 28
 ---
 
-System tray (StatusNotifierItem). Set `colorize_icons = true` to tint tray application icons with `[shell].app_icon_color` (see [Shell → App icon colorization](/noctalia/configuration/shell/#app-icon-colorization)); `colorize_icons` does not recolor symbolic tray icons. Symbolic/monochrome tray glyphs, the drawer chevron, and letter fallbacks follow the widget's `color` / `icon_color` (items needing attention stay in the error color).
+System tray (StatusNotifierItem). Set `colorize_icons = true` to tint tray application icons with `[shell].app_icon_color` (see [Shell → App icon colorization](/vespertine/configuration/shell/#app-icon-colorization)); `colorize_icons` does not recolor symbolic tray icons. Symbolic/monochrome tray glyphs, the drawer chevron, and letter fallbacks follow the widget's `color` / `icon_color` (items needing attention stay in the error color).
 
 The drawer inherits the settings of the tray widget that opened it, including `colorize_icons`, even when that widget has a custom config name. Opening the drawer through IPC without a widget context uses `[widget.tray]`. Status overlay badges retain their original colors.
 
@@ -13,11 +13,11 @@ With `peek = true` and `drawer = false`, the bar shows a glyph; hovering reveals
 
 Leave `glyph = ""` for an automatic chevron: in drawer mode it points down on a top bar, up on a bottom bar, right on a left bar, and left on a right bar, whether the drawer is open or closed. In peek mode it points toward the icons' reveal direction: right or down with `glyph_position = "before"`, left or up with `"after"`. Set `glyph` to a custom glyph name to override the chevron in either mode. The glyph picker appears when drawer mode or peek is enabled.
 
-When Noctalia restarts, running applications can re-register their tray icons. Noctalia also discovers existing StatusNotifierItem services. Icons may take a few seconds to reappear while startup is busy.
+When Vespertine restarts, running applications can re-register their tray icons. Vespertine also discovers existing StatusNotifierItem services. Icons may take a few seconds to reappear while startup is busy.
 
-When an application registers only its D-Bus service name, Noctalia ignores tray paths that return no StatusNotifierItem properties. This prevents unused paths from creating blank duplicate icons. Applications with multiple valid tray items can still show multiple icons.
+When an application registers only its D-Bus service name, Vespertine ignores tray paths that return no StatusNotifierItem properties. This prevents unused paths from creating blank duplicate icons. Applications with multiple valid tray items can still show multiple icons.
 
-Noctalia uses an existing `org.kde.StatusNotifierWatcher` when one is running. If that watcher exits, Noctalia takes over the watcher name and rediscovers tray items.
+Vespertine uses an existing `org.kde.StatusNotifierWatcher` when one is running. If that watcher exits, Vespertine takes over the watcher name and rediscovers tray items.
 
 For theme icons in `status` or `panel` directories, the tray selects SVG artwork for the displayed logical size across all roots of the first matching theme. Application icons and bitmap icons keep their normal lookup. An inherited theme cannot replace an icon already supplied by a higher-priority theme.
 
@@ -31,7 +31,7 @@ For theme icons in `status` or `panel` directories, the tray selects SVG artwork
 | `drawer`                    | bool            | `false`    | Replace inline tray icons with a tray button that opens a tray drawer panel                                                                                                                                                           |
 | `glyph`                     | string          | `""`       | Custom drawer or peek glyph; empty selects a chevron pointing toward the drawer or peek reveal                                                                                                                                        |
 | `glyph_position`            | string          | `"before"` | Place the drawer button or peek glyph `"before"` or `"after"` the tray icons; available with `drawer = true` or `peek = true`                                                                                                         |
-| `peek`                      | bool            | `false`    | Show a tray glyph and reveal inline icons on hover; only available with `drawer = false`. See [Peek](/noctalia/bar/widgets/#peek)                                                                                                     |
+| `peek`                      | bool            | `false`    | Show a tray glyph and reveal inline icons on hover; only available with `drawer = false`. See [Peek](/vespertine/bar/widgets/#peek)                                                                                                     |
 | `peek_delay_ms`             | int             | `100`      | Hover time before inline icons reveal, from `0` to `2000` ms                                                                                                                                                                          |
 | `drawer_columns`            | number          | `3`        | Number of tray icons per row in the drawer panel (`1` to `5`)                                                                                                                                                                         |
 | `drawer_item_size`          | number          | *inherit*  | Size of tray icons inside the drawer panel in pixels (`8` to `64`)                                                                                                                                                                    |

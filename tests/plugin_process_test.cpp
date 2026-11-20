@@ -50,26 +50,26 @@ int main() {
   });
 
   constexpr auto source = R"(
-assert(not noctalia.runAsync(""))
-assert(noctalia.runAsync(
+assert(not vespertine.runAsync(""))
+assert(vespertine.runAsync(
   { "printf", "%s", "owner/repo; printf injected" },
   function(_) end,
   5000
 ))
-assert(noctalia.getSetting("shell.offline_mode"))
-assert(noctalia.wallpaperPath("DP-1") == "/tmp/wallpaper.png")
-assert(noctalia.wallpaperPath("missing") == nil)
-assert(type(noctalia.getColor("primary")) == "string")
-assert(string.len(noctalia.getColor("primary")) == 7)
-assert(string.sub(noctalia.getColor("primary"), 1, 1) == "#")
-assert(noctalia.getColor("surface") ~= nil)
-assert(noctalia.getColor("on_surface") ~= nil)
-assert(noctalia.getColor("missing_role") == nil)
-noctalia.setWallpaperMask("DP-1", {
+assert(vespertine.getSetting("shell.offline_mode"))
+assert(vespertine.wallpaperPath("DP-1") == "/tmp/wallpaper.png")
+assert(vespertine.wallpaperPath("missing") == nil)
+assert(type(vespertine.getColor("primary")) == "string")
+assert(string.len(vespertine.getColor("primary")) == 7)
+assert(string.sub(vespertine.getColor("primary"), 1, 1) == "#")
+assert(vespertine.getColor("surface") ~= nil)
+assert(vespertine.getColor("on_surface") ~= nil)
+assert(vespertine.getColor("missing_role") == nil)
+vespertine.setWallpaperMask("DP-1", {
   path = "/tmp/mask.png",
   wallpaperPath = "/tmp/wallpaper.png",
 })
-noctalia.setWallpaperMask("DP-1", nil)
+vespertine.setWallpaperMask("DP-1", nil)
 )";
   if (!expect(host.exec("=direct-argv", source), "argv call should be accepted")) {
     return 1;
@@ -103,7 +103,7 @@ noctalia.setWallpaperMask("DP-1", nil)
   testPalette.primary = rgba(1.0F, 0.0F, 0.0F, 1.0F);
   setPalette(testPalette);
   ok = expect(
-           host.exec("=get-color", "assert(noctalia.getColor('primary') == '#FF0000')\n"),
+           host.exec("=get-color", "assert(vespertine.getColor('primary') == '#FF0000')\n"),
            "getColor should return updated color from active palette"
        )
       && ok;
@@ -111,8 +111,8 @@ noctalia.setWallpaperMask("DP-1", nil)
   ok = expect(
            host.exec(
                "=get-color-restored",
-               "assert(noctalia.getColor('primary') ~= '#FF0000')\n"
-               "assert(noctalia.getColor('invalid_role') == nil)\n"
+               "assert(vespertine.getColor('primary') ~= '#FF0000')\n"
+               "assert(vespertine.getColor('invalid_role') == nil)\n"
            ),
            "getColor should track restored palette and return nil for invalid roles"
        )
@@ -131,7 +131,7 @@ noctalia.setWallpaperMask("DP-1", nil)
   });
   ok = expect(host.exec(
       "=nightlight-state",
-      "local s = noctalia.nightlight.state()\n"
+      "local s = vespertine.nightlight.state()\n"
       "assert(s.enabled == true and s.force == false and s.active == true)\n"
       "assert(s.transitioning == true and s.phase == 'night')\n"
       "assert(s.currentTemperature == 4200 and s.targetTemperature == 4000)\n"
@@ -141,10 +141,10 @@ noctalia.setWallpaperMask("DP-1", nil)
   bindingContext.beginCall({});
   ok = expect(host.exec(
       "=nightlight-actions",
-      "noctalia.nightlight.setEnabled(false)\n"
-      "noctalia.nightlight.toggle()\n"
-      "noctalia.nightlight.setForce(true)\n"
-      "noctalia.nightlight.toggleForce()\n"
+      "vespertine.nightlight.setEnabled(false)\n"
+      "vespertine.nightlight.toggle()\n"
+      "vespertine.nightlight.setForce(true)\n"
+      "vespertine.nightlight.toggleForce()\n"
   ), "nightlight actions dispatch") && ok;
   ok = expect(bindingContext.sideEffects.size() == 4, "nightlight actions produce four side effects") && ok;
   ok = expect(
@@ -171,7 +171,7 @@ noctalia.setWallpaperMask("DP-1", nil)
   ok = expect(host.exec(
       "=nightlight-watch",
       "watched = nil\n"
-      "nightlightWatchId = noctalia.nightlight.watch(function(state) watched = state end)\n"
+      "nightlightWatchId = vespertine.nightlight.watch(function(state) watched = state end)\n"
   ), "nightlight watch registers") && ok;
   ok = expect(
       bindingContext.sideEffects.size() == 1
@@ -188,7 +188,7 @@ noctalia.setWallpaperMask("DP-1", nil)
       "=nightlight-watched", "assert(watched ~= nil and watched.enabled == true and watched.phase == 'night')\n"
   ), "nightlight watch receives state") && ok;
   bindingContext.beginCall({});
-  ok = expect(host.exec("=nightlight-unwatch", "assert(noctalia.nightlight.unwatch(nightlightWatchId) == true)\n"),
+  ok = expect(host.exec("=nightlight-unwatch", "assert(vespertine.nightlight.unwatch(nightlightWatchId) == true)\n"),
               "nightlight unwatch") && ok;
   ok = expect(!host.hasNightLightWatchCallback(watchId), "nightlight watch callback removed") && ok;
 

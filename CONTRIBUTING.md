@@ -1,10 +1,10 @@
 # Contributing
 
-This file collects contributor-facing details for Noctalia: design goals, stack notes, code style, contribution rules, testing, commit conventions, source layout, and debugging helpers.
+This file collects contributor-facing details for Vespertine: design goals, stack notes, code style, contribution rules, testing, commit conventions, source layout, and debugging helpers.
 
 For dependencies and normal build commands, start with [BUILDING.md](BUILDING.md). For the architecture and the invariants reviewers enforce (UI phases, layer boundaries, rendering, surfaces, config, plugins), read [ARCHITECTURE.md](ARCHITECTURE.md).
 
-Before contributing, read our [ethos](https://noctalia.dev/ethos) to understand the values and philosophy guiding the project.
+Before contributing, read our [ethos](https://vespertine.dev/ethos) to understand the values and philosophy guiding the project.
 
 ## Design Principles
 
@@ -101,19 +101,19 @@ D-Bus wire-protocol string literals, such as `player["bus_name"]`, stay snake_ca
 ### Source Conventions
 
 - `lib/` and `src/` are the include roots; project includes are relative to them (`#include "ui/controls/button.h"`, `#include "app/application.h"`).
-- `lib/` (`core`, `i18n`, `render`, `ui`, `util`, `wayland`) is the self-contained `noctalia-ui` library (`noctalia_ui_dep`) plus the opt-in codec pack (`noctalia_ui_codecs_dep`, `lib/render/codecs/`). It compiles with only `lib/` and its own generated protocol headers on the include path, so it cannot include shell code from `src/`, and nothing in `lib/` references files outside it. Code that only the shell uses belongs in `src/`, even when it looks generic. See ARCHITECTURE.md for what the application supplies at startup.
+- `lib/` (`core`, `i18n`, `render`, `ui`, `util`, `wayland`) is the self-contained `vespertine-ui` library (`vespertine_ui_dep`) plus the opt-in codec pack (`vespertine_ui_codecs_dep`, `lib/render/codecs/`). It compiles with only `lib/` and its own generated protocol headers on the include path, so it cannot include shell code from `src/`, and nothing in `lib/` references files outside it. Code that only the shell uses belongs in `src/`, even when it looks generic. See ARCHITECTURE.md for what the application supplies at startup.
 - `lib/meson.build` lists every library source, finds the library's dependencies, and generates the Wayland protocols the library binds from `lib/protocols/` and wayland-protocols; the root `meson.build` lists every shell source, generates the shell-only protocols, and runs `subdir('lib')`. There are no other per-directory build files.
-- Library tests link `noctalia_ui_dep` (or `noctalia_ui_codecs_dep`) and `tests/test_identity.cpp`, which sets the shell's identity before `main()`. Tests of shell code link `noctalia_core_dep`, which includes `tests/test_shell_library.cpp`: it calls `configureSharedLibrary()` before `main()`, as the shell does.
+- Library tests link `vespertine_ui_dep` (or `vespertine_ui_codecs_dep`) and `tests/test_identity.cpp`, which sets the shell's identity before `main()`. Tests of shell code link `vespertine_core_dep`, which includes `tests/test_shell_library.cpp`: it calls `configureSharedLibrary()` before `main()`, as the shell does.
 - Headers and sources are co-located; there is no separate `include/` tree.
 - Use `[[nodiscard]]` only where ignoring the result is likely a bug: a call with side effects that reports failure or hands back something the caller must own, consume or keep (a handle, token or id), and `&&` builders. Mark result and status types with `struct [[nodiscard]] Name` instead of each function that returns them. Getters and pure functions go without it.
 
 ### Standalone UI library consumers
 
-A consumer copies `lib/` and runs `subdir('lib')` to obtain `noctalia_ui_dep`. The core does not configure or build the codec pack, probe its dependencies, or require `lib/render/codecs/` or `lib/third_party/`. Install an application-owned `ImageDecoder` when supplying your own image formats.
+A consumer copies `lib/` and runs `subdir('lib')` to obtain `vespertine_ui_dep`. The core does not configure or build the codec pack, probe its dependencies, or require `lib/render/codecs/` or `lib/third_party/`. Install an application-owned `ImageDecoder` when supplying your own image formats.
 
-To enable the bundled codec pack, set `noctalia_ui_build_codecs = true` before `subdir('lib')` and link `noctalia_ui_codecs_dep`. This also defines `noctalia_ui_codecs_lib`. `noctalia_ui_system_wuffs = true` selects system Wuffs headers when the codec pack is enabled. The Noctalia shell explicitly enables the pack; its existing image support and dependencies are unchanged.
+To enable the bundled codec pack, set `vespertine_ui_build_codecs = true` before `subdir('lib')` and link `vespertine_ui_codecs_dep`. This also defines `vespertine_ui_codecs_lib`. `vespertine_ui_system_wuffs = true` selects system Wuffs headers when the codec pack is enabled. The Vespertine shell explicitly enables the pack; its existing image support and dependencies are unchanged.
 
-Applications with their own asset layout call `paths::setAssetRoots({.application = applicationAssets, .library = libraryAssets})` from `core/files/resource_paths.h` once at startup, before any asset lookup or workers. The application chooses its canonical environment/install paths and validates its own required files. The library validates both directories and requires regular `fonts/noctalia-tabler.ttf` and `fonts/tabler.json` files in the library root. The roots may be the same installed bundle or separate application and `lib/assets` directories. Relative roots are anchored to the working directory at configuration time. Invalid roots throw; explicit roots never enter discovery or require a translation catalog. Reconfiguration and configuration after the first lookup throw to preserve borrowed path references.
+Applications with their own asset layout call `paths::setAssetRoots({.application = applicationAssets, .library = libraryAssets})` from `core/files/resource_paths.h` once at startup, before any asset lookup or workers. The application chooses its canonical environment/install paths and validates its own required files. The library validates both directories and requires regular `fonts/vespertine-tabler.ttf` and `fonts/tabler.json` files in the library root. The roots may be the same installed bundle or separate application and `lib/assets` directories. Relative roots are anchored to the working directory at configuration time. Invalid roots throw; explicit roots never enter discovery or require a translation catalog. Reconfiguration and configuration after the first lookup throw to preserve borrowed path references.
 
 Without explicit roots, the shell keeps its existing application-bundle discovery through its environment override, executable location and install directory, identified by `translations/en.json`. Library discovery checks the application bundle and build-tree `lib/assets` for both the font and metadata; missing library assets are an error.
 
@@ -141,13 +141,13 @@ End-user documentation lives in [`docs/user/`](docs/user/) (MDX), with images un
 
 The documentation site is generated from these files by `tools/sync-docs.sh`, which copies `docs/user/**/*.mdx` into the docs site checkout and deletes pages that no longer exist here. Never edit the generated copies; the next sync overwrites them.
 
-The same script archives each `vX.Y.Z` release tag, from the tag's own `docs/user/`, `docs/assets/`, and `docs/plugin-api.json`, under `/noctalia/<tag>/`, and writes the version list the site's switcher reads. It needs `jq` and a checkout with the release tags fetched. A release is archived once and not rewritten afterwards, unless its pages or plugin API metadata are missing from the docs site; run it with `FORCE_SYNC=1` to rebuild every archive after changing the archiving itself.
+The same script archives each `vX.Y.Z` release tag, from the tag's own `docs/user/`, `docs/assets/`, and `docs/plugin-api.json`, under `/vespertine/<tag>/`, and writes the version list the site's switcher reads. It needs `jq` and a checkout with the release tags fetched. A release is archived once and not rewritten afterwards, unless its pages or plugin API metadata are missing from the docs site; run it with `FORCE_SYNC=1` to rebuild every archive after changing the archiving itself.
 
-New plugin API levels go into `docs/plugin-api.json` with `"noctaliaVersion": null`; do not fill in the version by hand. The sync stamps each null level with the first release tag whose ledger contains it, so tagging a release is enough.
+New plugin API levels go into `docs/plugin-api.json` with `"vespertineVersion": null`; do not fill in the version by hand. The sync stamps each null level with the first release tag whose ledger contains it, so tagging a release is enough.
 
 ### Vendored code
 
-Do not patch vendored code under `third_party/` or `lib/third_party/` for Noctalia behavior; local edits are lost when the dependency is refreshed. Put compatibility code in Noctalia-owned sources under `lib/` or `src/`, or fix the issue upstream and update the vendored snapshot from upstream.
+Do not patch vendored code under `third_party/` or `lib/third_party/` for Vespertine behavior; local edits are lost when the dependency is refreshed. Put compatibility code in Vespertine-owned sources under `lib/` or `src/`, or fix the issue upstream and update the vendored snapshot from upstream.
 
 ### Palette colors
 
@@ -189,7 +189,7 @@ Draft pull requests may leave checkboxes incomplete. Before marking a pull reque
 
 ## Translations
 
-Noctalia translations are managed through [Noctalia Translate](https://i18n.noctalia.dev/projects/noctalia). The JSON files in `assets/translations/` are exported from that workflow, with `assets/translations/en.json` acting as the source catalog for new strings.
+Vespertine translations are managed through [Vespertine Translate](https://i18n.vespertine.dev/projects/vespertine). The JSON files in `assets/translations/` are exported from that workflow, with `assets/translations/en.json` acting as the source catalog for new strings.
 
 When a code, UI, settings, or documentation change needs a new user-facing string, add or update the English string in `assets/translations/en.json` only. Do not machine translate strings, copy English into other locales, or include broad updates to non-English translation files in a normal feature or bug-fix PR. The translation team handles those locale updates through the translation app.
 
@@ -206,8 +206,8 @@ python3 tools/i18n-check.py
 ## Project Layout
 
 ```text
-lib/                Shared UI library (noctalia-ui); self-contained, built without src/ on its include path
-  meson.build       Library targets (noctalia-ui, opt-in noctalia-ui-codecs), dependencies, and the Wayland protocols they bind
+lib/                Shared UI library (vespertine-ui); self-contained, built without src/ on its include path
+  meson.build       Library targets (vespertine-ui, opt-in vespertine-ui-codecs), dependencies, and the Wayland protocols they bind
   assets/fonts/     Glyph font and Tabler metadata the library loads
   protocols/        Non-wayland-protocols XMLs the library binds (text-input-v3, cursor-shape)
   third_party/
@@ -293,7 +293,7 @@ src/
   theme/            Palette generation, templates, theme service, template application
   time/             Time service, polling, and time formatting
 assets/
-  fonts/            Bundled Noctalia Tabler and UI fonts
+  fonts/            Bundled Vespertine Tabler and UI fonts
   sounds/           Notification and UI sounds
   templates/        Built-in theme templates
   translations/     Exported translation catalogs
@@ -309,20 +309,20 @@ third_party/
 
 ## Debugging
 
-All debug commands use the `dev.noctalia.Debug` D-Bus service, available at runtime.
+All debug commands use the `dev.vespertine.Debug` D-Bus service, available at runtime.
 
 ```sh
 # Enable verbose debug logs
-gdbus call --session --dest dev.noctalia.Debug --object-path /dev/noctalia/Debug --method dev.noctalia.Debug.SetVerboseLogs true
+gdbus call --session --dest dev.vespertine.Debug --object-path /dev/vespertine/Debug --method dev.vespertine.Debug.SetVerboseLogs true
 
 # Disable verbose debug logs
-gdbus call --session --dest dev.noctalia.Debug --object-path /dev/noctalia/Debug --method dev.noctalia.Debug.SetVerboseLogs false
+gdbus call --session --dest dev.vespertine.Debug --object-path /dev/vespertine/Debug --method dev.vespertine.Debug.SetVerboseLogs false
 
 # Check current verbose log state
-gdbus call --session --dest dev.noctalia.Debug --object-path /dev/noctalia/Debug --method dev.noctalia.Debug.GetVerboseLogs
+gdbus call --session --dest dev.vespertine.Debug --object-path /dev/vespertine/Debug --method dev.vespertine.Debug.GetVerboseLogs
 
 # Emit an internal notification (app_name, summary, body, timeout_ms, urgency 0-2)
-gdbus call --session --dest dev.noctalia.Debug --object-path /dev/noctalia/Debug --method dev.noctalia.Debug.EmitInternalNotification "Noctalia" "Test" "Hello from debug" 5000 1
+gdbus call --session --dest dev.vespertine.Debug --object-path /dev/vespertine/Debug --method dev.vespertine.Debug.EmitInternalNotification "Vespertine" "Test" "Hello from debug" 5000 1
 ```
 
 ### Crash output
@@ -331,16 +331,16 @@ When reporting a crash, include the complete terminal output from the process if
 
 ### ASan crash reports
 
-AddressSanitizer (ASan) can find memory errors that a normal build reports only as a crash. It requires a temporary source build; it does not replace the Noctalia package you already use.
+AddressSanitizer (ASan) can find memory errors that a normal build reports only as a crash. It requires a temporary source build; it does not replace the Vespertine package you already use.
 
 Install the source-build dependencies for your distribution using the commands in [BUILDING.md](BUILDING.md#dependencies), then clone the repository:
 
 ```sh
-git clone https://github.com/noctalia-dev/noctalia.git
-cd noctalia
+git clone https://github.com/vespertine-dev/vespertine.git
+cd vespertine
 ```
 
-Stop the Noctalia instance started by your compositor, then configure and build ASan:
+Stop the Vespertine instance started by your compositor, then configure and build ASan:
 
 ```sh
 just configure asan && just build asan
@@ -349,7 +349,7 @@ just configure asan && just build asan
 Start the ASan binary in the foreground and save its output:
 
 ```sh
-ASAN_OPTIONS=log_path=/tmp/noctalia-asan ./build-asan/noctalia 2>&1 | tee noctalia-asan-terminal.log
+ASAN_OPTIONS=log_path=/tmp/vespertine-asan ./build-asan/vespertine 2>&1 | tee vespertine-asan-terminal.log
 ```
 
-Reproduce the crash once. If Noctalia does not exit, press `Ctrl+C`. Attach both `noctalia-asan-terminal.log` and every `/tmp/noctalia-asan.*` file to the GitHub issue. The files in `/tmp` preserve the ASan report if the crash takes down the terminal. If the build or startup fails, attach that complete output instead.
+Reproduce the crash once. If Vespertine does not exit, press `Ctrl+C`. Attach both `vespertine-asan-terminal.log` and every `/tmp/vespertine-asan.*` file to the GitHub issue. The files in `/tmp` preserve the ASan report if the crash takes down the terminal. If the build or startup fails, attach that complete output instead.

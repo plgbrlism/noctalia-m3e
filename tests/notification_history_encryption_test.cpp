@@ -17,7 +17,7 @@ namespace {
   const security::EncryptionContext kHistoryContext{"notification-history-v1", "history"};
 
   struct TestDirectory {
-    fs::path path = fs::temp_directory_path() / ("noctalia-notification-encryption-" + std::to_string(getpid()));
+    fs::path path = fs::temp_directory_path() / ("vespertine-notification-encryption-" + std::to_string(getpid()));
     TestDirectory() {
       fs::remove_all(path);
       fs::create_directories(path);
@@ -68,7 +68,7 @@ namespace {
     TEST_CHECK(saveNotificationHistoryToFile(path, entries, 8, 9, key));
     privateFile(path);
     const auto ciphertext = contents(path);
-    TEST_CHECK(ciphertext.starts_with("NOCTALIAENC1"));
+    TEST_CHECK(ciphertext.starts_with("VESPERTINEENC1"));
     TEST_CHECK(!ciphertext.contains("482913"));
     const auto manifest = readNotificationHistoryJson(path, key);
     const auto filename = manifest["entries"][0]["notification"]["image_data"]["image_file"].get<std::string>();
@@ -77,7 +77,7 @@ namespace {
     privateFile(asset);
     TEST_CHECK((fs::status(asset.parent_path()).permissions() & fs::perms::mask) == static_cast<fs::perms>(0700));
     const auto imageCiphertext = contents(asset);
-    TEST_CHECK(imageCiphertext.starts_with("NOCTALIAENC1"));
+    TEST_CHECK(imageCiphertext.starts_with("VESPERTINEENC1"));
     TEST_CHECK(!imageCiphertext.contains("WEBP"));
     TEST_CHECK(!security::readEncryptedFile(asset, key, kHistoryContext, 1024).succeeded());
     TEST_CHECK(!security::readEncryptedFile(asset, key, {"notification-image-v1", "other.webp.enc"}, 1024).succeeded());
@@ -163,7 +163,7 @@ namespace {
     TEST_CHECK(!fs::exists(assets / "n_1.rgba"));
     TEST_CHECK(!fs::exists(assets / "i_orphan.webp"));
     for (const auto& item : fs::directory_iterator(assets)) {
-      TEST_CHECK(contents(item.path()).starts_with("NOCTALIAENC1"));
+      TEST_CHECK(contents(item.path()).starts_with("VESPERTINEENC1"));
       privateFile(item.path());
     }
 
@@ -196,7 +196,7 @@ namespace {
   }
 
   void testManager(const fs::path& dir) {
-    TEST_CHECK(setenv("NOCTALIA_STATE_HOME", dir.c_str(), 1) == 0);
+    TEST_CHECK(setenv("VESPERTINE_STATE_HOME", dir.c_str(), 1) == 0);
     const auto path = fs::path(FileUtils::stateDir()) / "notification_history.enc";
     const auto keyFile = dir / "storage-key";
     write(keyFile, std::string(64, '1'));
@@ -277,7 +277,7 @@ namespace {
     provider.setChangeCallback({});
   }
   void testClearBeforeUnlock(const fs::path& dir) {
-    TEST_CHECK(setenv("NOCTALIA_STATE_HOME", dir.c_str(), 1) == 0);
+    TEST_CHECK(setenv("VESPERTINE_STATE_HOME", dir.c_str(), 1) == 0);
     const auto path = fs::path(FileUtils::stateDir()) / "notification_history.enc";
     const auto keyFile = dir / "storage-key";
     write(keyFile, std::string(64, '1'));

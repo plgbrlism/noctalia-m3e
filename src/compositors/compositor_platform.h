@@ -223,7 +223,7 @@ public:
   compositors::umbriel::UmbrielRuntime& umbrielRuntime() noexcept;
   const compositors::umbriel::UmbrielRuntime& umbrielRuntime() const noexcept;
 
-  // Plugin event-stream subscriptions (noctalia.compositor.subscribe()); also the poll source for their sockets.
+  // Plugin event-stream subscriptions (vespertine.compositor.subscribe()); also the poll source for their sockets.
   compositors::CompositorEventSubscriptions& eventSubscriptions() noexcept { return *m_eventSubscriptions; }
 
 private:

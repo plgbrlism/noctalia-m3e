@@ -11,7 +11,7 @@
 #include <fstream>
 #include <iterator>
 
-namespace noctalia::theme {
+namespace vespertine::theme {
 
   namespace {
 
@@ -295,4 +295,4 @@ namespace noctalia::theme {
     return out;
   }
 
-} // namespace noctalia::theme
+} // namespace vespertine::theme

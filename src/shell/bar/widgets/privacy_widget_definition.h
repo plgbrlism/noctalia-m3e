@@ -3,4 +3,4 @@
 #include "shell/bar/widget_definition.h"
 #include "shell/bar/widgets/privacy_widget.h"
 
-const noctalia::bar::WidgetDefinition<PrivacyWidget::Options>& privacyWidgetDefinition();
+const vespertine::bar::WidgetDefinition<PrivacyWidget::Options>& privacyWidgetDefinition();

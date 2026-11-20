@@ -106,7 +106,7 @@ struct WirePlumberMixer::Impl {
     core = wp_core_new(
         context, nullptr,
         wp_properties_new(
-            noctalia::pipewire::kContextRtModuleKey, noctalia::pipewire::kContextRtModuleDisabled, nullptr
+            vespertine::pipewire::kContextRtModuleKey, vespertine::pipewire::kContextRtModuleDisabled, nullptr
         )
     );
     if (core == nullptr) {

@@ -6,7 +6,7 @@
 #include <array>
 #include <string_view>
 
-namespace noctalia::cli {
+namespace vespertine::cli {
 
   inline constexpr std::array<std::string_view, 2> kThemeModeChoices{"dark", "light"};
   inline constexpr std::array<std::string_view, 2> kTerminalColorsChoices{"palette", "standard"};
@@ -57,4 +57,4 @@ namespace noctalia::cli {
       false,
   };
 
-} // namespace noctalia::cli
+} // namespace vespertine::cli

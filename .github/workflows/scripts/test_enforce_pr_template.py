@@ -56,8 +56,8 @@ class TemplateValidationTests(unittest.TestCase):
 
     def test_accepts_equivalent_documentation_markup(self) -> None:
         for markup in (
-            "[docs/user/](https://github.com/noctalia-dev/noctalia/docs/user/)",
-            "[`docs/user/`](https://github.com/noctalia-dev/noctalia/blob/main/docs/user/)",
+            "[docs/user/](https://github.com/vespertine-dev/vespertine/docs/user/)",
+            "[`docs/user/`](https://github.com/vespertine-dev/vespertine/blob/main/docs/user/)",
             "`docs/user/`",
             "docs/user/",
         ):
@@ -220,14 +220,14 @@ class TemplateValidationTests(unittest.TestCase):
 
 
 class TemplateEnforcementTests(unittest.TestCase):
-    ISSUE_URL = "https://api.github.test/repos/noctalia-dev/noctalia/issues/123"
-    PULL_REQUEST_URL = "https://api.github.test/repos/noctalia-dev/noctalia/pulls/123"
+    ISSUE_URL = "https://api.github.test/repos/vespertine-dev/vespertine/issues/123"
+    PULL_REQUEST_URL = "https://api.github.test/repos/vespertine-dev/vespertine/pulls/123"
     GRAPHQL_URL = "https://api.github.test/graphql"
-    COMMENT_URL = "https://api.github.test/repos/noctalia-dev/noctalia/issues/comments/7"
-    OLDER_COMMENT_URL = "https://api.github.test/repos/noctalia-dev/noctalia/issues/comments/5"
+    COMMENT_URL = "https://api.github.test/repos/vespertine-dev/vespertine/issues/comments/7"
+    OLDER_COMMENT_URL = "https://api.github.test/repos/vespertine-dev/vespertine/issues/comments/5"
     NODE_ID = "PR_node123"
     OWN_USER = {"login": "github-actions[bot]"}
-    FORMER_USER = {"login": "Noctalia-CI"}
+    FORMER_USER = {"login": "Vespertine-CI"}
 
     def event(self, body: str, *, draft: bool = False) -> dict[str, object]:
         return {

@@ -17,19 +17,19 @@ write_if_changed() {
 }
 
 if grep -q '^\[color\]' "$config_file"; then
-    if sed -n '/^\[color\]/,/^\[/p' "$config_file" | grep -qE '^theme\s*=\s*"noctalia"'; then
+    if sed -n '/^\[color\]/,/^\[/p' "$config_file" | grep -qE '^theme\s*=\s*"vespertine"'; then
         :
     elif sed -n '/^\[color\]/,/^\[/p' "$config_file" | grep -qE '^theme\s*='; then
         tmp_file="$(mktemp "${config_file}.tmp.XXXXXX")"
-        sed -E '/^\[color\]/,/^\[/{s/^theme\s*=.*/theme = "noctalia"/}' "$config_file" >"$tmp_file"
+        sed -E '/^\[color\]/,/^\[/{s/^theme\s*=.*/theme = "vespertine"/}' "$config_file" >"$tmp_file"
         write_if_changed "$config_file" "$tmp_file"
     else
         tmp_file="$(mktemp "${config_file}.tmp.XXXXXX")"
-        sed '/^\[color\]/a theme = "noctalia"' "$config_file" >"$tmp_file"
+        sed '/^\[color\]/a theme = "vespertine"' "$config_file" >"$tmp_file"
         write_if_changed "$config_file" "$tmp_file"
     fi
 else
-    printf '\n[color]\ntheme = "noctalia"\n' >>"$config_file"
+    printf '\n[color]\ntheme = "vespertine"\n' >>"$config_file"
 fi
 
 if pgrep -x cava >/dev/null; then

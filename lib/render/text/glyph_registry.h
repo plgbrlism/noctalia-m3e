@@ -7,7 +7,7 @@
 
 // Glyph names resolve in this order:
 // 1. Explicit codepoint literals such as U+F123 or 0xF123.
-// 2. Hand-curated Noctalia aliases from glyph_registry.cpp.
+// 2. Hand-curated Vespertine aliases from glyph_registry.cpp.
 // 3. Native Tabler icon names from assets/fonts/tabler.json.
 namespace GlyphRegistry {
 
@@ -21,7 +21,7 @@ namespace GlyphRegistry {
 
   // Full Tabler icon catalog with categories, loaded on first call; name lookups do not need it.
   const std::unordered_map<std::string, TablerGlyphMetadata>& tablerGlyphMetadata();
-  // Hand-curated Noctalia alias -> native Tabler icon name map.
+  // Hand-curated Vespertine alias -> native Tabler icon name map.
   const std::unordered_map<std::string, std::string_view>& aliases();
 
 } // namespace GlyphRegistry

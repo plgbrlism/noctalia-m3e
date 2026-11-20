@@ -3,4 +3,4 @@
 #include "shell/bar/widget_definition.h"
 #include "shell/bar/widgets/text_widget.h"
 
-const noctalia::bar::WidgetDefinition<TextWidget::Options>& textWidgetDefinition();
+const vespertine::bar::WidgetDefinition<TextWidget::Options>& textWidgetDefinition();

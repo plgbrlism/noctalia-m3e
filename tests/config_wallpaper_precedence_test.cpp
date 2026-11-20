@@ -25,16 +25,16 @@ namespace {
 
   void checkBundledWallpaperRemainsFallback() {
     const std::filesystem::path root =
-        std::filesystem::temp_directory_path() / ("noctalia-wallpaper-fallback-" + std::to_string(::getpid()));
+        std::filesystem::temp_directory_path() / ("vespertine-wallpaper-fallback-" + std::to_string(::getpid()));
     std::filesystem::remove_all(root);
-    std::filesystem::create_directories(root / "config" / "noctalia");
-    std::filesystem::create_directories(root / "state" / "noctalia");
+    std::filesystem::create_directories(root / "config" / "vespertine");
+    std::filesystem::create_directories(root / "state" / "vespertine");
     std::filesystem::create_directories(root / "data");
-    ::setenv("NOCTALIA_CONFIG_HOME", (root / "config").c_str(), 1);
-    ::setenv("NOCTALIA_STATE_HOME", (root / "state").c_str(), 1);
-    ::setenv("NOCTALIA_DATA_HOME", (root / "data").c_str(), 1);
+    ::setenv("VESPERTINE_CONFIG_HOME", (root / "config").c_str(), 1);
+    ::setenv("VESPERTINE_STATE_HOME", (root / "state").c_str(), 1);
+    ::setenv("VESPERTINE_DATA_HOME", (root / "data").c_str(), 1);
 
-    const auto bundled = paths::assetPath("noctalia-wallpaper.png").string();
+    const auto bundled = paths::assetPath("vespertine-wallpaper.png").string();
     TEST_CHECK(std::filesystem::exists(bundled));
     {
       ConfigService config;
@@ -51,7 +51,7 @@ namespace {
       ConfigService config;
       TEST_CHECK(config.getWallpaperPath("DP-1") == bundled);
       {
-        std::ofstream out(root / "config" / "noctalia" / "config.toml");
+        std::ofstream out(root / "config" / "vespertine" / "config.toml");
         out << "[wallpaper.default]\npath = \"/tmp/declared.png\"\n";
       }
       config.forceReload();
@@ -64,9 +64,9 @@ namespace {
       ConfigService config;
       TEST_CHECK(config.getDefaultWallpaperPath() == "/tmp/picked.png");
     }
-    ::unsetenv("NOCTALIA_CONFIG_HOME");
-    ::unsetenv("NOCTALIA_STATE_HOME");
-    ::unsetenv("NOCTALIA_DATA_HOME");
+    ::unsetenv("VESPERTINE_CONFIG_HOME");
+    ::unsetenv("VESPERTINE_STATE_HOME");
+    ::unsetenv("VESPERTINE_DATA_HOME");
     std::filesystem::remove_all(root);
   }
 
@@ -74,20 +74,20 @@ namespace {
   // is written for the first time.
   void checkConfigSurvivesFirstSidecarWrite() {
     const std::filesystem::path root =
-        std::filesystem::temp_directory_path() / ("noctalia-wallpaper-config-file-" + std::to_string(::getpid()));
+        std::filesystem::temp_directory_path() / ("vespertine-wallpaper-config-file-" + std::to_string(::getpid()));
     std::filesystem::remove_all(root);
-    std::filesystem::create_directories(root / "config" / "noctalia");
-    std::filesystem::create_directories(root / "state" / "noctalia");
+    std::filesystem::create_directories(root / "config" / "vespertine");
+    std::filesystem::create_directories(root / "state" / "vespertine");
     std::filesystem::create_directories(root / "data");
-    ::setenv("NOCTALIA_CONFIG_HOME", (root / "config").c_str(), 1);
-    ::setenv("NOCTALIA_STATE_HOME", (root / "state").c_str(), 1);
-    ::setenv("NOCTALIA_DATA_HOME", (root / "data").c_str(), 1);
+    ::setenv("VESPERTINE_CONFIG_HOME", (root / "config").c_str(), 1);
+    ::setenv("VESPERTINE_STATE_HOME", (root / "state").c_str(), 1);
+    ::setenv("VESPERTINE_DATA_HOME", (root / "data").c_str(), 1);
 
     {
-      std::ofstream out(root / "config" / "noctalia" / "config.toml", std::ios::trunc);
+      std::ofstream out(root / "config" / "vespertine" / "config.toml", std::ios::trunc);
       out << "[wallpaper]\nenabled = true\n\n[wallpaper.default]\npath = \"/tmp/from-config.png\"\n";
     }
-    const auto sidecar = root / "state" / "noctalia" / "settings.toml";
+    const auto sidecar = root / "state" / "vespertine" / "settings.toml";
     expect(!std::filesystem::exists(sidecar), "state dir should start without settings.toml");
 
     ConfigService config;
@@ -103,26 +103,26 @@ namespace {
         "config.toml path was dropped by the first sidecar write"
     );
 
-    ::unsetenv("NOCTALIA_CONFIG_HOME");
-    ::unsetenv("NOCTALIA_STATE_HOME");
-    ::unsetenv("NOCTALIA_DATA_HOME");
+    ::unsetenv("VESPERTINE_CONFIG_HOME");
+    ::unsetenv("VESPERTINE_STATE_HOME");
+    ::unsetenv("VESPERTINE_DATA_HOME");
     std::filesystem::remove_all(root);
   }
 
   // State settings loads last, so it should outranks config.toml
   void checkSidecarPathOutranksConfigFilePath() {
     const std::filesystem::path root =
-        std::filesystem::temp_directory_path() / ("noctalia-wallpaper-sidecar-" + std::to_string(::getpid()));
+        std::filesystem::temp_directory_path() / ("vespertine-wallpaper-sidecar-" + std::to_string(::getpid()));
     std::filesystem::remove_all(root);
-    std::filesystem::create_directories(root / "config" / "noctalia");
-    std::filesystem::create_directories(root / "state" / "noctalia");
+    std::filesystem::create_directories(root / "config" / "vespertine");
+    std::filesystem::create_directories(root / "state" / "vespertine");
     std::filesystem::create_directories(root / "data");
-    ::setenv("NOCTALIA_CONFIG_HOME", (root / "config").c_str(), 1);
-    ::setenv("NOCTALIA_STATE_HOME", (root / "state").c_str(), 1);
-    ::setenv("NOCTALIA_DATA_HOME", (root / "data").c_str(), 1);
+    ::setenv("VESPERTINE_CONFIG_HOME", (root / "config").c_str(), 1);
+    ::setenv("VESPERTINE_STATE_HOME", (root / "state").c_str(), 1);
+    ::setenv("VESPERTINE_DATA_HOME", (root / "data").c_str(), 1);
 
     {
-      std::ofstream out(root / "config" / "noctalia" / "config.toml", std::ios::trunc);
+      std::ofstream out(root / "config" / "vespertine" / "config.toml", std::ios::trunc);
       out << "[wallpaper]\nenabled = true\n\n[wallpaper.default]\npath = \"/tmp/from-config.png\"\n";
     }
     ConfigService config;
@@ -137,9 +137,9 @@ namespace {
     expect(config.getWallpaperPath("DP-9") == "/tmp/dp9.png", "per-monitor path did not survive a reload");
     expect(config.getWallpaperPath("DP-8") == "/tmp/picked.png", "unconfigured monitor did not fall back to default");
 
-    ::unsetenv("NOCTALIA_CONFIG_HOME");
-    ::unsetenv("NOCTALIA_STATE_HOME");
-    ::unsetenv("NOCTALIA_DATA_HOME");
+    ::unsetenv("VESPERTINE_CONFIG_HOME");
+    ::unsetenv("VESPERTINE_STATE_HOME");
+    ::unsetenv("VESPERTINE_DATA_HOME");
     std::filesystem::remove_all(root);
   }
 
@@ -147,31 +147,31 @@ namespace {
   // pathStringField). Regression guard: wallpaper.directory must expand $VARS.
   void checkDirectoryExpandsEnvVars() {
     const std::filesystem::path root =
-        std::filesystem::temp_directory_path() / ("noctalia-wallpaper-envvar-" + std::to_string(::getpid()));
+        std::filesystem::temp_directory_path() / ("vespertine-wallpaper-envvar-" + std::to_string(::getpid()));
     std::filesystem::remove_all(root);
-    std::filesystem::create_directories(root / "config" / "noctalia");
-    std::filesystem::create_directories(root / "state" / "noctalia");
+    std::filesystem::create_directories(root / "config" / "vespertine");
+    std::filesystem::create_directories(root / "state" / "vespertine");
     std::filesystem::create_directories(root / "data");
-    ::setenv("NOCTALIA_CONFIG_HOME", (root / "config").c_str(), 1);
-    ::setenv("NOCTALIA_STATE_HOME", (root / "state").c_str(), 1);
-    ::setenv("NOCTALIA_DATA_HOME", (root / "data").c_str(), 1);
-    ::setenv("NOCTALIA_WP_TEST", "/tmp/wp-root", 1);
+    ::setenv("VESPERTINE_CONFIG_HOME", (root / "config").c_str(), 1);
+    ::setenv("VESPERTINE_STATE_HOME", (root / "state").c_str(), 1);
+    ::setenv("VESPERTINE_DATA_HOME", (root / "data").c_str(), 1);
+    ::setenv("VESPERTINE_WP_TEST", "/tmp/wp-root", 1);
 
     {
-      std::ofstream out(root / "config" / "noctalia" / "config.toml", std::ios::trunc);
-      out << "[wallpaper]\nenabled = true\ndirectory = \"$NOCTALIA_WP_TEST/pics\"\n";
+      std::ofstream out(root / "config" / "vespertine" / "config.toml", std::ios::trunc);
+      out << "[wallpaper]\nenabled = true\ndirectory = \"$VESPERTINE_WP_TEST/pics\"\n";
     }
 
     ConfigService config;
     expect(
         config.config().wallpaper.directory == "/tmp/wp-root/pics",
-        "wallpaper.directory did not expand $NOCTALIA_WP_TEST"
+        "wallpaper.directory did not expand $VESPERTINE_WP_TEST"
     );
 
-    ::unsetenv("NOCTALIA_WP_TEST");
-    ::unsetenv("NOCTALIA_CONFIG_HOME");
-    ::unsetenv("NOCTALIA_STATE_HOME");
-    ::unsetenv("NOCTALIA_DATA_HOME");
+    ::unsetenv("VESPERTINE_WP_TEST");
+    ::unsetenv("VESPERTINE_CONFIG_HOME");
+    ::unsetenv("VESPERTINE_STATE_HOME");
+    ::unsetenv("VESPERTINE_DATA_HOME");
     std::filesystem::remove_all(root);
   }
 
@@ -179,17 +179,17 @@ namespace {
   // one with an explicit theme_mode must restore it.
   void checkFavoriteThemeModeOverride() {
     const std::filesystem::path root =
-        std::filesystem::temp_directory_path() / ("noctalia-wallpaper-favorite-" + std::to_string(::getpid()));
+        std::filesystem::temp_directory_path() / ("vespertine-wallpaper-favorite-" + std::to_string(::getpid()));
     std::filesystem::remove_all(root);
-    std::filesystem::create_directories(root / "config" / "noctalia");
-    std::filesystem::create_directories(root / "state" / "noctalia");
+    std::filesystem::create_directories(root / "config" / "vespertine");
+    std::filesystem::create_directories(root / "state" / "vespertine");
     std::filesystem::create_directories(root / "data");
-    ::setenv("NOCTALIA_CONFIG_HOME", (root / "config").c_str(), 1);
-    ::setenv("NOCTALIA_STATE_HOME", (root / "state").c_str(), 1);
-    ::setenv("NOCTALIA_DATA_HOME", (root / "data").c_str(), 1);
+    ::setenv("VESPERTINE_CONFIG_HOME", (root / "config").c_str(), 1);
+    ::setenv("VESPERTINE_STATE_HOME", (root / "state").c_str(), 1);
+    ::setenv("VESPERTINE_DATA_HOME", (root / "data").c_str(), 1);
 
     {
-      std::ofstream out(root / "state" / "noctalia" / "settings.toml", std::ios::trunc);
+      std::ofstream out(root / "state" / "vespertine" / "settings.toml", std::ios::trunc);
       out << "[theme]\nmode = \"dark\"\n\n"
              "[[wallpaper.favorite]]\npath = \"/tmp/explicit.png\"\ntheme_mode = \"light\"\n";
     }
@@ -209,32 +209,32 @@ namespace {
     );
     expect(config.config().theme.mode == ThemeMode::Light, "favorite theme_mode was not applied");
 
-    ::unsetenv("NOCTALIA_CONFIG_HOME");
-    ::unsetenv("NOCTALIA_STATE_HOME");
-    ::unsetenv("NOCTALIA_DATA_HOME");
+    ::unsetenv("VESPERTINE_CONFIG_HOME");
+    ::unsetenv("VESPERTINE_STATE_HOME");
+    ::unsetenv("VESPERTINE_DATA_HOME");
     std::filesystem::remove_all(root);
   }
 
   // Saving favorites from the panel must keep ~ and $VAR paths as written, while matching on the expanded path.
   void checkFavoriteKeepsConfiguredPathOnSave() {
     const std::filesystem::path root =
-        std::filesystem::temp_directory_path() / ("noctalia-wallpaper-favorite-path-" + std::to_string(::getpid()));
+        std::filesystem::temp_directory_path() / ("vespertine-wallpaper-favorite-path-" + std::to_string(::getpid()));
     std::filesystem::remove_all(root);
-    std::filesystem::create_directories(root / "config" / "noctalia");
-    std::filesystem::create_directories(root / "state" / "noctalia");
+    std::filesystem::create_directories(root / "config" / "vespertine");
+    std::filesystem::create_directories(root / "state" / "vespertine");
     std::filesystem::create_directories(root / "data");
-    ::setenv("NOCTALIA_CONFIG_HOME", (root / "config").c_str(), 1);
-    ::setenv("NOCTALIA_STATE_HOME", (root / "state").c_str(), 1);
-    ::setenv("NOCTALIA_DATA_HOME", (root / "data").c_str(), 1);
-    ::setenv("NOCTALIA_WP_TEST", "/tmp/wp-root", 1);
+    ::setenv("VESPERTINE_CONFIG_HOME", (root / "config").c_str(), 1);
+    ::setenv("VESPERTINE_STATE_HOME", (root / "state").c_str(), 1);
+    ::setenv("VESPERTINE_DATA_HOME", (root / "data").c_str(), 1);
+    ::setenv("VESPERTINE_WP_TEST", "/tmp/wp-root", 1);
     const char* home = std::getenv("HOME");
     TEST_CHECK(home != nullptr && home[0] == '/');
 
-    const std::filesystem::path settings = root / "state" / "noctalia" / "settings.toml";
+    const std::filesystem::path settings = root / "state" / "vespertine" / "settings.toml";
     {
       std::ofstream out(settings, std::ios::trunc);
       out << "[[wallpaper.favorite]]\npath = \"~/pics/tilde.png\"\n\n"
-             "[[wallpaper.favorite]]\npath = \"$NOCTALIA_WP_TEST/env.png\"\n";
+             "[[wallpaper.favorite]]\npath = \"$VESPERTINE_WP_TEST/env.png\"\n";
     }
     {
       ConfigService config;
@@ -248,14 +248,14 @@ namespace {
     TEST_CHECK(favorites != nullptr && favorites->size() == 3);
     if (favorites != nullptr && favorites->size() == 3) {
       TEST_CHECK((*favorites)[0].as_table()->get("path")->value<std::string>() == "~/pics/tilde.png");
-      TEST_CHECK((*favorites)[1].as_table()->get("path")->value<std::string>() == "$NOCTALIA_WP_TEST/env.png");
+      TEST_CHECK((*favorites)[1].as_table()->get("path")->value<std::string>() == "$VESPERTINE_WP_TEST/env.png");
       TEST_CHECK((*favorites)[2].as_table()->get("path")->value<std::string>() == "/tmp/starred.png");
     }
 
-    ::unsetenv("NOCTALIA_WP_TEST");
-    ::unsetenv("NOCTALIA_CONFIG_HOME");
-    ::unsetenv("NOCTALIA_STATE_HOME");
-    ::unsetenv("NOCTALIA_DATA_HOME");
+    ::unsetenv("VESPERTINE_WP_TEST");
+    ::unsetenv("VESPERTINE_CONFIG_HOME");
+    ::unsetenv("VESPERTINE_STATE_HOME");
+    ::unsetenv("VESPERTINE_DATA_HOME");
     std::filesystem::remove_all(root);
   }
 
@@ -263,7 +263,7 @@ namespace {
 
 int main(int argc, char** argv) {
   TEST_CHECK(argc == 2);
-  ::setenv("NOCTALIA_APP_ASSETS_DIR", argv[1], 1);
+  ::setenv("VESPERTINE_APP_ASSETS_DIR", argv[1], 1);
   checkBundledWallpaperRemainsFallback();
   checkConfigSurvivesFirstSidecarWrite();
   checkSidecarPathOutranksConfigFilePath();

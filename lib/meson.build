@@ -1,52 +1,52 @@
-# noctalia-ui: UI controls, renderer, Wayland transport, and core utilities
-# shared by Noctalia applications. lib/ is its include root; it never sees src/.
+# vespertine-ui: UI controls, renderer, Wayland transport, and core utilities
+# shared by Vespertine applications. lib/ is its include root; it never sees src/.
 #
 # Self-contained: a consumer project (C++23, Meson >= 1.1) runs `subdir('lib')`
 # and reads no other file outside lib/. Optional input, set before subdir():
-#   noctalia_ui_build_codecs  true: enable the codec pack (default: false)
-#   noctalia_ui_system_wuffs  true: compile the enabled codec pack against a system
+#   vespertine_ui_build_codecs  true: enable the codec pack (default: false)
+#   vespertine_ui_system_wuffs  true: compile the enabled codec pack against a system
 #                             wuffs-v0.4.c instead of lib/third_party/wuffs
 #
 # Outputs:
-#   noctalia_ui_dep              core library: render, text, scene/input, Wayland
+#   vespertine_ui_dep              core library: render, text, scene/input, Wayland
 #                                transport, controls (incl. Image), i18n service;
 #                                system dependencies only
-#   noctalia_ui_codecs_dep       only when enabled; opt-in codec pack: Wuffs, ICO, WebP, JPEG XL,
+#   vespertine_ui_codecs_dep       only when enabled; opt-in codec pack: Wuffs, ICO, WebP, JPEG XL,
 #                                SVG (librsvg), runtime-loaded libheif, image
 #                                encoders, thumbnails; install it with
 #                                codecs::installImageDecoder()
-#   noctalia_ui_lib              core static library
-#   noctalia_ui_codecs_lib       codec static library, only when enabled
-#   noctalia_ui_protocol_headers              generated client protocol headers
-#   noctalia_ui_assets_dir       assets the library loads (glyph font); install
+#   vespertine_ui_lib              core static library
+#   vespertine_ui_codecs_lib       codec static library, only when enabled
+#   vespertine_ui_protocol_headers              generated client protocol headers
+#   vespertine_ui_assets_dir       assets the library loads (glyph font); install
 #                                its contents into the application's asset dir
 #
-# Variables defined here use the noctalia_ui_ / _noctalia_ui_ prefixes, since a
+# Variables defined here use the vespertine_ui_ / _vespertine_ui_ prefixes, since a
 # subdir shares the consumer's variable namespace.
 
-_noctalia_ui_cc = meson.get_compiler('c')
+_vespertine_ui_cc = meson.get_compiler('c')
 
 # ── Dependencies ──────────────────────────────────────────────────────────────
-_noctalia_ui_egl_dep = dependency('egl', required: false)
-if not _noctalia_ui_egl_dep.found()
-  _noctalia_ui_egl_dep = dependency('wayland-egl', required: false)
+_vespertine_ui_egl_dep = dependency('egl', required: false)
+if not _vespertine_ui_egl_dep.found()
+  _vespertine_ui_egl_dep = dependency('wayland-egl', required: false)
 endif
-if not _noctalia_ui_egl_dep.found()
-  _noctalia_ui_egl_dep = dependency('epoxy')
+if not _vespertine_ui_egl_dep.found()
+  _vespertine_ui_egl_dep = dependency('epoxy')
 endif
-_noctalia_ui_gles2_dep = dependency('glesv2', required: false)
-if not _noctalia_ui_gles2_dep.found()
-  _noctalia_ui_gles2_dep = dependency('epoxy')
-endif
-
-if not _noctalia_ui_cc.has_header('stb/stb_image_resize2.h')
-  error('noctalia-ui: stb/stb_image_resize2.h not found')
+_vespertine_ui_gles2_dep = dependency('glesv2', required: false)
+if not _vespertine_ui_gles2_dep.found()
+  _vespertine_ui_gles2_dep = dependency('epoxy')
 endif
 
-_noctalia_ui_system_dependencies = [
+if not _vespertine_ui_cc.has_header('stb/stb_image_resize2.h')
+  error('vespertine-ui: stb/stb_image_resize2.h not found')
+endif
+
+_vespertine_ui_system_dependencies = [
   dependency('wayland-client'),
-  _noctalia_ui_egl_dep,
-  _noctalia_ui_gles2_dep,
+  _vespertine_ui_egl_dep,
+  _vespertine_ui_gles2_dep,
   dependency('wayland-egl'),
   dependency('freetype2'),
   dependency('fontconfig'),
@@ -62,51 +62,51 @@ _noctalia_ui_system_dependencies = [
 ]
 
 # ── Compile arguments ─────────────────────────────────────────────────────────
-_noctalia_ui_cpp_args = [
+_vespertine_ui_cpp_args = [
   '-Wall', '-Wextra', '-Wno-missing-field-initializers', '-Wpedantic', '-Wconversion', '-Wshadow',
   '-fno-strict-aliasing', '-fno-strict-overflow',
-  '-DNOCTALIA_UI_INSTALL_PREFIX="' + get_option('prefix') + '"',
-  '-DNOCTALIA_UI_INSTALL_DATADIR="' + get_option('datadir') + '"',
+  '-DVESPERTINE_UI_INSTALL_PREFIX="' + get_option('prefix') + '"',
+  '-DVESPERTINE_UI_INSTALL_DATADIR="' + get_option('datadir') + '"',
 ]
 
 # ── Wayland protocols bound by the library ────────────────────────────────────
-_noctalia_ui_wayland_scanner = find_program('wayland-scanner')
-_noctalia_ui_protos_dir = dependency('wayland-protocols').get_variable('pkgdatadir')
+_vespertine_ui_wayland_scanner = find_program('wayland-scanner')
+_vespertine_ui_protos_dir = dependency('wayland-protocols').get_variable('pkgdatadir')
 
-_noctalia_ui_protocol_sources = []
-noctalia_ui_protocol_headers = []
+_vespertine_ui_protocol_sources = []
+vespertine_ui_protocol_headers = []
 
-foreach _noctalia_ui_p : [
+foreach _vespertine_ui_p : [
   ['xdg-output-unstable-v1',
-    _noctalia_ui_protos_dir / 'unstable/xdg-output/xdg-output-unstable-v1.xml'],
+    _vespertine_ui_protos_dir / 'unstable/xdg-output/xdg-output-unstable-v1.xml'],
   ['xdg-shell',
-    _noctalia_ui_protos_dir / 'stable/xdg-shell/xdg-shell.xml'],
+    _vespertine_ui_protos_dir / 'stable/xdg-shell/xdg-shell.xml'],
   ['xdg-activation-v1',
-    _noctalia_ui_protos_dir / 'staging/xdg-activation/xdg-activation-v1.xml'],
+    _vespertine_ui_protos_dir / 'staging/xdg-activation/xdg-activation-v1.xml'],
   ['fractional-scale-v1',
-    _noctalia_ui_protos_dir / 'staging/fractional-scale/fractional-scale-v1.xml'],
+    _vespertine_ui_protos_dir / 'staging/fractional-scale/fractional-scale-v1.xml'],
   ['viewporter',
-    _noctalia_ui_protos_dir / 'stable/viewporter/viewporter.xml'],
+    _vespertine_ui_protos_dir / 'stable/viewporter/viewporter.xml'],
   ['text-input-unstable-v3', files('protocols/text-input-unstable-v3.xml')],
   ['cursor-shape-v1', files('protocols/cursor-shape-v1.xml')],
 ]
-  _noctalia_ui_h = custom_target(_noctalia_ui_p[0] + '-client-header',
-    input:   _noctalia_ui_p[1],
-    output:  _noctalia_ui_p[0] + '-client-protocol.h',
-    command: [_noctalia_ui_wayland_scanner, 'client-header', '@INPUT@', '@OUTPUT@'],
+  _vespertine_ui_h = custom_target(_vespertine_ui_p[0] + '-client-header',
+    input:   _vespertine_ui_p[1],
+    output:  _vespertine_ui_p[0] + '-client-protocol.h',
+    command: [_vespertine_ui_wayland_scanner, 'client-header', '@INPUT@', '@OUTPUT@'],
   )
-  _noctalia_ui_c = custom_target(_noctalia_ui_p[0] + '-client-source',
-    input:   _noctalia_ui_p[1],
-    output:  _noctalia_ui_p[0] + '-client-protocol.c',
-    command: [_noctalia_ui_wayland_scanner, 'private-code', '@INPUT@', '@OUTPUT@'],
-    depends: _noctalia_ui_h,  # ensure .h exists before this .c is compiled (it #includes it)
+  _vespertine_ui_c = custom_target(_vespertine_ui_p[0] + '-client-source',
+    input:   _vespertine_ui_p[1],
+    output:  _vespertine_ui_p[0] + '-client-protocol.c',
+    command: [_vespertine_ui_wayland_scanner, 'private-code', '@INPUT@', '@OUTPUT@'],
+    depends: _vespertine_ui_h,  # ensure .h exists before this .c is compiled (it #includes it)
   )
-  _noctalia_ui_protocol_sources += _noctalia_ui_c
-  noctalia_ui_protocol_headers += _noctalia_ui_h
+  _vespertine_ui_protocol_sources += _vespertine_ui_c
+  vespertine_ui_protocol_headers += _vespertine_ui_h
 endforeach
 
 # ── Core library ──────────────────────────────────────────────────────────────
-_noctalia_ui_sources = files(
+_vespertine_ui_sources = files(
   'core/application_identity.cpp',
   'core/deferred_call.cpp',
   'core/files/resource_paths.cpp',
@@ -214,55 +214,55 @@ _noctalia_ui_sources = files(
 )
 
 if get_option('b_sanitize') != 'none'
-  _noctalia_ui_sources += files('core/lsan_suppressions.cpp')
+  _vespertine_ui_sources += files('core/lsan_suppressions.cpp')
 endif
 
 # '.' adds both lib/ and its build directory, where the protocol headers above
 # are generated.
-_noctalia_ui_inc = include_directories('.')
+_vespertine_ui_inc = include_directories('.')
 
-noctalia_ui_lib = static_library('noctalia-ui',
-  sources: _noctalia_ui_sources + _noctalia_ui_protocol_sources + noctalia_ui_protocol_headers,
-  dependencies: _noctalia_ui_system_dependencies,
-  include_directories: _noctalia_ui_inc,
-  cpp_args: _noctalia_ui_cpp_args,
+vespertine_ui_lib = static_library('vespertine-ui',
+  sources: _vespertine_ui_sources + _vespertine_ui_protocol_sources + vespertine_ui_protocol_headers,
+  dependencies: _vespertine_ui_system_dependencies,
+  include_directories: _vespertine_ui_inc,
+  cpp_args: _vespertine_ui_cpp_args,
 )
 
-noctalia_ui_dep = declare_dependency(
-  link_with: noctalia_ui_lib,
-  dependencies: _noctalia_ui_system_dependencies,
-  include_directories: _noctalia_ui_inc,
-  sources: noctalia_ui_protocol_headers,
+vespertine_ui_dep = declare_dependency(
+  link_with: vespertine_ui_lib,
+  dependencies: _vespertine_ui_system_dependencies,
+  include_directories: _vespertine_ui_inc,
+  sources: vespertine_ui_protocol_headers,
 )
 
-noctalia_ui_assets_dir = meson.current_source_dir() / 'assets'
+vespertine_ui_assets_dir = meson.current_source_dir() / 'assets'
 
 # ── Codec pack ────────────────────────────────────────────────────────────────
-if get_variable('noctalia_ui_build_codecs', false)
-  if is_variable('noctalia_ui_system_wuffs') and noctalia_ui_system_wuffs
-    if not _noctalia_ui_cc.has_header('wuffs-v0.4.c')
-      error('noctalia-ui: noctalia_ui_system_wuffs is set but wuffs-v0.4.c was not found')
+if get_variable('vespertine_ui_build_codecs', false)
+  if is_variable('vespertine_ui_system_wuffs') and vespertine_ui_system_wuffs
+    if not _vespertine_ui_cc.has_header('wuffs-v0.4.c')
+      error('vespertine-ui: vespertine_ui_system_wuffs is set but wuffs-v0.4.c was not found')
     endif
-    _noctalia_ui_wuffs_inc = []
+    _vespertine_ui_wuffs_inc = []
   else
-    _noctalia_ui_wuffs_inc = [include_directories('third_party/wuffs', is_system: true)]
+    _vespertine_ui_wuffs_inc = [include_directories('third_party/wuffs', is_system: true)]
   endif
 
-  if not _noctalia_ui_cc.has_header('stb/stb_image_write.h')
-    error('noctalia-ui: stb/stb_image_write.h not found')
+  if not _vespertine_ui_cc.has_header('stb/stb_image_write.h')
+    error('vespertine-ui: stb/stb_image_write.h not found')
   endif
 
-  _noctalia_ui_dl_dep = meson.get_compiler('cpp').find_library('dl', required: false)
+  _vespertine_ui_dl_dep = meson.get_compiler('cpp').find_library('dl', required: false)
 
-  _noctalia_ui_codecs_system_dependencies = [
+  _vespertine_ui_codecs_system_dependencies = [
     dependency('librsvg-2.0'),
     dependency('libwebp'),
     dependency('libwebpdemux'),
     dependency('libjxl'),
     dependency('libjxl_threads'),
-  ] + (_noctalia_ui_dl_dep.found() ? [_noctalia_ui_dl_dep] : [])
+  ] + (_vespertine_ui_dl_dep.found() ? [_vespertine_ui_dl_dep] : [])
 
-  noctalia_ui_codecs_lib = static_library('noctalia-ui-codecs',
+  vespertine_ui_codecs_lib = static_library('vespertine-ui-codecs',
     sources: files(
       'render/codecs/codecs.cpp',
       'render/codecs/heif_library.cpp',
@@ -273,13 +273,13 @@ if get_variable('noctalia_ui_build_codecs', false)
       'render/codecs/svg_rasterizer.cpp',
       'render/codecs/thumbnail_service.cpp',
     ),
-    dependencies: _noctalia_ui_codecs_system_dependencies + [noctalia_ui_dep],
-    include_directories: _noctalia_ui_wuffs_inc,
-    cpp_args: _noctalia_ui_cpp_args,
+    dependencies: _vespertine_ui_codecs_system_dependencies + [vespertine_ui_dep],
+    include_directories: _vespertine_ui_wuffs_inc,
+    cpp_args: _vespertine_ui_cpp_args,
   )
 
-  noctalia_ui_codecs_dep = declare_dependency(
-    link_with: noctalia_ui_codecs_lib,
-    dependencies: _noctalia_ui_codecs_system_dependencies + [noctalia_ui_dep],
+  vespertine_ui_codecs_dep = declare_dependency(
+    link_with: vespertine_ui_codecs_lib,
+    dependencies: _vespertine_ui_codecs_system_dependencies + [vespertine_ui_dep],
   )
 endif

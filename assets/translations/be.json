@@ -971,22 +971,22 @@
       "calendar-reminder-open": "Адкрыць",
       "calendar-reminder-untitled": "Падзея без назвы",
       "calendar-reminder-with-location": "{when}\n{location}",
-      "config-migration-body": "Абнавіце {path} у зыходным файле. Noctalia толькі тэрмінова прымяняе гэтую замену. Выканайце noctalia config validate, каб убачыць усе патрэбныя змены.",
+      "config-migration-body": "Абнавіце {path} у зыходным файле. Vespertine толькі тэрмінова прымяняе гэтую замену. Выканайце vespertine config validate, каб убачыць усе патрэбныя змены.",
       "config-migration-title": "Патрабуецца абнаўленне канфігурацыі",
       "dbus-disabled": "Апавяшчэнні DBus выключаныя",
       "desktop-widgets-editor": "Рэдактар віджэтаў",
       "desktop-widgets-editor-enabled": "Рэдактар віджэтаў працоўнага стала ўключаны. Пераключыцеся на пустую прастору, каб вокны не перакрывалі рэдактар.",
-      "greeter-sync": "Noctalia Greeter",
+      "greeter-sync": "Vespertine Greeter",
       "greeter-sync-pending": "Сінхранізацыя выгляду з Greeter. Калі з'явіцца запыт адміністратара, ухваліце яго; аўтарызацыя без пароля залежыць ад сістэмнай палітыкі.",
-      "greeter-sync-pending-console": "Сінхранізацыя выгляду з Greeter. Калі патрабуецца аўтарызацыя, ухваліце запыт polkit у Noctalia, на TTY або кансолі.",
+      "greeter-sync-pending-console": "Сінхранізацыя выгляду з Greeter. Калі патрабуецца аўтарызацыя, ухваліце запыт polkit у Vespertine, на TTY або кансолі.",
       "greeter-sync-pending-legacy": "Сінхранізацыя праз састарэлы аўтэнтыфікаваны памочнік. Патрабуецца ўхваленне адміністратара.",
-      "greeter-sync-pending-manual": "Файлы падрыхтаваны для аўтэнтыфікаванай састарэлай сінхранізацыі. Выканайце ў тэрмінале памочнік прымянення, перадаўшы каталог стану пазіцыйным аргументам; калі выкарыстоўваеце ўласны шлях, захавайце NOCTALIA_GREETER_STATE_DIR. Або наладзьце shell.greeter_sync.privilege_command і сінхранізуйце паўторна.",
-      "greeter-sync-pending-manual-pkexec": "Сінхранізацыя выгляду ў Greeter. Калі патрабуецца аўтарызацыя адміністратара, а запыт не паказваецца, выканайце ў тэрмінале: pkexec noctalia-greeter-apply-appearance --sync \"/run/user/$(id -u)/noctalia-greeter-sync\".",
+      "greeter-sync-pending-manual": "Файлы падрыхтаваны для аўтэнтыфікаванай састарэлай сінхранізацыі. Выканайце ў тэрмінале памочнік прымянення, перадаўшы каталог стану пазіцыйным аргументам; калі выкарыстоўваеце ўласны шлях, захавайце VESPERTINE_GREETER_STATE_DIR. Або наладзьце shell.greeter_sync.privilege_command і сінхранізуйце паўторна.",
+      "greeter-sync-pending-manual-pkexec": "Сінхранізацыя выгляду ў Greeter. Калі патрабуецца аўтарызацыя адміністратара, а запыт не паказваецца, выканайце ў тэрмінале: pkexec vespertine-greeter-apply-appearance --sync \"/run/user/$(id -u)/vespertine-greeter-sync\".",
       "greeter-sync-success": "Выгляд сінхранізаваны. Змены прыменяцца на наступным экране блакіроўкі.",
       "greeter-sync-timeout": "Сінхранізацыя Greeter усё яшчэ чакае ухвалення адміністратара. Праверце TTY або кансоль на прадмет запыту polkit, уключыце агент polkit у наладах прыватнасці і бяспекі, або ўласнаручна выканайце pkexec.",
-      "greeter-sync-timeout-manual": "Аўтэнтыфікаваная састарэлая сінхранізацыя ўсё яшчэ патрабуе ўхвалення адміністратара. Выканайце ў тэрмінале памочнік прымянення, перадаўшы каталог стану пазіцыйным аргументам; калі выкарыстоўваеце ўласны шлях, захавайце NOCTALIA_GREETER_STATE_DIR.",
-      "greeter-sync-timeout-manual-pkexec": "Сінхранізацыя Greeter усё яшчэ патрабуе аўтарызацыі. Выканайце ў тэрмінале: pkexec noctalia-greeter-apply-appearance --sync \"/run/user/$(id -u)/noctalia-greeter-sync\"",
-      "keybind-app": "Noctalia",
+      "greeter-sync-timeout-manual": "Аўтэнтыфікаваная састарэлая сінхранізацыя ўсё яшчэ патрабуе ўхвалення адміністратара. Выканайце ў тэрмінале памочнік прымянення, перадаўшы каталог стану пазіцыйным аргументам; калі выкарыстоўваеце ўласны шлях, захавайце VESPERTINE_GREETER_STATE_DIR.",
+      "greeter-sync-timeout-manual-pkexec": "Сінхранізацыя Greeter усё яшчэ патрабуе аўтарызацыі. Выканайце ў тэрмінале: pkexec vespertine-greeter-apply-appearance --sync \"/run/user/$(id -u)/vespertine-greeter-sync\"",
+      "keybind-app": "Vespertine",
       "keybind-invalid-modifier": "Гэта спалучэнне можа быць адной клавішай без мадыфікатараў.",
       "keybind-invalid-printable": "Клавішам-сімвалам (літарам, лічбам, пунктуацыі і інш.) патрабуюцца мадыфікатары, такія як Ctrl або Alt.",
       "keybind-invalid-super": "Клавіша Super/Windows не можа быць выкарыстана ў спалучэннях клавішаў абалонкі.",
@@ -1067,7 +1067,7 @@
     },
     "enable-failed": {
       "body-error": "{plugin}: {error}",
-      "body-incompatible": "{plugin} разлічаны на API {version}; ваша Noctalia падтрымлівае API {oldest}–{current}.",
+      "body-incompatible": "{plugin} разлічаны на API {version}; ваша Vespertine падтрымлівае API {oldest}–{current}.",
       "body-timeout": "{plugin} усталёўвалася надта доўга.",
       "title": "Убудова не ўключана"
     }
@@ -1371,10 +1371,10 @@
       },
       "reset-page": "Некаторыя налады не ўдалося скінуць.",
       "support-report": "Не ўдалося захаваць справаздачу.",
-      "sync-greeter": "Не ўдалося сінхранізаваць выгляд з Noctalia Greeter.",
+      "sync-greeter": "Не ўдалося сінхранізаваць выгляд з Vespertine Greeter.",
       "sync-greeter-timeout": "Сінхранізацыя Greeter усё яшчэ чакае аўтарызацыі. Праверце TTY або кансоль на прадмет запыту polkit, уключыце агент polkit у наладах прыватнасці і бяспекі або ўласнаручна выканайце pkexec.",
-      "sync-greeter-timeout-manual": "Аўтэнтыфікаваная састарэлая сінхранізацыя ўсё яшчэ патрабуе ўхвалення адміністратара. Выканайце ў тэрмінале памочнік прымянення, перадаўшы каталог стану пазіцыйным аргументам; калі выкарыстоўваеце ўласны шлях, захавайце NOCTALIA_GREETER_STATE_DIR.",
-      "sync-greeter-timeout-manual-pkexec": "Сінхранізацыя Greeter усё яшчэ патрабуе аўтарызацыі. Выканайце ў тэрмінале: pkexec noctalia-greeter-apply-appearance --sync \"/run/user/$(id -u)/noctalia-greeter-sync\"",
+      "sync-greeter-timeout-manual": "Аўтэнтыфікаваная састарэлая сінхранізацыя ўсё яшчэ патрабуе ўхвалення адміністратара. Выканайце ў тэрмінале памочнік прымянення, перадаўшы каталог стану пазіцыйным аргументам; калі выкарыстоўваеце ўласны шлях, захавайце VESPERTINE_GREETER_STATE_DIR.",
+      "sync-greeter-timeout-manual-pkexec": "Сінхранізацыя Greeter усё яшчэ патрабуе аўтарызацыі. Выканайце ў тэрмінале: pkexec vespertine-greeter-apply-appearance --sync \"/run/user/$(id -u)/vespertine-greeter-sync\"",
       "widget": {
         "rename": "Не ўдалося перайменаваць названы віджэт."
       },
@@ -1841,7 +1841,7 @@
         "deprecated": "састарэлая",
         "empty": "Няма ўключаных убудоў.",
         "held-back": "старэйшая версія",
-        "held-back-hint": "v{version} патрабуе API {required}; ваша Noctalia падтрымлівае версіі да {current}. Абнавіце Noctalia, каб атрымаць.",
+        "held-back-hint": "v{version} патрабуе API {required}; ваша Vespertine падтрымлівае версіі да {current}. Абнавіце Vespertine, каб атрымаць.",
         "incompatible-plugin-api": "несумяшчальны API",
         "remove": "Выдаліць убудову",
         "requires": "Патрабуе {dependencies}",
@@ -1874,8 +1874,8 @@
         },
         "kind-label": "Тып",
         "location-label": "Месцазнаходжанне",
-        "location-placeholder-git": "https://github.com/ja/ubudovy-noctalia",
-        "location-placeholder-path": "~/dev/ubudovy-noctalia",
+        "location-placeholder-git": "https://github.com/ja/ubudovy-vespertine",
+        "location-placeholder-path": "~/dev/ubudovy-vespertine",
         "name-label": "ID крыніцы",
         "name-placeholder": "maje-ubudovy",
         "precedence-hint": "Крыніцы ніжэй перавызначаюць крыніцы вышэй, калі ёсць аднолькавыя ўбудовы.",
@@ -1885,20 +1885,20 @@
         "update": "Абнавіць крыніцу"
       },
       "store": {
-        "add": "Дадаць у Noctalia",
+        "add": "Дадаць у Vespertine",
         "back-to-catalog": "Вярнуцца ў каталог",
         "categories": "Катэгорыі",
         "category-all": "Усе",
         "empty": "Убудоў не знойдзена",
         "held-back": "Старэйшая версія",
-        "held-back-hint": "Усталюе {version} для API {resolved}. Найноўшая версія {latest} патрабуе API {latestRequired}; ваша Noctalia падтрымлівае версіі да {current}.",
+        "held-back-hint": "Усталюе {version} для API {resolved}. Найноўшая версія {latest} патрабуе API {latestRequired}; ваша Vespertine падтрымлівае версіі да {current}.",
         "incompatible": "Несумяшчальная",
-        "incompatible-hint": "Патрабуе API {required}; ваша Noctalia падтрымлівае API {oldest}–{current}.",
+        "incompatible-hint": "Патрабуе API {required}; ваша Vespertine падтрымлівае API {oldest}–{current}.",
         "installed": "Усталяваныя",
         "loading": "Загрузка каталога…",
         "no-readme": "Апісання няма",
         "not-listed": "Не ў каталогу",
-        "open-page": "Адкрыць старонку ўбудовы на noctalia.dev",
+        "open-page": "Адкрыць старонку ўбудовы на vespertine.dev",
         "open-source": "Адкрыць рэпазіторый убудовы",
         "recommend": "Рэкамендаваць",
         "recommendation-error": "Змена не пацвердзілася. Папярэдняя рэкамендацыя не змянілася. Паўтарыце тую ж змену, каб узгадніць стан.",
@@ -1974,7 +1974,7 @@
           "label": "Скругленасць кутоў"
         },
         "custom-palette": {
-          "description": "Выберыце палітру з ~/.config/noctalia/palettes/",
+          "description": "Выберыце палітру з ~/.config/vespertine/palettes/",
           "label": "Уласная палітра",
           "search-placeholder": "Шукаць карыстальніцкія палітры…"
         },
@@ -2023,7 +2023,7 @@
           "label": "Абсалютны чорны"
         },
         "shell-theme-mode": {
-          "description": "Замацаваць уласны светлы або цёмны рэжым Noctalia; «Сачыць» трымае яго ў адпаведнасці з рэжымам тэмы",
+          "description": "Замацаваць уласны светлы або цёмны рэжым Vespertine; «Сачыць» трымае яго ў адпаведнасці з рэжымам тэмы",
           "label": "Рэжым тэмы абалонкі"
         },
         "show-close-buttons": {
@@ -2521,7 +2521,7 @@
             "label": "Пры завяршэнні працы"
           },
           "started": {
-            "description": "Каманда, якая выконваецца пасля запуску Noctalia",
+            "description": "Каманда, якая выконваецца пасля запуску Vespertine",
             "label": "Пры запуску"
           },
           "theme-mode-changed": {
@@ -2529,7 +2529,7 @@
             "label": "Пры змене рэжыму тэмы"
           },
           "wallpaper-changed": {
-            "description": "Каманда, якая выконваецца, калі змяняюцца шпалеры; перадае NOCTALIA_WALLPAPER_PATH і NOCTALIA_WALLPAPER_CONNECTOR",
+            "description": "Каманда, якая выконваецца, калі змяняюцца шпалеры; перадае VESPERTINE_WALLPAPER_PATH і VESPERTINE_WALLPAPER_CONNECTOR",
             "label": "Пры змене шпалер"
           },
           "wifi-disabled": {
@@ -2952,7 +2952,7 @@
           "label": "Паказваць кнопку сеансу"
         },
         "launcher-show-settings-button": {
-          "description": "Паказваць ярлык для налад Noctalia",
+          "description": "Паказваць ярлык для налад Vespertine",
           "label": "Паказваць кнопку налад"
         },
         "launcher-sort-by-usage": {
@@ -3201,7 +3201,7 @@
           "placeholder": "Горад, краіна"
         },
         "location-auto-locate": {
-          "description": "Аўтаматычна вызначаць месцазнаходжанне па IP-адрасе праз noctalia.dev",
+          "description": "Аўтаматычна вызначаць месцазнаходжанне па IP-адрасе праз vespertine.dev",
           "label": "Аўтавызначэнне (IP)"
         },
         "longitude": {
@@ -3454,7 +3454,7 @@
           "label": "Фармат даты"
         },
         "external-ip": {
-          "description": "Вызначаць публічны WAN IP злучэння (праз api.noctalia.dev) і паказваць яго на ўкладцы сеткі ў Цэнтры кіравання",
+          "description": "Вызначаць публічны WAN IP злучэння (праз api.vespertine.dev) і паказваць яго на ўкладцы сеткі ў Цэнтры кіравання",
           "label": "Паказваць WAN IP"
         },
         "greeter-sync-auto": {
@@ -3470,9 +3470,9 @@
           "label": "Подпісы раскладак клавіятуры"
         },
         "launch-apps-as-systemd-services": {
-          "description": "Запускаць праграмы ў асобных службах systemd, каб яны не дзялілі cgroup Noctalia",
+          "description": "Запускаць праграмы ў асобных службах systemd, каб яны не дзялілі cgroup Vespertine",
           "label": "Запускаць праграмы як службы systemd",
-          "requires-systemd-session": "Патрабуе, каб Noctalia працавала як карыстальніцкая служба systemd (uwsm або карыстальніцкі юніт systemd)"
+          "requires-systemd-session": "Патрабуе, каб Vespertine працавала як карыстальніцкая служба systemd (uwsm або карыстальніцкі юніт systemd)"
         },
         "launch-apps-custom-command": {
           "description": "Абгортвае праграмы, якія запускаюцца з меню запуску, дока і панэлі задач; замяняе $CMD зыходнай камандай",
@@ -3755,8 +3755,8 @@
         },
         "sync-greeter": {
           "button": "Сінхранізаваць зараз",
-          "description": "Капіяваць бягучы знешні выгляд і размяшчэнне манітораў у Noctalia Greeter. Запытваецца ўхваленне адміністратара, калі сістэмная палітыка не дазваляе сінхранізацыю без пароля для вашага карыстальніка.",
-          "label": "Noctalia Greeter"
+          "description": "Капіяваць бягучы знешні выгляд і размяшчэнне манітораў у Vespertine Greeter. Запытваецца ўхваленне адміністратара, калі сістэмная палітыка не дазваляе сінхранізацыю без пароля для вашага карыстальніка.",
+          "label": "Vespertine Greeter"
         },
         "telemetry": {
           "description": "Адпраўляе невялікі ананімны сігнал запуску з версіяй, АС, кампазітарам, разрозненнямі манітораў, RAM і маштабам інтэрфейсу",
@@ -4133,7 +4133,7 @@
             "label": "Задаць профіль EasyEffects"
           },
           "greeter-sync": {
-            "description": "Сінхранізаваць шпалеры, колеры і макет манітораў у Noctalia Greeter",
+            "description": "Сінхранізаваць шпалеры, колеры і макет манітораў у Vespertine Greeter",
             "label": "Сінхранізаваць знешні выгляд Greeter"
           },
           "keyboard-backlight-down": {
@@ -4249,7 +4249,7 @@
             "label": "Выклікаць апошняе дзеянне апавяшчэння"
           },
           "notification-show": {
-            "description": "Паказаць унутранае апавяшчэнне Noctalia",
+            "description": "Паказаць унутранае апавяшчэнне Vespertine",
             "label": "Паказаць апавяшчэнне"
           },
           "osd-disable": {
@@ -4325,7 +4325,7 @@
             "label": "Адкрыць налады"
           },
           "settings-open-plugin": {
-            "description": "Адкрыць акно налад на наладах убудовы (напр. noctalia/notes)",
+            "description": "Адкрыць акно налад на наладах убудовы (напр. vespertine/notes)",
             "label": "Адкрыць налады ўбудовы"
           },
           "settings-open-widget": {
@@ -5252,8 +5252,8 @@
       "export-config": "Экспарт канфігурацыі…",
       "export-config-saved": "Экспарт канфігурацыі захаваны.",
       "filter-overridden": "Перавызначаныя",
-      "legacy-config-warning": "Састарэлая налада: {issue}. Адрэдагуйце гэты зыходны запіс; Noctalia ужывае замену толькі часова. Выканайце noctalia config validate, каб атрымаць спіс усіх неабходных змен.",
-      "native-title": "Налады Noctalia",
+      "legacy-config-warning": "Састарэлая налада: {issue}. Адрэдагуйце гэты зыходны запіс; Vespertine ужывае замену толькі часова. Выканайце vespertine config validate, каб атрымаць спіс усіх неабходных змен.",
+      "native-title": "Налады Vespertine",
       "no-results": "Налад не знойдзена",
       "no-results-hint": "Паспрабуйце іншую назву налады або ключ канфігурацыі.",
       "offline-mode-notice": {
@@ -5289,7 +5289,7 @@
     "no-wallpaper-selected": "Шпалеры не выбраны",
     "select-wallpaper": "Выбраць шпалеры",
     "subtitle": "Некалькі хуткіх выбараў, каб пачаць.",
-    "title": "Вітаем у Noctalia",
+    "title": "Вітаем у Vespertine",
     "wallpaper": "Шпалеры",
     "wallpaper-scheme": "Схема шпалер"
   },

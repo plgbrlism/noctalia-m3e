@@ -13,7 +13,7 @@
 #include <sstream>
 #include <utility>
 
-namespace noctalia::theme {
+namespace vespertine::theme {
 
   namespace {
 
@@ -229,4 +229,4 @@ namespace noctalia::theme {
     }
   }
 
-} // namespace noctalia::theme
+} // namespace vespertine::theme

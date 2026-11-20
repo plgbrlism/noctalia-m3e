@@ -1,4 +1,4 @@
-// noctalia-pam-helper: runs the PAM conversation for the lock screen.
+// vespertine-pam-helper: runs the PAM conversation for the lock screen.
 //
 // Kept as a separate, minimal executable so distributions whose PAM stack
 // needs extra privileges for unprivileged password checks (e.g. setgid for
@@ -17,8 +17,8 @@
 #include <unistd.h>
 #include <vector>
 
-#ifndef NOCTALIA_PAM_SERVICE
-#error "NOCTALIA_PAM_SERVICE must be defined"
+#ifndef VESPERTINE_PAM_SERVICE
+#error "VESPERTINE_PAM_SERVICE must be defined"
 #endif
 
 namespace {
@@ -150,7 +150,7 @@ namespace {
     };
 
     PamHandle pamh;
-    const int startRc = pam_start(NOCTALIA_PAM_SERVICE, user.c_str(), &conv, &pamh.h);
+    const int startRc = pam_start(VESPERTINE_PAM_SERVICE, user.c_str(), &conv, &pamh.h);
     if (startRc != PAM_SUCCESS || pamh.h == nullptr) {
       return Outcome{.status = pam_helper::Status::StartFailed, .pamRc = startRc};
     }

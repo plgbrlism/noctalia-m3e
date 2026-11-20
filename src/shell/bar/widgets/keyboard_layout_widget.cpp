@@ -233,9 +233,9 @@ void KeyboardLayoutWidget::sync(Renderer& renderer) {
   if (auto* node = root(); node != nullptr) {
     // Dim only when the click cannot do anything: the compositor backend is missing and the left
     // binding is still the one that needs it.
-    const auto* left = gestureBindings().find(noctalia::bar::Gesture::Left);
+    const auto* left = gestureBindings().find(vespertine::bar::Gesture::Left);
     const bool needsBackend = left != nullptr
-        && left->kind == noctalia::bar::WidgetAction::Kind::Ipc
+        && left->kind == vespertine::bar::WidgetAction::Kind::Ipc
         && left->verb == "keyboard-layout-cycle";
     node->setOpacity(needsBackend && !m_platform.hasKeyboardLayoutBackend() ? 0.85F : 1.0F);
   }
@@ -246,10 +246,10 @@ void KeyboardLayoutWidget::sync(Renderer& renderer) {
 // The compositor reports the new layout on its own schedule, so show the layout the cycle is
 // about to land on and poll hard until reality catches up.
 void KeyboardLayoutWidget::onGestureDispatch(
-    noctalia::bar::Gesture gesture, const noctalia::bar::WidgetAction& action
+    vespertine::bar::Gesture gesture, const vespertine::bar::WidgetAction& action
 ) {
   (void)gesture;
-  if (action.kind != noctalia::bar::WidgetAction::Kind::Ipc || action.verb != "keyboard-layout-cycle") {
+  if (action.kind != vespertine::bar::WidgetAction::Kind::Ipc || action.verb != "keyboard-layout-cycle") {
     return;
   }
 

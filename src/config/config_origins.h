@@ -9,7 +9,7 @@
 #include <string_view>
 #include <unordered_map>
 
-namespace noctalia::config {
+namespace vespertine::config {
 
   // Dotted config path to the file and position that defined it.
   //
@@ -48,4 +48,4 @@ namespace noctalia::config {
   // Position of a toml++ parse failure, attributed to `file`.
   schema::SourceOrigin parseErrorOrigin(const toml::parse_error& error, const std::filesystem::path& file);
 
-} // namespace noctalia::config
+} // namespace vespertine::config

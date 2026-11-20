@@ -20,15 +20,15 @@
 #include <unistd.h>
 #include <vector>
 
-#ifndef NOCTALIA_PAM_HELPER
-#error "NOCTALIA_PAM_HELPER must be defined"
+#ifndef VESPERTINE_PAM_HELPER
+#error "VESPERTINE_PAM_HELPER must be defined"
 #endif
 
 namespace {
 
   constexpr Logger kLog("pam");
 
-  constexpr const char* kHelperName = "noctalia-pam-helper";
+  constexpr const char* kHelperName = "vespertine-pam-helper";
 
   void closeFd(int& fd) {
     if (fd >= 0) {
@@ -135,19 +135,19 @@ namespace {
     return true;
   }
 
-  // NOCTALIA_PAM_HELPER_PATH replaces the lookup, so a shell built elsewhere
+  // VESPERTINE_PAM_HELPER_PATH replaces the lookup, so a shell built elsewhere
   // (e.g. by Nix on another distribution) can pair with a helper built against
   // the host's libpam. Otherwise a helper next to the binary (build tree,
   // bundle) wins over the installed one, so a dev build never talks to an
   // older installed helper. Logs why nothing was found.
   [[nodiscard]] std::string resolveHelperPath() {
-    if (const char* envPath = std::getenv("NOCTALIA_PAM_HELPER_PATH"); envPath != nullptr) {
+    if (const char* envPath = std::getenv("VESPERTINE_PAM_HELPER_PATH"); envPath != nullptr) {
       if (*envPath != '/') {
-        kLog.error("NOCTALIA_PAM_HELPER_PATH must be an absolute path, got {}", envPath);
+        kLog.error("VESPERTINE_PAM_HELPER_PATH must be an absolute path, got {}", envPath);
         return {};
       }
       if (::access(envPath, X_OK) != 0) {
-        kLog.error("NOCTALIA_PAM_HELPER_PATH={} is not executable: {}", envPath, std::strerror(errno));
+        kLog.error("VESPERTINE_PAM_HELPER_PATH={} is not executable: {}", envPath, std::strerror(errno));
         return {};
       }
       return envPath;
@@ -166,10 +166,10 @@ namespace {
         }
       }
     }
-    if (::access(NOCTALIA_PAM_HELPER, X_OK) == 0) {
-      return NOCTALIA_PAM_HELPER;
+    if (::access(VESPERTINE_PAM_HELPER, X_OK) == 0) {
+      return VESPERTINE_PAM_HELPER;
     }
-    kLog.error("{} not found (expected at {})", kHelperName, NOCTALIA_PAM_HELPER);
+    kLog.error("{} not found (expected at {})", kHelperName, VESPERTINE_PAM_HELPER);
     return {};
   }
 
@@ -249,7 +249,7 @@ PamAuthenticator::authenticateCurrentUser(std::string_view password, const Messa
       && ((exitCode == pam_helper::kExitSuccess) == succeeded);
   if (reply.version != 0 && reply.version != pam_helper::kProtocolVersion) {
     kLog.error(
-        "pam helper {} speaks protocol {}, expected {}; restart noctalia after an upgrade", helperPath, reply.version,
+        "pam helper {} speaks protocol {}, expected {}; restart vespertine after an upgrade", helperPath, reply.version,
         pam_helper::kProtocolVersion
     );
     return fail();

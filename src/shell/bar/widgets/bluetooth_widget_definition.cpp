@@ -14,15 +14,15 @@ namespace {
 
 } // namespace
 
-const noctalia::bar::WidgetDefinition<BluetoothWidget::Options>& bluetoothWidgetDefinition() {
-  using noctalia::bar::field;
-  using noctalia::bar::glyphPositionField;
-  using noctalia::bar::peekDelayField;
-  using noctalia::bar::peekField;
-  using noctalia::bar::whenAllTrue;
+const vespertine::bar::WidgetDefinition<BluetoothWidget::Options>& bluetoothWidgetDefinition() {
+  using vespertine::bar::field;
+  using vespertine::bar::glyphPositionField;
+  using vespertine::bar::peekDelayField;
+  using vespertine::bar::peekField;
+  using vespertine::bar::whenAllTrue;
   using Options = BluetoothWidget::Options;
 
-  static const noctalia::bar::WidgetDefinition<Options> definition{
+  static const vespertine::bar::WidgetDefinition<Options> definition{
       .type = "bluetooth",
       .fields = {
           field<&Options::showLabel>({

@@ -13,7 +13,7 @@
 #include <system_error>
 #include <vector>
 
-namespace noctalia::system::cpu_temp {
+namespace vespertine::system::cpu_temp {
   namespace {
 
     struct Sensor {
@@ -382,4 +382,4 @@ namespace noctalia::system::cpu_temp {
     return ProbeResult{.reading = std::nullopt, .error = "no CPU temperature sensor found"};
   }
 
-} // namespace noctalia::system::cpu_temp
+} // namespace vespertine::system::cpu_temp

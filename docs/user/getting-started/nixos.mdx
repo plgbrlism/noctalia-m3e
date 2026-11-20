@@ -1,6 +1,6 @@
 ---
 title: NixOS
-description: Start here to set up and use Noctalia.
+description: Start here to set up and use Vespertine.
 sidebar:
   order: 2
 ---
@@ -8,7 +8,7 @@ sidebar:
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 :::caution
-To make Noctalia's wifi, bluetooth, power-profile, and battery feature available, please ensure the following NixOS options are enabled:
+To make Vespertine's wifi, bluetooth, power-profile, and battery feature available, please ensure the following NixOS options are enabled:
 
 - `networking.networkmanager.enable`
 - `hardware.bluetooth.enable`
@@ -18,7 +18,7 @@ To make Noctalia's wifi, bluetooth, power-profile, and battery feature available
 
 ## Installation
 
-A Noctalia package is available on [nixpkgs unstable](https://search.nixos.org/packages?channel=unstable\&show=noctalia).
+A Vespertine package is available on [nixpkgs unstable](https://search.nixos.org/packages?channel=unstable\&show=vespertine).
 
 If you'd prefer the latest git version or would like to use one of the modules, you can [add the input](#add-input) using your preferred input-pinning method and optionally use the [binary cache](#binary-cache) to avoid compiling locally.
 
@@ -26,14 +26,14 @@ If you'd prefer the latest git version or would like to use one of the modules, 
 
 <Tabs>
   <TabItem label="flakes">
-    Add Noctalia to your flake inputs:
+    Add Vespertine to your flake inputs:
 
     ```nix
     # flake.nix
     {
       inputs = {
-        noctalia = {
-          url = "github:noctalia-dev/noctalia";
+        vespertine = {
+          url = "github:vespertine-dev/vespertine";
           inputs.nixpkgs.follows = "nixpkgs"; # this line is optional, prevents downloading two versions of nixpkgs but disables cache
         };
       };
@@ -46,13 +46,13 @@ If you'd prefer the latest git version or would like to use one of the modules, 
   </TabItem>
 
   <TabItem label="tack">
-    Add Noctalia to your tack inputs:
+    Add Vespertine to your tack inputs:
 
     ```
-    tack add noctalia github:noctalia-dev/noctalia
+    tack add vespertine github:vespertine-dev/vespertine
     ```
 
-    If you want to use the cache, make sure to disable any sort of following for Noctalia's nixpkgs input.
+    If you want to use the cache, make sure to disable any sort of following for Vespertine's nixpkgs input.
 
     :::note
     For flakes/tack instructions, we assume you are passing in `inputs` through `specialArgs` or equivalent.
@@ -60,17 +60,17 @@ If you'd prefer the latest git version or would like to use one of the modules, 
   </TabItem>
 
   <TabItem label="npins">
-    Add Noctalia to your npins sources:
+    Add Vespertine to your npins sources:
 
     ```
-    npins add github noctalia-dev noctalia --branch main
+    npins add github vespertine-dev vespertine --branch main
     ```
 
     ```nix
     # configuration.nix
     { pkgs, ... }:
     let
-      noctalia = import (import ./npins).noctalia {
+      vespertine = import (import ./npins).vespertine {
         inherit pkgs; # this line is optional, prevents downloading two versions of nixpkgs but disables cache
       };
     in
@@ -79,21 +79,21 @@ If you'd prefer the latest git version or would like to use one of the modules, 
   </TabItem>
 
   <TabItem label="tarball">
-    Add Noctalia directly using `builtins.fetchTarball`. With pinning:
+    Add Vespertine directly using `builtins.fetchTarball`. With pinning:
 
     ```nix
     # configuration.nix
     { pkgs, ... }:
     let
-      noctalia-src = let
+      vespertine-src = let
         commit = ""; # replace this with an actual commit id or tag
       in
         fetchTarball {
-          url = "https://github.com/noctalia-dev/noctalia/archive/${commit}.tar.gz";
+          url = "https://github.com/vespertine-dev/vespertine/archive/${commit}.tar.gz";
           sha256 = ""; # replace this with hash from nix build output, or by using `nix-prefetch-url --unpack`
         };
       
-      noctalia = import noctalia-src {
+      vespertine = import vespertine-src {
         inherit pkgs; # this line is optional, prevents downloading two versions of nixpkgs but disables cache
       };
     in
@@ -106,9 +106,9 @@ If you'd prefer the latest git version or would like to use one of the modules, 
     # configuration.nix
     { pkgs, ... }:
     let
-      noctalia-src = fetchTarball "https://github.com/noctalia-dev/noctalia/archive/main.tar.gz";
+      vespertine-src = fetchTarball "https://github.com/vespertine-dev/vespertine/archive/main.tar.gz";
 
-      noctalia = import noctalia-src {
+      vespertine = import vespertine-src {
         inherit pkgs; # this line is optional, prevents downloading two versions of nixpkgs but disables cache
       };
     in
@@ -130,7 +130,7 @@ Note that both the Home Manager and Hjem modules install the package for you, so
     { inputs, pkgs, ... }:
     {
       environment.systemPackages = [
-        inputs.noctalia.packages.${pkgs.stdenv.hostPlatform.system}.default
+        inputs.vespertine.packages.${pkgs.stdenv.hostPlatform.system}.default
       ];
     }
     ```
@@ -143,7 +143,7 @@ Note that both the Home Manager and Hjem modules install the package for you, so
       # see adding the input above
     in {
       environment.systemPackages = [
-        noctalia.package
+        vespertine.package
       ];
     }
     ```
@@ -152,7 +152,7 @@ Note that both the Home Manager and Hjem modules install the package for you, so
 
 ### Home Manager Module {#home-manager}
 
-The Home Manager module allows you to configure Noctalia's settings [(that you would otherwise put in `~/.config/noctalia/`)](/noctalia/configuration/) using nix instead of toml, or allows you to link an existing toml file. It is optional.
+The Home Manager module allows you to configure Vespertine's settings [(that you would otherwise put in `~/.config/vespertine/`)](/vespertine/configuration/) using nix instead of toml, or allows you to link an existing toml file. It is optional.
 
 <Tabs>
   <TabItem label="flakes/tack">
@@ -161,10 +161,10 @@ The Home Manager module allows you to configure Noctalia's settings [(that you w
     {
       home-manager.users.drfoobar = {
         imports = [
-          inputs.noctalia.homeModules.default
+          inputs.vespertine.homeModules.default
         ];
 
-        programs.noctalia = {
+        programs.vespertine = {
           enable = true;
 
           settings = { # This may also be a string or path to a .toml file.
@@ -192,10 +192,10 @@ The Home Manager module allows you to configure Noctalia's settings [(that you w
     in {
       home-manager.users.drfoobar = {
         imports = [
-          noctalia.homeModule
+          vespertine.homeModule
         ];
 
-        programs.noctalia = {
+        programs.vespertine = {
           enable = true;
 
           settings = { # This may also be a string or path to a .toml file.
@@ -218,18 +218,18 @@ The Home Manager module allows you to configure Noctalia's settings [(that you w
 </Tabs>
 
 :::note
-Home Manager settings provide Noctalia's declarative configuration. Wallpaper selections made through the UI or IPC are saved in `~/.local/state/noctalia/settings.toml` and take priority over `wallpaper.default.path`. Completing setup without choosing a wallpaper does not save one, so the declared wallpaper applies.
+Home Manager settings provide Vespertine's declarative configuration. Wallpaper selections made through the UI or IPC are saved in `~/.local/state/vespertine/settings.toml` and take priority over `wallpaper.default.path`. Completing setup without choosing a wallpaper does not save one, so the declared wallpaper applies.
 
-To restore the declared wallpaper after a runtime selection, stop Noctalia and remove the saved `path` entries under `[wallpaper.default]`, `[wallpaper.last]`, and any relevant `[wallpaper.monitors."<connector>"]` tables from `settings.toml`, then restart Noctalia. `wallpaper.last.path` remembers the last selection for wallpaper-derived palettes and greeter sync, so clearing it also restores those to the configured wallpaper. Preserve unrelated settings. The same steps clear the bundled wallpaper path that older versions saved when setup completed.
+To restore the declared wallpaper after a runtime selection, stop Vespertine and remove the saved `path` entries under `[wallpaper.default]`, `[wallpaper.last]`, and any relevant `[wallpaper.monitors."<connector>"]` tables from `settings.toml`, then restart Vespertine. `wallpaper.last.path` remembers the last selection for wallpaper-derived palettes and greeter sync, so clearing it also restores those to the configured wallpaper. Preserve unrelated settings. The same steps clear the bundled wallpaper path that older versions saved when setup completed.
 :::
 
 ### Nix-managed plugins {#plugins}
 
-Pin a plugin repository alongside Noctalia. The official plugin repository contains plugin sources without a `flake.nix`, so set `flake = false`. Nix still records its revision and content hash in `flake.lock`:
+Pin a plugin repository alongside Vespertine. The official plugin repository contains plugin sources without a `flake.nix`, so set `flake = false`. Nix still records its revision and content hash in `flake.lock`:
 
 ```nix
-inputs.noctalia-plugins = {
-  url = "github:noctalia-dev/official-plugins";
+inputs.vespertine-plugins = {
+  url = "github:vespertine-dev/official-plugins";
   flake = false;
 };
 ```
@@ -239,25 +239,25 @@ Use it as a read-only `path` source in the Home Manager module. Plugin versions 
 ```nix
 { inputs, pkgs, ... }:
 {
-  imports = [ inputs.noctalia.homeModules.default ];
+  imports = [ inputs.vespertine.homeModules.default ];
 
-  programs.noctalia = {
+  programs.vespertine = {
     enable = true;
     extraPackages = [ pkgs.gpu-screen-recorder pkgs.slurp ];
 
     settings = {
       plugins = {
-        enabled = [ "noctalia/screen_recorder" ];
+        enabled = [ "vespertine/screen_recorder" ];
         source = [
           {
             name = "official";
             kind = "path";
-            location = "${inputs.noctalia-plugins}";
+            location = "${inputs.vespertine-plugins}";
             enabled = true;
           }
         ];
       };
-      plugin_settings."noctalia/screen_recorder" = {
+      plugin_settings."vespertine/screen_recorder" = {
         frame_rate = 30;
         show_cursor = false;
       };
@@ -266,11 +266,11 @@ Use it as a read-only `path` source in the Home Manager module. Plugin versions 
 }
 ```
 
-An explicit `plugins.source` list replaces the default sources. Noctalia reads path sources directly and never updates their contents. Choose plugin revisions compatible with your Noctalia version.
+An explicit `plugins.source` list replaces the default sources. Vespertine reads path sources directly and never updates their contents. Choose plugin revisions compatible with your Vespertine version.
 
-The Home Manager module's `programs.noctalia.extraPackages` option adds executables to Noctalia's `PATH`, including when launched by systemd or through the desktop launcher. It wraps the selected `programs.noctalia.package` without rebuilding Noctalia and requires that package to be non-null. List the packages required by your plugins; dependencies are not installed automatically from plugin manifests.
+The Home Manager module's `programs.vespertine.extraPackages` option adds executables to Vespertine's `PATH`, including when launched by systemd or through the desktop launcher. It wraps the selected `programs.vespertine.package` without rebuilding Vespertine and requires that package to be non-null. List the packages required by your plugins; dependencies are not installed automatically from plugin manifests.
 
-Plugin settings use the keys declared in each plugin's `plugin.toml`. Runtime changes in Settings take precedence over the declarative defaults; see [Plugin settings](/noctalia/plugins/#plugin-settings).
+Plugin settings use the keys declared in each plugin's `plugin.toml`. Runtime changes in Settings take precedence over the declarative defaults; see [Plugin settings](/vespertine/plugins/#plugin-settings).
 
 ### Hjem Module {#hjem}
 
@@ -283,11 +283,11 @@ For those using Hjem instead of Home Manager, a Hjem module is also available.
     {
       hjem = {
         extraModules = [
-          inputs.noctalia.hjemModules.default
+          inputs.vespertine.hjemModules.default
         ];
 
         users.drfoobar = {
-          programs.noctalia = {
+          programs.vespertine = {
             enable = true;
             
             settings = { ... };
@@ -305,11 +305,11 @@ For those using Hjem instead of Home Manager, a Hjem module is also available.
     in {
       hjem = {
         extraModules = [
-          noctalia.hjemModule
+          vespertine.hjemModule
         ];
 
         users.drfoobar = {
-          programs.noctalia = {
+          programs.vespertine = {
             enable = true;
             
             settings = { ... };
@@ -331,10 +331,10 @@ The NixOS module installs the package system-wide and can enable some recommende
     { inputs, ... }:
     {
       imports = [
-        inputs.noctalia.nixosModules.default
+        inputs.vespertine.nixosModules.default
       ];
 
-      programs.noctalia = {
+      programs.vespertine = {
         enable = true;
 
         # Enables NetworkManager, Bluetooth, UPower, and a power profile service.
@@ -350,10 +350,10 @@ The NixOS module installs the package system-wide and can enable some recommende
       # see adding the input above
     in {
       imports = [
-        noctalia.nixosModule
+        vespertine.nixosModule
       ];
       
-      programs.noctalia = {
+      programs.vespertine = {
         enable = true;
       
         # Enables NetworkManager, Bluetooth, UPower, and a power profile service.
@@ -366,20 +366,20 @@ The NixOS module installs the package system-wide and can enable some recommende
 
 ### Systemd Service {#systemd}
 
-Each of the above modules includes a systemd user service for Noctalia, which can be enabled by setting `programs.noctalia.systemd.enable = true`.
+Each of the above modules includes a systemd user service for Vespertine, which can be enabled by setting `programs.vespertine.systemd.enable = true`.
 
 :::note
-When using the service, it is recommended to enable `launch_apps_as_systemd_services`, otherwise any apps launched by Noctalia will be terminated when the service restarts.
+When using the service, it is recommended to enable `launch_apps_as_systemd_services`, otherwise any apps launched by Vespertine will be terminated when the service restarts.
 :::
 
 ### Binary Cache {#binary-cache}
 
-Pre-built binaries are available on [Cachix](https://app.cachix.org/cache/noctalia), so you can skip compiling locally.
+Pre-built binaries are available on [Cachix](https://app.cachix.org/cache/vespertine), so you can skip compiling locally.
 
 You can configure the substituter either in your NixOS config, flake, or `/etc/nix/nix.conf`:
 
 :::caution
-To use the binary cache, you have to omit `inputs.nixpkgs.follows` from the Noctalia input with flakes/tack or avoid `inherit pkgs;` with npins/tarball.
+To use the binary cache, you have to omit `inputs.nixpkgs.follows` from the Vespertine input with flakes/tack or avoid `inherit pkgs;` with npins/tarball.
 :::
 
 You can add the cache either to your flake, nixos configuration, or `/etc/nix/nix.conf`.
@@ -388,8 +388,8 @@ You can add the cache either to your flake, nixos configuration, or `/etc/nix/ni
   <TabItem label="configuration.nix">
     ```nix
     nix.settings = {
-      extra-substituters = [ "https://noctalia.cachix.org" ];
-      extra-trusted-public-keys = [ "noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4=" ];
+      extra-substituters = [ "https://vespertine.cachix.org" ];
+      extra-trusted-public-keys = [ "vespertine.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4=" ];
     };
     ```
   </TabItem>
@@ -397,42 +397,42 @@ You can add the cache either to your flake, nixos configuration, or `/etc/nix/ni
   <TabItem label="flake.nix">
     ```nix
     nixConfig = {
-      extra-substituters = [ "https://noctalia.cachix.org" ];
-      extra-trusted-public-keys = [ "noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4=" ];
+      extra-substituters = [ "https://vespertine.cachix.org" ];
+      extra-trusted-public-keys = [ "vespertine.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4=" ];
     };
     ```
   </TabItem>
 
   <TabItem label="nix.conf">
     ```properties
-    extra-substituters = https://noctalia.cachix.org
-    extra-trusted-public-keys = noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4=
+    extra-substituters = https://vespertine.cachix.org
+    extra-trusted-public-keys = vespertine.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4=
     ```
   </TabItem>
 </Tabs>
 
-Overriding any of Noctalia's inputs (e.g. via `inputs.nixpkgs.follows` with flakes) changes the derivation hash, causing cache misses.
+Overriding any of Vespertine's inputs (e.g. via `inputs.nixpkgs.follows` with flakes) changes the derivation hash, causing cache misses.
 
 Additionally, tracking `main` directly may pull in a commit that hasn't been cached yet by CI.
 
-To avoid this, the [`cachix`](https://github.com/noctalia-dev/noctalia/tree/cachix) branch always points to the latest cached commit. Pinning to this branch guarantees you always track the latest commit that has already been cached:
+To avoid this, the [`cachix`](https://github.com/vespertine-dev/vespertine/tree/cachix) branch always points to the latest cached commit. Pinning to this branch guarantees you always track the latest commit that has already been cached:
 
 <Tabs>
   <TabItem label="flakes">
     ```nix
-    noctalia.url = "github:noctalia-dev/noctalia/cachix";
+    vespertine.url = "github:vespertine-dev/vespertine/cachix";
     ```
   </TabItem>
 
   <TabItem label="tack">
     ```
-    tack add noctalia github:noctalia-dev/noctalia/cachix
+    tack add vespertine github:vespertine-dev/vespertine/cachix
     ```
   </TabItem>
 
   <TabItem label="npins">
     ```
-    npins add github noctalia-dev noctalia --branch cachix
+    npins add github vespertine-dev vespertine --branch cachix
     ```
   </TabItem>
 

@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   waiting:
-    if: ${{ github.repository == 'noctalia-dev/noctalia' && !github.event.issue.pull_request }}
+    if: ${{ github.repository == 'vespertine-dev/vespertine' && !github.event.issue.pull_request }}
     runs-on: ubuntu-latest
     steps:
       # A reply from the reporter clears the waiting labels, so the daily stale pass does not
@@ -38,8 +38,8 @@ jobs:
               }
             }
 
-      # Same Noctalia Automation GitHub App as project-intake.yml.
-      - name: Create Noctalia Automation token
+      # Same Vespertine Automation GitHub App as project-intake.yml.
+      - name: Create Vespertine Automation token
         id: app-token
         uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
         with:
@@ -103,7 +103,7 @@ jobs:
                 addProjectV2ItemById(input:{projectId:$project,contentId:$content}) { item { id } }
               }`, { project: projectId, content: issue.node_id });
               item = { id: added.addProjectV2ItemById.item.id, status: null };
-              updates.push(option('Component', 'Noctalia'), option('Kind', 'Issue'));
+              updates.push(option('Component', 'Vespertine'), option('Kind', 'Issue'));
             } else if (target === 'Reviewing' && item.status?.name !== 'Waiting') {
               return;
             }
