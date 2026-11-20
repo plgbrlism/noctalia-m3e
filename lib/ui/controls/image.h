@@ -43,6 +43,10 @@ public:
   void setForegroundTint(std::optional<ColorSpec> tint);
   void setFit(ImageFit fit);
   void setPadding(float padding);
+  // Draws on whole buffer pixels and decodes file sources at the padded frame's buffer-pixel size, so texels map 1:1
+  // to screen pixels. Once laid out, the frame size replaces the requested targetSize. For static images shown at a
+  // fixed size (avatars); Cover on a square frame needs a centerSquareCrop source to avoid upscaling the short edge.
+  void setPixelAligned(bool pixelAligned);
   void setAsyncReadyCallback(AsyncReadyCallback callback);
 
   bool setSourceFile(Renderer& renderer, const std::string& path, int targetSize = 0, bool mipmap = false);
@@ -55,7 +59,8 @@ public:
       bool centerSquareCrop = false
   );
   bool setSourceFileAsync(
-      Renderer& renderer, AsyncTextureCache& cache, const std::string& path, int targetSize = 0, bool mipmap = false
+      Renderer& renderer, AsyncTextureCache& cache, const std::string& path, int targetSize = 0, bool mipmap = false,
+      bool centerSquareCrop = false
   );
   bool setSourceBytes(Renderer& renderer, const std::uint8_t* data, std::size_t size, bool mipmap = false);
   bool setSourceRaw(
@@ -103,6 +108,7 @@ private:
   void rebakeColorizedTexture();
   void reloadColorizedSource();
   void reloadUncolorizedSource();
+  [[nodiscard]] int textureTargetSize(const Renderer& renderer, int requestedTargetSize) const;
   bool setSourceFileImpl(
       Renderer& renderer, const std::string& path, int targetSize, bool mipmap, bool centerSquareCrop, int blurRadius
   );
@@ -121,6 +127,7 @@ private:
   int m_ownedSourceRgbaHeight = 0;
   float m_radius = 0.0F;
   float m_padding = 0.0F;
+  bool m_pixelAligned = false;
   ImageFit m_fit = ImageFit::Contain;
   ColorSpec m_border = clearColorSpec();
   float m_borderWidth = 0.0F;
@@ -136,6 +143,7 @@ private:
   int m_asyncRequestedTargetSize = 0;
   int m_asyncTargetSize = 0;
   bool m_asyncMipmap = false;
+  bool m_asyncCenterSquareCrop = false;
   AsyncReadyCallback m_asyncReadyCallback;
   Signal<>::ScopedConnection m_paletteConn;
 };
