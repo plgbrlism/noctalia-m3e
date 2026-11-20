@@ -1891,7 +1891,6 @@ void LauncherPanel::create() {
             .height = toolbarSideWidth,
             .visible = false,
             .participatesInLayout = false,
-            .configure = [](Image& image) { image.setPixelAligned(true); },
         })
     );
     profile->addChild(
