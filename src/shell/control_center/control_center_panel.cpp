@@ -169,7 +169,14 @@ void ControlCenterPanel::create() {
         .keepItemsInTabOrder = false,
         .wrap = true,
         .scrollIntoView = [this](const Node* node) { scrollSidebarNodeIntoView(node); },
-        .syncIndexFromSelection = {},
+        .syncIndexFromSelection = [this] {
+          for (std::size_t i = 0; i < kTabCount; ++i) {
+            if (kTabs[i].id == m_activeTab) {
+              return i;
+            }
+          }
+          return std::size_t{0};
+        },
     });
     sidebarNav->setTabFocusKey("control-center.sidebar");
     sidebarNav->setFillWidth(true);
