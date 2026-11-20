@@ -589,6 +589,9 @@ void Application::initStyleThemeAndWayland() {
       m_notificationToast.requestLayout();
       m_panelManager.requestLayout();
     }
+    if (densityChanged) {
+      m_settingsWindow.onExternalOptionsChanged();
+    }
   };
   auto applyPasswordMaskStyle = [this] {
     const auto style = m_configService.config().shell.passwordMaskStyle == PasswordMaskStyle::RandomIcons
