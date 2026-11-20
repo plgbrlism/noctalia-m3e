@@ -603,7 +603,7 @@ void Application::initStyleThemeAndWayland() {
   applyStyleConfig();
   applyPasswordMaskStyle();
   applyInputConfig();
-  m_cornerRadiusConn = Style::cornerRadiusChanged().connect([this] {
+  m_cornerRadiusConn = Style::cornerShapeChanged().connect([this] {
     // Radius changes need a repaint everywhere; panels, bar, and desktop widgets also
     // recompute derived geometry or custom-node radii during layout.
     m_bar.refresh();
