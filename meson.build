@@ -1326,6 +1326,7 @@ if build_tests
     'secret_store',
     'security_primitives',
     'settings_search',
+    'smart_auto_hide',
     'spring',
     'state_store',
     'style',
