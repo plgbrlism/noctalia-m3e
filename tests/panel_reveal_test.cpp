@@ -69,5 +69,32 @@ int main() {
     TEST_NEAR(high.offsetY, 0.0F, 1e-4F);           // clamped to p=1
   }
 
+  // Blur region follows the same transform as the panel chrome.
+  {
+    const RevealRect body{20.0F, 30.0F, 200.0F, 100.0F};
+    const float originX = body.x + body.width / 2.0F;
+    const float originY = body.y + body.height / 2.0F;
+
+    const auto identity = transformBodyRect(body, originX, originY, RevealTransform{});
+    TEST_NEAR(identity.x, body.x, 1e-4F);
+    TEST_NEAR(identity.y, body.y, 1e-4F);
+    TEST_NEAR(identity.width, body.width, 1e-4F);
+    TEST_NEAR(identity.height, body.height, 1e-4F);
+
+    const auto depth = transformBodyRect(
+        body, originX, originY, chromeTransform(0.0F, PanelMotion::Depth, RevealDirection::Down, false)
+    );
+    TEST_NEAR(depth.width, 0.92F * body.width, 1e-4F);
+    TEST_NEAR(depth.height, 0.92F * body.height, 1e-4F);
+    TEST_NEAR(depth.x + depth.width / 2.0F, originX, 1e-4F);
+    TEST_NEAR(depth.y + depth.height / 2.0F, originY, 1e-4F);
+
+    const auto fluidTransform = chromeTransform(0.0F, PanelMotion::Fluid, RevealDirection::Down, false);
+    const auto fluid = transformBodyRect(body, originX, originY, fluidTransform);
+    TEST_NEAR(fluid.width, fluidTransform.scaleX * body.width, 1e-4F);
+    TEST_NEAR(fluid.y, body.y + fluidTransform.offsetY, 1e-4F);
+    TEST_NEAR(fluid.x + fluid.width / 2.0F, originX, 1e-4F);
+  }
+
   return 0;
 }

@@ -15,6 +15,24 @@ namespace vespertine::shell::panel::reveal {
     float offsetY = 0.0F;
   };
 
+  struct RevealRect {
+    float x = 0.0F;
+    float y = 0.0F;
+    float width = 0.0F;
+    float height = 0.0F;
+  };
+
+  inline RevealRect transformBodyRect(
+      const RevealRect& body, float originX, float originY, const RevealTransform& transform
+  ) noexcept {
+    return {
+        originX + (body.x - originX) * transform.scaleX + transform.offsetX,
+        originY + (body.y - originY) * transform.scaleY + transform.offsetY,
+        body.width * transform.scaleX,
+        body.height * transform.scaleY,
+    };
+  }
+
   inline constexpr float kFluidTravel = 24.0F;   // logical px
   inline constexpr float kFluidSquash = 0.02F;   // perpendicular swell
 

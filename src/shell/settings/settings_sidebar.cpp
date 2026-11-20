@@ -20,7 +20,7 @@
 namespace settings {
   namespace {
 
-    constexpr float kSidebarWidth = 200.0F;
+    constexpr float kSidebarWidth = 240.0F;
     constexpr float kSidebarPadding = 6.0F;
     constexpr float kSidebarGap = 8.0F;
     constexpr float kPrimaryNavGlyphSize = 20.0F;

@@ -18,3 +18,14 @@
 M3 control redesign in rev8: Checkbox with state layer + indeterminate; Toggle with animated hover/press halo and centered check glyph; Slider and RangeSlider with M3E XS Box-owned 7-node layout (inactive tracks, active track, pill handles with press squish, stop dots, 6px gaps) and fractional scale propagation via `setScale()`; template-store rows using a shared `TemplateStoreTile`.
 
 Invariants: INV-02 (controls own nodes), PHASE-002, SHP-CLAMP-001, SHP-SCALE-001.
+
+## Upstream sync 2026-11-20
+
+| Commit | Area | Decision | Reason |
+|---|---|---|---|
+| `2feffcaf` | live corner-radius rescale | left out | collides with SHP-001/002 and `corner_shape` |
+| `7111f2f4` | hide close buttons live | left out | collides with M3E button and style redesign |
+| `0e32beee` | style props reset | adapt to garden | small box/flex fix |
+| `e56dee2c`, `23076844` | image and avatar snapping | adapt to garden | small render-image fixes |
+| `bf887d5b` | GTK font family | adapt to garden | review style and application paths |
+| `6bc8abe9` | notification actions | adapt to garden | feature commit |

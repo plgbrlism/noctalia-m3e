@@ -105,3 +105,19 @@ Status: `pending-test` | `pass` | `fail` | `reverted`
 - cf196d5f4 2026-11-19 feat(ui): standardize picker and widget dialog headers
 - 0e5248564 2026-11-19 feat(settings): color destructive sheet action
 - c115c8048 2026-11-19 feat(control-center): redesign screen time tab
+
+## Git history appended (2026-11-20 cleanup)
+- 053bcdd06 build(mcu): drop C-only warning flag from C++ args
+- d10046ff3 merge m3e flag fix into vespertine
+- e311fc33c fix(render): interpolate colors in premultiplied alpha
+- 847495a34 fix(render): reapply pending window resizes in makeCurrent()
+- d130863c9 perf(process): wait for child exit on a pidfd instead of polling
+- e36a59f36 merge upstream fixes from garden into master
+
+[REPO] projects/noctalia moved to source/noctalia; local main only pass
+[REPO] noctalia fork/ves remotes cleaned; fork points to vespertine pass
+[REPO] vespertine origin renamed to upstream; master tracks origin/master pass
+[REPO] garden tracks origin/garden; lazygit pushRemote origin pass
+[DOCS] m3e/upstream/*.md refreshed for master/garden topology pass
+[DOCS] 00-overview updated with 165/106 raw and 64/38 patch status pass
+

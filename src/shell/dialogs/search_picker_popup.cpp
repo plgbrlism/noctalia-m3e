@@ -17,7 +17,7 @@
 
 namespace {
 
-  constexpr float kPopupWidth = 480.0F;
+  constexpr float kPopupWidth = 560.0F;
   constexpr float kPopupHeight = 460.0F;
 
   SearchPickerPopup* s_dialogPopup = nullptr;

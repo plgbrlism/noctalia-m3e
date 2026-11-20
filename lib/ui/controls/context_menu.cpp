@@ -50,10 +50,11 @@ namespace {
 
   bool hasShortcut(const ContextMenuControlEntry& entry) { return entry.shortcut && !entry.shortcut->empty(); }
 
-  ColorSpec shortcutColor(bool enabled, bool highlighted, bool destructive) {
-    return colorSpecFromRole(
-        destructive ? ColorRole::Error : ColorRole::OnSurface, highlighted ? 0.65F : (enabled ? 0.5F : 0.3F)
-    );
+  ColorSpec shortcutColor(bool enabled, bool highlighted, bool destructive, bool highlightedTertiary = false) {
+    const ColorRole role = destructive    ? ColorRole::Error
+        : highlightedTertiary            ? ColorRole::OnTertiary
+                                         : ColorRole::OnSurface;
+    return colorSpecFromRole(role, highlighted ? 0.65F : (enabled ? 0.5F : 0.3F));
   }
 
   float submenuSlot(const ContextMenuControlEntry& entry, float scale) {
@@ -540,15 +541,13 @@ void ContextMenuControl::rebuildRows(Renderer& renderer) {
     if (rowBgPtr != nullptr && labelPtr != nullptr) {
       visual.apply = [rowBgPtr, labelPtr, shortcutPtr, togglePtr, chevronPtr, interactive, separator,
                       header = entry.header, destructive = entry.destructive](bool highlighted) {
-        const ColorRole hoverRole =
-            Style::popupBordersEnabled() ? ColorRole::SurfaceContainerHighest : ColorRole::Surface;
         rowBgPtr->setFill(
             highlighted
-                ? colorSpecFromRole(destructive ? ColorRole::Error : hoverRole, destructive ? 0.16F : 1.0F)
+                ? colorSpecFromRole(destructive ? ColorRole::Error : ColorRole::Tertiary, destructive ? 0.16F : 1.0F)
                 : clearColorSpec()
         );
         const auto foreground = destructive ? (interactive ? enabledItemColor(true) : disabledItemColor(true))
-            : highlighted                   ? colorSpecFromRole(ColorRole::OnSurface)
+            : highlighted                   ? colorSpecFromRole(ColorRole::OnTertiary)
                                             : (interactive ? enabledItemColor() : disabledItemColor());
         if (separator || header) {
           labelPtr->setColor(colorSpecFromRole(ColorRole::OnSurfaceVariant));
@@ -556,7 +555,7 @@ void ContextMenuControl::rebuildRows(Renderer& renderer) {
           labelPtr->setColor(foreground);
         }
         if (shortcutPtr != nullptr) {
-          shortcutPtr->setColor(shortcutColor(interactive, highlighted, destructive));
+          shortcutPtr->setColor(shortcutColor(interactive, highlighted, destructive, highlighted && !destructive));
         }
         if (togglePtr != nullptr) {
           togglePtr->setColor(foreground);

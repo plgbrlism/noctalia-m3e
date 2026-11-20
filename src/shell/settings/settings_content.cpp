@@ -1060,16 +1060,18 @@ namespace settings {
     if (collapsibleGroups && ctx.groupJumpRow != nullptr) {
       for (const auto& group : pageGroupKeys) {
         Button* pill = nullptr;
+        const bool expanded = expandedGroups->contains(group);
         ctx.groupJumpRow->addChild(
             ui::button({
                 .out = &pill,
                 .text = groupLabel(group),
                 .fontSize = Style::fontSizeCaption * scale,
-                .variant = expandedGroups->contains(group) ? ButtonVariant::Primary : ButtonVariant::Default,
+                .variant = expanded ? ButtonVariant::Primary : ButtonVariant::Default,
                 .minHeight = Style::controlHeightLg * scale,
                 .paddingV = Style::spaceLg * scale,
                 .paddingH = Style::spaceLg * scale,
                 .radius = Style::scaledRadiusMd(scale),
+                .configure = [expanded](Button& button) { applySettingsGroupPillPalette(button, expanded); },
             })
         );
         pillByGroup.emplace(group, pill);

@@ -15,6 +15,9 @@
 namespace {
 
   bool settingPathNeedsSceneRebuild(const std::vector<std::string>& path) {
+    if (path.size() == 2 && path[0] == "accessibility") {
+      return path[1] == "density";
+    }
     if (path.size() == 2 && path[0] == "theme") {
       return path[1] == "corner_shape" || path[1] == "density";
     }

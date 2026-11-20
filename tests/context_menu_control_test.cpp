@@ -118,6 +118,10 @@ int main() {
     Palette colors{};
     colors.onSurface = rgba(0.9F, 0.8F, 0.7F);
     colors.onSurfaceVariant = rgba(0.5F, 0.5F, 0.5F);
+    colors.primary = rgba(0.2F, 0.4F, 0.9F);
+    colors.onPrimary = rgba(0.95F, 0.95F, 0.95F);
+    colors.tertiary = rgba(0.8F, 0.2F, 0.6F);
+    colors.onTertiary = rgba(0.98F, 0.98F, 0.98F);
     colors.hover = rgba(0.1F, 0.7F, 0.3F);
     colors.onHover = rgba(0.05F, 0.08F, 0.1F);
     colors.error = rgba(0.9F, 0.2F, 0.3F);
@@ -146,7 +150,7 @@ int main() {
     require(literalLabels.front()->text() == literal, "literal label was altered");
     const auto& node = dynamic_cast<const TextNode&>(*literalLabels.front()->children().front());
     require(!node.useMarkup(), "filename label was interpreted as markup");
-    require(labels(menu, 1).front()->color() == colors.onSurface, "neutral highlight changed its palette role");
+    require(labels(menu, 1).front()->color() == colors.onTertiary, "neutral highlight did not use the tertiary role");
     require(labels(menu, 5).front()->color() == colors.error, "destructive entry did not use the error role");
     menu.setHighlightedIndex(5);
     require(labels(menu, 5).front()->color() == colors.error, "destructive highlight lost its error foreground");

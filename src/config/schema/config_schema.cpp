@@ -1852,20 +1852,21 @@ namespace vespertine::config::schema {
         field(&ShellConfig::popupShadows, "popup_shadows"),
         field(&ShellConfig::cardBorders, "card_borders"),
         field(&ShellConfig::showCloseButtons, "show_close_buttons"),
-        // font_family is trimmed; empty falls back to sans-serif.
+        // font_family is trimmed; empty follows the system font (text::resolveFontFamily).
         custom<ShellConfig>(
             "font_family",
             [](const toml::table& tbl, ShellConfig& out, std::string_view parentPath, Diagnostics& diag) {
               if (auto v = tbl["font_family"].value<std::string>()) {
                 out.fontFamily = StringUtils::trim(*v);
-                if (out.fontFamily.empty()) {
-                  out.fontFamily = "sans-serif";
-                }
               } else {
                 warnWrongType(tbl, "font_family", parentPath, diag, "a string");
               }
             },
-            [](toml::table& tbl, const ShellConfig& in) { tbl.insert_or_assign("font_family", in.fontFamily); }
+            [](toml::table& tbl, const ShellConfig& in) {
+              if (!in.fontFamily.empty()) {
+                tbl.insert_or_assign("font_family", in.fontFamily);
+              }
+            }
         ),
         stringIfNonEmptyField(&ShellConfig::lang, "lang"),
         field(&ShellConfig::timeFormat, "time_format"),
@@ -2408,16 +2409,16 @@ namespace vespertine::config::schema {
       return s;
     }
 
-    // layer accepts top|overlay (concrete string member); anything else warns.
+    // Bar layer accepts top|overlay|auto (concrete string member); anything else warns.
     Field<BarConfig> barLayerField() {
       return custom<BarConfig>(
           "layer",
           [](const toml::table& tbl, BarConfig& out, std::string_view parentPath, Diagnostics& diag) {
             if (auto v = tbl["layer"].value<std::string>()) {
-              if (*v == "top" || *v == "overlay") {
+              if (*v == "top" || *v == "overlay" || *v == "auto") {
                 out.layer = *v;
               } else {
-                diag.warn(joinPath(parentPath, "layer"), "expected top or overlay, got \"" + *v + "\"");
+                diag.warn(joinPath(parentPath, "layer"), "expected top, overlay, or auto, got \"" + *v + "\"");
               }
             } else {
               warnWrongType(tbl, "layer", parentPath, diag, "a string");
@@ -2694,15 +2695,15 @@ namespace vespertine::config::schema {
         optionalBoolField(&BarMonitorOverride::showOnWorkspaceSwitch, "show_on_workspace_switch"),
         optionalBoolField(&BarMonitorOverride::reserveSpace, "reserve_space"),
         optionalBoolField(&BarMonitorOverride::autoHideReserveSpace, "auto_hide_reserve_space"),
-        // layer accepts top|overlay; anything else warns and leaves it unset.
+        // Bar layer accepts top|overlay|auto; anything else warns and leaves it unset.
         custom<BarMonitorOverride>(
             "layer",
             [](const toml::table& tbl, BarMonitorOverride& out, std::string_view parentPath, Diagnostics& diag) {
               if (auto v = tbl["layer"].value<std::string>()) {
-                if (*v == "top" || *v == "overlay") {
+                if (*v == "top" || *v == "overlay" || *v == "auto") {
                   out.layer = *v;
                 } else {
-                  diag.warn(joinPath(parentPath, "layer"), "expected top or overlay, got \"" + *v + "\"");
+                  diag.warn(joinPath(parentPath, "layer"), "expected top, overlay, or auto, got \"" + *v + "\"");
                 }
               } else {
                 warnWrongType(tbl, "layer", parentPath, diag, "a string");
