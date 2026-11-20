@@ -16,3 +16,11 @@ Current config reality:
 - v24 moves all five keys and removes old spring/motion_preset config. Internal fixed spring tables remain.
 
 Work item: CFG-REFACTOR. Test: config_motion/config_migration/config_schema_roundtrip/config_path_resolution.
+
+## Upstream sync 2026-11-20
+
+| Commit | Area | Decision | Reason |
+|---|---|---|---|
+| `2f3e3c4f` | settings registry split | left out | collides with CFG-REFACTOR and settings UI paths |
+| `c1249d5d` | config schema split | left out | collides with new motion/accessibility/shell schema |
+| `a81e34e7` | bar smart layer option | adapt to garden | config and example changes only |

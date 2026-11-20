@@ -13,3 +13,13 @@ Themes:
 - Rev9: dialog hosts gained a bottom dim layer; clipboard sidebar uses the shared header surface; Screen Time tab uses two cards with primary-only vertical bars and pill app usage bars.
 
 Cross-reference: COL-003 (tonal elevation), DES-003 (border gating rev6), rev8 settings cleanup.
+
+## Upstream sync 2026-11-20
+
+| Commit | Area | Decision |
+|---|---|---|
+| `6bc8abe9` | notification action buttons | adapt to garden |
+| `6fdf8858` | smart auto-hide | adapt to garden |
+| `a81e34e7` | smart Wayland layer option | adapt to garden |
+| `e56dee2c`, `23076844` | image and avatar snapping | adapt to garden |
+| `02cafcdf` | plugin store thumbnails | adapt to garden |

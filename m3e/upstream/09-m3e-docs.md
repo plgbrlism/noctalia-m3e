@@ -12,3 +12,12 @@
 | `m3e/noctalia-v5-index.md` | +106 | Subsystem → file map, replaces ARCHITECTURE.md for reads |
 
 These documents are fork-only. The upstream branch has no `m3e/` tree and no spec workflow. Per AGENTS.md, spec changes normally go through `spec-amend`; rev8 was applied as an explicit maintainer-directed bulk update.
+
+## Refresh 2026-11-20
+
+| Change | Detail |
+|---|---|
+| Branch topology | `master` product, `garden` staging, `upstream/noctalia` mirror |
+| Remote topology | `origin` = `plgbrlism/vespertine`, `upstream` = `noctalia-dev/noctalia` |
+| Scope | all 10 `m3e/upstream/*.md` pages audited |
+| Spec files | untouched |

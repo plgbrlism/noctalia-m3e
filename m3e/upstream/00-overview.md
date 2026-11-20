@@ -1,16 +1,27 @@
 # Upstream diff — overview
 
-Comparison of `fork/m3e` against upstream `origin/main`.
+Current branch topology and patch status for the vespertine fork against noctalia upstream.
 
 | Field | Value |
 |---|---|
-| Upstream ref | `origin/main` |
-| Fork ref | `fork/m3e` |
-| Local branch | `m3e` (fork head d10812ce1) |
-| Merge base | 76637f9d4 |
-| Scope | 122 files, +4720 / -591 lines |
+| Upstream remote | `upstream` = `noctalia-dev/noctalia` |
+| Upstream ref | `upstream/main` at `230768446` |
+| Product branch | `master` at `e36a59f36`, tracks `origin/master` |
+| Product remote | `origin` = `plgbrlism/vespertine`, default `master` |
+| Staging branch | `garden` at `d130863c9`, tracks `origin/garden` |
+| Upstream mirror | `upstream/noctalia` at `230768446`, tracks `upstream/main` |
+| Merge base (garden vs upstream) | `76637f9d4` |
+| Raw compare, master vs upstream | 165 ahead, 106 behind |
+| Raw compare, garden vs upstream | 162 ahead, 106 behind |
 
-This directory decomposes the full diff by subsystem. Each page lists touched files and the intent of the change. Narrative rationale lives in `m3e/spec.md` and `m3e/spec/12-revisions.md`.
+| Patch status of upstream vs garden | Count |
+|---|---:|
+| Patch-identical, old cherry-picks | 64 |
+| Patch-different | 38 |
+| Patch-different with same subject in garden | 19 |
+| No same subject in garden | 19 |
+
+This directory decomposes the fork diff by subsystem. Narrative rationale lives in `m3e/spec.md` and `m3e/spec/12-revisions.md`.
 
 | Page | Scope |
 |---|---|
@@ -24,4 +35,6 @@ This directory decomposes the full diff by subsystem. Each page lists touched fi
 | `08-tests.md` | New test suites added by the fork |
 | `09-m3e-docs.md` | AGENTS.md, spec skills, m3e specs/facts/worklog |
 
-Generated 2026-11-17. Refresh after each upstream rebase with `git diff --stat origin/main...fork/m3e`.
+Raw ahead/behind counts commit hashes. Cherry-picks create new hashes, so the numbers overstate unique work. Patch status is the useful signal.
+
+Generated 2026-11-20. Refresh after each upstream sync with `git fetch upstream && git rev-list --left-right --count master...upstream/main`.

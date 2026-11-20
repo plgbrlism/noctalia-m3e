@@ -23,3 +23,11 @@ Current settings paths:
 - Last three hidden when `shell.animation.enabled` is false.
 
 Community Template Store and Built-in Template Store both render as sheets (`SettingsSheetModal`) built from a shared `TemplateStoreTile` list with native search/category/sort, hover tooltips, and click routing.
+
+## Upstream sync 2026-11-20
+
+| Commit | Area | Decision | Reason |
+|---|---|---|---|
+| `2f3e3c4f` | settings registry split | left out | collides with M3E settings paths and visibility gating |
+| `02cafcdf` | plugin store thumbnails | adapt to garden | small plugin store fix |
+| `a81e34e7` | bar smart layer option | adapt to garden | settings path additions |

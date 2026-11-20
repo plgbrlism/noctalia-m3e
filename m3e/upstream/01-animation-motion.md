@@ -17,3 +17,12 @@ Key design points:
 - Reduce motion swaps spatial tokens to effects tokens.
 
 Work items: MOT-001..006, CFG-001. Gates: VG-01, VG-08.
+
+## Upstream sync 2026-11-20
+
+| Commit | Area | Decision | Reason |
+|---|---|---|---|
+| `2feffcaf` | live corner-radius rescale | left out | collides with SHP-001/002 and `corner_shape` |
+| `0e32beee` | style props reset | adapt to garden | small reconciler fix |
+| `9648ba40` | OSD corner radius | adapt to garden | touches `application_services.cpp` |
+| `6fdf8858` | smart auto-hide | adapt to garden | touches bar and dock motion paths |

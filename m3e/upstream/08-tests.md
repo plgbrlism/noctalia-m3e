@@ -20,3 +20,13 @@ New suites added by the fork (all `+` lines):
 Modified: `tests/config_schema_roundtrip_test.cpp`, `tests/ui_tree_reconciler_test.cpp` (schema + widget updates).
 
 Test IDs and acceptance criteria are in `m3e/spec/08-tests.md` (rev8 section). Run all with `ninja -C build-release test` / `meson test -C build-release`.
+
+## Upstream sync 2026-11-20
+
+| Commit | Area | Decision | Reason |
+|---|---|---|---|
+| `0a0d6380` | TEST_CHECK conversion | left out | 120 files, mechanical, low value |
+| `0e32beee` | style props reset | adapt to garden | includes `ui_tree_reconciler` test |
+| `6bc8abe9` | notification actions | adapt to garden | includes notification history test |
+| `6fdf8858` | smart auto-hide | adapt to garden | feature test coverage |
+| `a81e34e7` | bar smart layer option | adapt to garden | config schema test updates |

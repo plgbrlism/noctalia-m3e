@@ -14,3 +14,10 @@
 Upstream reveal was a single fixed animation. The fork selects one of four via `[motion_preset].panel` and keeps reduce-motion as an instant snap.
 
 Work item: DES-005. Tests: `tests/panel_reveal_test.cpp`, AT-PANEL-01..06.
+
+## Upstream sync 2026-11-20
+
+| Commit | Area | Decision | Reason |
+|---|---|---|---|
+| `a81e34e7` | smart Wayland layer option | adapt to garden | touches `panel_manager` |
+| `9648ba40` | OSD corner radius | adapt to garden | surface style path |
