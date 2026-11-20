@@ -185,7 +185,7 @@ else
   _mcu_lib = static_library('material_color_utilities',
     _mcu_sources,
     include_directories: include_directories('third_party/material_color_utilities', is_system: true),
-    cpp_args: ['-Wno-pedantic', '-Wno-conversion', '-Wno-shadow', '-Wno-unused-parameter', '-Wno-absolute-value'],
+    cpp_args: ['-Wno-pedantic', '-Wno-conversion', '-Wno-shadow', '-Wno-unused-parameter'],
     override_options: ['warning_level=0'],
   )
   mcu_dep = declare_dependency(
